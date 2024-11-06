@@ -137,7 +137,7 @@ const OrderDetails: React.FC = () => {
     }
   };
 
-
+console.log('orders are',order);
   if (!order) return (
     <div className="flex justify-center items-center h-screen">
       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
@@ -277,7 +277,7 @@ const OrderDetails: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {editedOrder?.items.map((item) => (
+                {editedOrder?.orderItems.map((item) => (
                   <tr key={item.id}>
                     <td>
                       <Input
@@ -392,7 +392,7 @@ const OrderDetails: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {order?.items.map((item) => (
+                {order?.orderItems.map((item) => (
                   <tr key={item.id}>
                     <td>{item.name}</td>
                     <td>{item.quantity}</td>

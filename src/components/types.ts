@@ -37,7 +37,7 @@ export interface Order {
   userLatitude: number; // Added
   userLongitude: number; // Added
   paymentMethod: string;
-  items: OrderItem[];
+  orderItems: OrderItem[];
 }
 
 export interface Restaurant {
