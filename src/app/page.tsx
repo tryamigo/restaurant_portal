@@ -8,33 +8,26 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { EyeIcon } from 'lucide-react';
+import { EyeIcon, BellIcon } from 'lucide-react';
+import { useNotifications } from '@/contexts/NotificationContext';
+import NotificationList from '@/components/NotificationList';
 
 const RestaurantDetails: React.FC = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { data: session, status } = useSession();
+  const { notifications } = useNotifications();
 
   useEffect(() => {
-   if(status  === 'authenticated'){
-    fetchRestaurantDetails();
-    fetchOrders()
-   }
-   
-  }, [session, status]);
-  const getStatusColor = (status: string): "default" | "secondary" | "destructive" | "outline" => {
-    switch (status) {
-      case 'pending': return 'default'
-      case 'preparing': return 'secondary'
-      case 'on the way': return 'outline'
-      case 'delivered': return 'default'
-      default: return 'default'
+    if (status === 'authenticated') {
+      fetchRestaurantDetails();
+      fetchOrders();
     }
-  }
+  }, [session, status, notifications]);
+
   const fetchRestaurantDetails = async () => {
-  
     try {
       const response = await fetch(`/api/restaurants?id=${session?.user.id}`, {
         headers: {
@@ -55,20 +48,32 @@ const RestaurantDetails: React.FC = () => {
       setIsLoading(false);
     }
   };
+
   const fetchOrders = async () => {
     try {
-      const response = await fetch('/api/orders',{
-        headers:{
+      const response = await fetch('/api/orders', {
+        headers: {
           Authorization: `Bearer ${session?.user.token}`,
         }
-      }) // Adjust the API endpoint as needed
-      if (!response.ok) throw new Error('Failed to fetch orders')
-      const data = await response.json()
-      setOrders(data)
+      });
+      if (!response.ok) throw new Error('Failed to fetch orders');
+      const data = await response.json();
+      setOrders(data);
     } catch (error) {
-      console.error('Error fetching orders:', error)
+      console.error('Error fetching orders:', error);
     }
-  }
+  };
+
+  const getStatusColor = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    switch (status) {
+      case 'pending': return 'default';
+      case 'preparing': return 'secondary';
+      case 'on the way': return 'outline';
+      case 'delivered': return 'default';
+      default: return 'default';
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -103,6 +108,7 @@ const RestaurantDetails: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
+       <NotificationList />
       <Card className="shadow-lg">
         <CardHeader className="bg-primary text-white">
           <CardTitle className="text-2xl">Restaurant Details</CardTitle>
@@ -139,12 +145,13 @@ const RestaurantDetails: React.FC = () => {
                   <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">Total</th>
                   <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {orders.map((order, index) => (
                   <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{index+1}</td>
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{index + 1}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-500">{order.customerName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-500">${Number(order.total).toFixed(2)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -152,15 +159,19 @@ const RestaurantDetails: React.FC = () => {
                         {order.status}
                       </Badge>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">{format(new Date(order.date), 'PPp')}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                      {order.date && !isNaN(new Date(order.date).getTime())
+                        ? format(new Date(order.date), 'PPp')
+                        : 'Invalid Date'}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link href={`/orders/${order.id}`} passHref>
-                      <Button variant="ghost" size="sm">
-                        <EyeIcon className="mr-2 h-4 w-4" />
-                        View
-                      </Button>
-                    </Link>
-                  </td>
+                      <Link href={`/orders/${order.id}`} passHref>
+                        <Button variant="ghost" size="sm">
+                          <EyeIcon className="mr-2 h-4 w-4" />
+                          View
+                        </Button>
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -1,7 +1,9 @@
 'use client'
+import { Toaster } from "@/components/ui/toaster";
 // import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",
@@ -17,7 +19,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <SessionProvider>
-        {children}
+        <NotificationProvider>
+            {children}
+            <Toaster />
+          </NotificationProvider>
         </SessionProvider>
       </body>
     </html>

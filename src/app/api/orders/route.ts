@@ -1,3 +1,4 @@
+// app/api/orders/route.ts
 import { handleRequest } from "@/components/helper";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -5,7 +6,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
-    const mobile = searchParams.get('mobile'); // Add this line to retrieve mobile parameter
+    const mobile = searchParams.get('mobile'); // Retrieve mobile parameter
 
     if (id) {
       // Get specific order by ID

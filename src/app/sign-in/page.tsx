@@ -23,6 +23,7 @@ function OTPLoginContent() {
 
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
+      console.log("authenticated")
       router.push(callbackUrl);
     }
   }, [session, status, router, callbackUrl]);
@@ -62,6 +63,7 @@ function OTPLoginContent() {
         redirect: false,
         mobile,
         otp,
+
       })
   
       if (result?.error) {
