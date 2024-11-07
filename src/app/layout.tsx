@@ -33,7 +33,7 @@ export default function RootLayout({
                     {navItems.map((item) => (
                       <Link key={item.href} href={item.href} passHref>
                         <Button
-                          variant={pathname === item.href ? "default" : "ghost"}
+                          variant={pathname === item.href || (pathname === '/' && item.href === '/orders') ? "default" : "ghost"}
                           className="w-full justify-start mb-2"
                         >
                           <item.icon className="mr-2 h-4 w-4" />

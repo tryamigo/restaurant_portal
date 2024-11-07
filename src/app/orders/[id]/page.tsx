@@ -118,7 +118,6 @@ const OrderDetails: React.FC = () => {
       console.error('Error updating order:', error);
     }
   };
-  console.log('orders are',order);
   const handleDeleteOrder = async () => {
     try {
       const response = await fetch(`/api/orders?orderId=${id}`, {
@@ -137,7 +136,6 @@ const OrderDetails: React.FC = () => {
     }
   };
 
-console.log('orders are',order);
   if (!order) return (
     <div className="flex justify-center items-center h-screen">
       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
@@ -397,7 +395,7 @@ console.log('orders are',order);
                     <td>{item.name}</td>
                     <td>{item.quantity}</td>
                     <td>{item.description}</td>
-                    <td>${item.price.toFixed(2)}</td>
+                    <td>${(typeof item.price === 'number' ? item.price :0).toFixed(2)}</td>
                     <td>{item.discount ? `${item.discount}%` : 'N/A'}</td>
                     <td>
                       {item.imageLink ? (
