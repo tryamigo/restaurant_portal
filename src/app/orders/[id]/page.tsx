@@ -30,7 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Order, OrderItem, OrderStatus } from '@/components/types';
+import { Order, OrderStatus } from '@/components/types';
 import { useSession } from 'next-auth/react';
 
 const OrderDetails: React.FC = () => {

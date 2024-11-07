@@ -28,14 +28,14 @@ export interface OrderItem {
 export interface Order {
   id: string;
   customerName: string;
-  restaurantId: string; // Changed from restaurantName
+  restaurantId: string; 
   status: OrderStatus;
   total: number;
   mobile:string; 
   date: Date;
-  userAddress: string; // Changed from deliveryAddress
-  userLatitude: number; // Added
-  userLongitude: number; // Added
+  userAddress: string; 
+  userLatitude: number;
+  userLongitude: number; 
   paymentMethod: string;
   orderItems: OrderItem[];
 }
@@ -53,11 +53,12 @@ export interface MenuItem {
   name: string;
   description: string;
   price: number;
-  ratings?: number; // Add any other fields you need
-  discounts?: number; // If applicable
-  imageLink?: string; // If applicable
+  ratings?: number; 
+  discounts?: number; 
+  imageLink?: string; 
 }
 export type deliveryStatus = 'available' | 'on delivery' | 'offline';
+
 export interface DeliveryAgent {
   id: string;
   name: string;
@@ -70,15 +71,25 @@ export interface DeliveryAgent {
   licenseNumber?: string;
   aadharNumber?: string; 
   address:Address
-  // currentOrder?: {
-  //   id: string;
-  //   restaurantName: string;
-  //   customerName: string;
-  //   deliveryAddress: Address;
-  // };
+
 }
 
 export interface User {
   id: string;
   mobile: string;
+}
+
+export interface Coupon {
+  id: string;
+  title: string;
+  description: string;
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discountValue: number;
+  minOrderValue?: number;
+  maxDiscount?: number;
+  couponCode: string;
+  usageLimit?: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
 }
