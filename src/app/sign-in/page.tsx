@@ -1,14 +1,56 @@
 'use client'
 import React from "react"
 import { signIn, useSession } from "next-auth/react"
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, Suspense, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { AlertCircle, Loader2 } from "lucide-react"
+import { AlertCircle, Loader2, ShieldCheck } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useRouter, useSearchParams } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
+import { MobileIcon } from "@radix-ui/react-icons"
+
+function OTPInput({ value, onChange }: { value: string, onChange: (val: string) => void }) {
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleChange = (index: number, val: string) => {
+    if (val.length > 1) return;
+    
+    const newValue = value.split('');
+    newValue[index] = val;
+    onChange(newValue.join(''));
+
+    // Move focus to next input
+    if (val && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !value[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  return (
+    <div className="flex justify-center space-x-2">
+      {[0, 1, 2, 3, 4, 5].map((index) => (
+        <Input
+          key={index}
+          ref={(el) => inputRefs.current[index] = el as any}
+          type="text"
+          maxLength={1}
+          className="w-12 h-12 text-center text-xl font-bold"
+          value={value[index] || ''}
+          onChange={(e) => handleChange(index, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(index, e)}
+        />
+      ))}
+    </div>
+  );
+}
 
 
 function OTPLoginContent() {
@@ -24,12 +66,18 @@ function OTPLoginContent() {
 
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
-      console.log("authenticated")
       router.push(callbackUrl);
     }
   }, [session, status, router, callbackUrl]);
 
   const requestOtp = async () => {
+    // Mobile number validation
+    const mobileRegex = /^\+91[6-9]\d{9}$/;
+    if (!mobileRegex.test(mobile)) {
+      setError("Please enter a valid 10-digit mobile number");
+      return;
+    }
+
     setLoading(true)
     setError("")
 
@@ -56,6 +104,11 @@ function OTPLoginContent() {
   }
 
   const loginWithOtp = async () => {
+    if (otp.length !== 6) {
+      setError("Please enter the complete 6-digit OTP");
+      return;
+    }
+
     setLoading(true)
     setError("")
   
@@ -64,7 +117,6 @@ function OTPLoginContent() {
         redirect: false,
         mobile,
         otp,
-
       })
   
       if (result?.error) {
@@ -82,55 +134,95 @@ function OTPLoginContent() {
   }
 
   return (
-    <Card className="w-full max-w-md min-h-[340px] my-[30px] mx-auto">
-      <CardHeader>
-        <CardTitle>OTP Login</CardTitle>
-        <CardDescription>Enter your mobile number to receive an OTP.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="mobile">Mobile Number</Label>
-          <Input
-            id="mobile"
-            type="tel"
-            placeholder="Enter your mobile number"
-            value={mobile}
-            onChange={(e) => setMobile(e.target.value)}
-          />
-        </div>
-        {otpSent && (
-          <div className="space-y-2">
-            <Label htmlFor="otp">OTP</Label>
-            <Input
-              id="otp"
-              type="text"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-            />
-          </div>
-        )}
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-      </CardContent>
-      <CardFooter className="flex flex-col space-y-2">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100"
+    >
+      <Card className="w-full max-w-md shadow-2xl border-none">
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <ShieldCheck className="w-16 h-16 text-blue-600" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-gray-800">Secure OTP Login</CardTitle>
+            <CardDescription className="text-gray-500">
+              Verify your mobile number to access your account
+            </CardDescription>
+          </CardHeader>
+        </motion.div>
+
+        <CardContent className="space-y-6">
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <div className="space-y-2">
+              <Label htmlFor="mobile" className="flex items-center">
+                <MobileIcon className="mr-2 w-4 h-4" /> Mobile Number
+              </Label>
+              <Input
+                id="mobile"
+                type="tel"
+                placeholder="Enter 10-digit mobile number"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+                className="focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </motion.div>
+
+          <AnimatePresence>
+            {otpSent && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-2"
+              >
+                <Label>Enter 6-digit OTP</Label>
+                <OTPInput value={otp} onChange={setOtp} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </CardContent>
+         <CardFooter className="flex flex-col space-y-2">
         {!otpSent ? (
-          <Button onClick={requestOtp} disabled={loading} className="w-full">
+          <Button onClick={requestOtp} disabled={loading} className="w-full bg-gray-800 hover:bg-blue-700 transition duration-200">
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {loading ? "Sending..." : "Send OTP"}
           </Button>
         ) : (
-          <Button onClick={loginWithOtp} disabled={loading} className="w-full">
+          <Button onClick={loginWithOtp} disabled={loading} className="w-full bg-gray-800 hover:bg-blue-700 transition duration-200">
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {loading ? "Logging in..." : "Login"}
           </Button>
         )}
       </CardFooter>
     </Card>
+  </motion.div>
   )
 }
 
