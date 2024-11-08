@@ -23,8 +23,8 @@ export const AddressFields: React.FC<AddressFieldsProps> = ({
     { key: 'city', label: 'City' },
     { key: 'state', label: 'State' },
     { key: 'pincode', label: 'Pincode' },
-    {key:'latitude',label:'latitude'},
-    {key:'longitude',label:'longitude'}
+    { key:'latitude', label:'latitude'},
+    { key:'longitude',label:'longitude'}
   ];
 
   if (isEditing) {
@@ -55,7 +55,7 @@ export const AddressFields: React.FC<AddressFieldsProps> = ({
     <div className={`grid grid-cols-1 md:grid-cols-2 gap-1 ${className}`}>
       {address && addressFields.map(({ key, label }) => (
         <div key={key} className="">
-          <Label className='pr-2 font-sans'>{label}:</Label>
+          <Label className='pr-2 font-bold text-md'>{label}:</Label>
           <Badge variant="outline">
             {address[key as keyof Address]}
           </Badge>

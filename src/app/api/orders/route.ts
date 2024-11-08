@@ -40,24 +40,13 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const { searchParams } = new URL(req.url);
     const orderId = searchParams.get('orderId');
-    const updateType = searchParams.get('updateType');
 
     if (!orderId) {
       return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
 
-    if (!updateType) {
-      return NextResponse.json({ error: 'Update type is required' }, { status: 400 });
-    }
+    return await handleRequest(req, 'PUT', `/orders/${orderId}`, body);
 
-    switch (updateType) {
-      case 'status':
-        return await handleRequest(req, 'PUT', `/orders/${orderId}/status`, body);
-      case 'address':
-        return await handleRequest(req, 'PUT', `/orders/${orderId}/address`, body);
-      default:
-        return NextResponse.json({ error: 'Invalid update type' }, { status: 400 });
-    }
   } catch (error) {
     console.error('Error updating order:', error);
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });

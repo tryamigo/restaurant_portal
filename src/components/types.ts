@@ -11,7 +11,21 @@ landmark: string;
 city: string;
 state: string;
 pincode: string;
+}
 
+export interface orderAddress {
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  mobile: string;
+}
+
+export interface Message {
+  id: string;
+  sender: string;
+  content: string;
+  timestamp: Date;
 }
 
 export interface OrderItem {
@@ -20,32 +34,37 @@ export interface OrderItem {
   quantity: number;
   price: number;
   ratings: number;
-  discount: number;
   description: string; 
   imageLink: string; 
 }
 
 export interface Order {
   id: string;
-  customerName: string;
-  restaurantId: string; 
+  userId: string;
+  restaurantId: string;
   status: OrderStatus;
   total: number;
-  mobile:string; 
-  date: Date;
-  userAddress: string; 
-  userLatitude: number;
-  userLongitude: number; 
-  paymentMethod: string;
+  orderTime: Date;
+  deliveryTime?: Date;
+  rating?: number;
+  feedback?: string;
+  deliveryCharge: number;
+  discount: number;
+  takeFromStore: boolean;
   orderItems: OrderItem[];
+  userAddress?: orderAddress;
+  restaurantAddress?: orderAddress;
+  messages?: Message[];
 }
-
 export interface Restaurant {
   id: string;
   name: string;
   address: Address;
   phoneNumber: string;
   openingHours: string;
+  gstin: string;
+  FSSAI: string;
+  rating: number;
 }
 
 export interface MenuItem {

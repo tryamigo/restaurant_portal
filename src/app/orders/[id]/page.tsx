@@ -1,14 +1,23 @@
-
 'use client'
 
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeftIcon, Edit, Trash2, X, Plus } from 'lucide-react';
+import { 
+  ArrowLeftIcon, 
+  Edit, 
+  Trash2, 
+  MapPin, 
+  Clock, 
+  DollarSign, 
+  Star 
+} from 'lucide-react';
 import Link from 'next/link';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useParams, useRouter } from 'next/navigation';
+import { format } from 'date-fns';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Select,
   SelectContent,
@@ -32,6 +41,8 @@ import {
 } from "@/components/ui/dialog";
 import { Order, OrderStatus } from '@/components/types';
 import { useSession } from 'next-auth/react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const OrderDetails: React.FC = () => {
   const params = useParams();
@@ -49,7 +60,6 @@ const OrderDetails: React.FC = () => {
       const response = await fetch(`/api/orders?id=${id}`, {
         headers: {
           Authorization: `Bearer ${session?.user.token}`,
-
         }
       });
       if (!response.ok) throw new Error('Failed to fetch order details');
@@ -62,54 +72,32 @@ const OrderDetails: React.FC = () => {
   };
 
   useEffect(() => {
-
     if (status === 'authenticated') {
       fetchOrderDetails(id).then(setOrder);
-
     }
   }, [id, session, status]);
-
 
   const handleEditOrder = async () => {
     if (!editedOrder) return;
 
+    const updateData = {
+      status: editedOrder.status,
+      rating: editedOrder.rating,
+      feedback: editedOrder.feedback,
+      userAddress: editedOrder.userAddress
+    };
+
     try {
+      const response = await fetch(`/api/orders?orderId=${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.user.token}`,
+        },
+        body: JSON.stringify(updateData),
+      });
 
-      const statusChanged = editedOrder.status !== order?.status;
-      const addressChanged =
-        editedOrder.userAddress !== order?.userAddress ||
-        editedOrder.userLatitude !== order?.userLatitude ||
-        editedOrder.userLongitude !== order?.userLongitude;
-
-      if (statusChanged) {
-        const statusResponse = await fetch(`/api/orders?orderId=${id}&updateType=status`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session?.user.token}`,
-          },
-          body: JSON.stringify({ status: editedOrder.status }),
-        });
-
-        if (!statusResponse.ok) throw new Error('Failed to update order status');
-      }
-
-      if (addressChanged) {
-        const addressResponse = await fetch(`/api/orders?orderId=${id}&updateType=address`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session?.user.token}`,
-          },
-          body: JSON.stringify({
-            userAddress: editedOrder.userAddress,
-            userLatitude: editedOrder.userLatitude,
-            userLongitude: editedOrder.userLongitude,
-          }),
-        });
-
-        if (!addressResponse.ok) throw new Error('Failed to update order address');
-      }
+      if (!response.ok) throw new Error('Failed to update order');
 
       const updatedOrder = await fetchOrderDetails(id);
       setOrder(updatedOrder);
@@ -118,9 +106,10 @@ const OrderDetails: React.FC = () => {
       console.error('Error updating order:', error);
     }
   };
+
   const handleDeleteOrder = async () => {
     try {
-      const response = await fetch(`/api/orders?orderId=${id}`, {
+      const response = await fetch(`/api/orders/?orderId=${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${session?.user.token}`,
@@ -137,291 +126,359 @@ const OrderDetails: React.FC = () => {
   };
 
   if (!order) return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-    </div>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="container mx-auto p-6 max-w-4xl"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {[...Array(6)].map((_, index) => (
+          <Skeleton key={index} className="h-24 w-full" />
+        ))}
+      </div>
+    </motion.div>
   );
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl bg-white shadow rounded-lg space-y-6">
-    <div className="flex flex-row justify-between items-center pb-4 border-b">
-      <Link href="/" passHref>
-          <Button variant="outline">
-            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            Back to Orders
-          </Button>
-        </Link>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Options</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => {
-              setIsEditing(true);
-              setEditedOrder(order);
-            }}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Order
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-red-600"
-              onClick={() => setIsDeleteDialogOpen(true)}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete Order
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Order</DialogTitle>
-          </DialogHeader>
-          <DialogDescription>
-            Are you sure you want to delete this order? This action cannot be undone.
-          </DialogDescription>
-          <DialogFooter>
-            <Button variant="destructive" onClick={handleDeleteOrder}>
-              Delete
-            </Button>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {isEditing ? (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Customer Name</Label>
-              <Input
-                value={editedOrder?.customerName || ''}
-                disabled // Disable customer name editing
-                className="bg-gray-100" // Add visual indication that it's disabled
-              />
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="container mx-auto "
+    >
+      <Card className="shadow-lg border-none">
+        <CardHeader className="bg-black text-white">
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-2xl font-bold">Order Details</CardTitle>
+            <div className="flex space-x-4">
+              <Link href="/orders" passHref>
+                <Button variant="outline" size="sm" className="text-black border-white hover:bg-white hover:text-black">
+                  <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                  Back to Orders
+                </Button>
+              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="text-black border-white hover:bg-white hover:text-black">
+                    Options
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => {
+                    setIsEditing(true);
+                    setEditedOrder(order);
+                  }}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Order
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-red-600"
+                    onClick={() => setIsDeleteDialogOpen(true)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Order
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                value={editedOrder?.status}
-                onValueChange={(value: OrderStatus) =>
-                  setEditedOrder(prev => ({ ...prev!, status: value }))
-                }
+          </div>
+        </CardHeader>
+  
+        <CardContent className="p-4">
+          <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete Order</DialogTitle>
+              </DialogHeader>
+              <DialogDescription>
+                Are you sure you want to delete this order? This action cannot be undone.
+              </DialogDescription>
+              <DialogFooter>
+                <Button variant="destructive" onClick={handleDeleteOrder}>
+                  Delete
+                </Button>
+                <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                  Cancel
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+  
+          <AnimatePresence mode="wait">
+            {isEditing ? (
+              <motion.div 
+                key="edit-form"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="space-y-4"
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="preparing">Preparing</SelectItem>
-                  <SelectItem value="on the way">On the way</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>User Address</Label>
-              <Input
-                value={editedOrder?.userAddress || ''}
-                onChange={(e) => setEditedOrder(prev => ({ ...prev!, userAddress: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Latitude</Label>
-              <Input
-                type="number"
-                value={editedOrder?.userLatitude || ''}
-                onChange={(e) => setEditedOrder(prev => ({ ...prev!, userLatitude: parseFloat(e.target.value) }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Longitude</Label>
-              <Input
-                type="number"
-                value={editedOrder?.userLongitude || ''}
-                onChange={(e) => setEditedOrder(prev => ({ ...prev!, userLongitude: parseFloat(e.target.value) }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Payment Method</Label>
-              <Input
-                value={editedOrder?.paymentMethod || ''}
-                disabled
-                className="bg-gray-100"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="font-medium">Order Items</h3>
-            </div>
-
-            <table className="w-full">
-              <thead>
-                <tr>
-                  <th className="text-left">Item</th>
-                  <th className="text-left">Quantity</th>
-                  <th className="text-left">Description</th>
-                  <th className="text-left">Price</th>
-                  <th className="text-left">Discount</th>
-                  <th className="text-left">Image</th>
-                  <th className="text-left">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                {editedOrder?.orderItems.map((item) => (
-                  <tr key={item.id}>
-                    <td>
-                      <Input
-                        value={item.name || ''}
-                        disabled
-                        className="bg-gray-100"
-                      />
-                    </td>
-                    <td>
-                      <Input
-                        type="number"
-                        value={item.quantity || ''}
-                        disabled
-                        className="bg-gray-100"
-                      />
-                    </td>
-                    <td>
-                      <Input
-                        value={item.description || ''}
-                        disabled
-                        className="bg-gray-100"
-                      />
-                    </td>
-                    <td>
-                      <Input
-                        type="number"
-                        value={item.price || ''}
-                        disabled
-                        className="bg-gray-100"
-                      />
-                    </td>
-                    <td>
-                      <Input
-                        type="number"
-                        value={item.discount || ''}
-                        disabled
-                        className="bg-gray-100"
-                      />
-                    </td>
-                    <td>
-                      <Input
-                        value={item.imageLink || ''}
-                        disabled
-                        className="bg-gray-100"
-                      />
-                    </td>
-                    <td>${(item.quantity * item.price).toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colSpan={6} className="text-right font-bold">Total:</td>
-                  <td className="font-bold">
-                    ${Number(editedOrder?.total).toFixed(2)}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <div className="flex gap-2">
-            <Button onClick={handleEditOrder}>Save Changes</Button>
-            <Button variant="outline" onClick={() => {
-              setIsEditing(false);
-              setEditedOrder(null);
-            }}>Cancel</Button>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-4 ">
-          <h2 className="text-3xl font-bold mb-4 ">Order Details:</h2>
-          < div className="grid grid-cols-1 md:grid-cols-2 ">
-            <div className="space-y-2">
-              <Label>Customer Name:</Label>
-              <Badge variant="outline">{order?.customerName}</Badge>
-            </div>
-            <div className="space-y-2">
-              <Label>Status:</Label>
-              <Badge variant="outline">{order?.status}</Badge>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Payment Method:</Label>
-              <Badge variant="outline">{order?.paymentMethod}</Badge>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label>User Address:</Label>
-            <Badge variant="outline">{order?.userAddress}</Badge>
-          </div>
-          <div className="space-y-2">
-            <Label>Latitude:</Label>
-            <Badge variant="outline">{order?.userLatitude}</Badge>
-          </div>
-          <div className="space-y-2">
-            <Label>Longitude:</Label>
-            <Badge variant="outline">{order?.userLongitude}</Badge>
-          </div>
-          <div className="space-y-4 bg-white p-4 rounded shadow mt-6">
-            <h3 className="font-medium">Order Items:</h3>
-            <table className="w-full">
-              <thead>
-                <tr>
-                  <th className="text-left">Item</th>
-                  <th className="text-left">Quantity</th>
-                  <th className="text-left">Description</th>
-                  <th className="text-left">Price</th>
-                  <th className="text-left">Discount</th>
-                  <th className="text-left">Image</th>
-                  <th className="text-left">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                {order?.orderItems.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.name}</td>
-                    <td>{item.quantity}</td>
-                    <td>{item.description}</td>
-                    <td>${(typeof item.price === 'number' ? item.price :0).toFixed(2)}</td>
-                    <td>{item.discount ? `${item.discount}%` : 'N/A'}</td>
-                    <td>
-                      {item.imageLink ? (
-                        <img src={item.imageLink} alt={item.name} className="w-16 h-16 object-cover" />
-                      ) : (
-                        'No Image'
-                      )}
-                    </td>
-                    <td>${(item.quantity * item.price).toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colSpan={6} className="text-right font-bold">Total:</td>
-                  <td className="font-bold">${Number(order?.total).toFixed(2)}</td>
-                </tr>
-              </tfoot>
-            </table>
-
-          </div>
-         
-        </div>
-        
-      )}
-    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Order Status</Label>
+                    <Select 
+                      value={editedOrder?.status}
+                      onValueChange={(value: OrderStatus) =>
+                        setEditedOrder(prev => ({ ...prev!, status: value }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="preparing">Preparing</SelectItem>
+                        <SelectItem value="on the way">On the way</SelectItem>
+                        <SelectItem value="delivered">Delivered</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+  
+                  {!editedOrder?.takeFromStore && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                          id="name"
+                          value={editedOrder?.userAddress?.name || ''}
+                          onChange={(e) => setEditedOrder(prev => ({
+                            ...prev!,
+                            userAddress: { ...prev!.userAddress!, name: e.target.value }
+                          }))}
+                        />
+                      </div>
+  
+                      <div className="space-y-2">
+                        <Label htmlFor="address">Address</Label>
+                        <Input
+                          id="address"
+                          value={editedOrder?.userAddress?.address || ''}
+                          onChange={(e) => setEditedOrder(prev => ({
+                            ...prev!,
+                            userAddress: { ...prev!.userAddress!, address: e.target.value }
+                          }))}
+                        />
+                      </div>
+  
+                      <div className="space-y-2">
+                        <Label htmlFor="mobile">Mobile</Label>
+                        <Input
+                          id="mobile"
+                          value={editedOrder?.userAddress?.mobile || ''}
+                          onChange={(e) => setEditedOrder(prev => ({
+                            ...prev!,
+                            userAddress: { ...prev!.userAddress!, mobile: e.target.value }
+                          }))}
+                        />
+                      </div>
+  
+                      <div className="space-y-2">
+                        <Label htmlFor="latitude">Latitude</Label>
+                        <Input
+                          id="latitude"
+                          type="number"
+                          value={editedOrder?.userAddress?.latitude || 0}
+                          onChange={(e) => setEditedOrder(prev => ({
+                            ...prev!,
+                            userAddress: { ...prev!.userAddress!, latitude: parseFloat(e.target.value) }
+                          }))}
+                        />
+                      </div>
+  
+                      <div className="space-y-2">
+                        <Label htmlFor="longitude">Longitude</Label>
+                        <Input
+                          id="longitude"
+                          type="number"
+                          value={editedOrder?.userAddress?.longitude || 0}
+                          onChange={(e) => setEditedOrder(prev => ({
+                            ...prev!,
+                            userAddress: { ...prev!.userAddress!, longitude: parseFloat(e.target.value) }
+                          }))}
+                        />
+                      </div>
+                    </>
+                  )}
+  
+                  <div className="space-y-2">
+                    <Label>Rating</Label>
+                    <Input
+                      type="number"
+                      value={editedOrder?.rating || ''}
+                      onChange={(e) => setEditedOrder(prev => ({
+                        ...prev!,
+                        rating: parseFloat(e.target.value)
+                      }))}
+                    />
+                  </div>
+  
+                  <div className="space-y-2">
+                    <Label>Feedback</Label>
+                    <Input
+                      value={editedOrder?.feedback || ''}
+                      onChange={(e) => setEditedOrder(prev => ({
+                        ...prev!,
+                        feedback: e.target.value
+                      }))}
+                    />
+                  </div>
+                </div>
+  
+                <div className="flex gap-2 mt-4">
+                  <Button onClick={handleEditOrder}>Save Changes</Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditedOrder(null);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="order-details"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <Label className="text-sm font-medium text-gray-600">Order ID</Label>
+                    <Badge variant="outline" className="w-full py-1.5 text-center">
+                      {order?.id}
+                    </Badge>
+                  </div> <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <Label className="text-sm font-medium text-gray-600">Order Date</Label>
+                    <Badge variant="outline" className="w-full py-1.5 text-center">
+                      {format(new Date(order?.orderTime || ''), 'PPp')}
+                    </Badge>
+                  </div>
+  
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <Label className="text-sm font-medium text-gray-600">Total</Label>
+                    <Badge variant="outline" className="w-full py-1.5 text-center">${order?.total.toFixed(2)}</Badge>
+                  </div>
+  
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <Label className="text-sm font-medium text-gray-600">Status</Label>
+                    <Badge 
+                      variant="outline" 
+                      className={`w-full py-1.5 text-center ${
+                        order?.status === 'delivered' ? 'bg-green-50 text-green-700' :
+                        order?.status === 'preparing' ? 'bg-blue-50 text-blue-700' :
+                        order?.status === 'on the way' ? 'bg-yellow-50 text-yellow-700' :
+                        'bg-gray-50 text-gray-700'
+                      }`}
+                    >
+                      {order?.status}
+                    </Badge>
+                  </div>
+  
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <Label className="text-sm font-medium text-gray-600">Delivery Type</Label>
+                    <Badge variant={order?.takeFromStore ? "secondary" : "default"} className="w-full py-1.5 text-center">
+                      {order?.takeFromStore ? "Pickup" : "Delivery"}
+                    </Badge>
+                  </div>
+  
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <Label className="text-sm font-medium text-gray-600">Delivery Charge</Label>
+                    <Badge variant="outline" className="w-full py-1.5 text-center">${order?.deliveryCharge.toFixed(2)}</Badge>
+                  </div>
+  
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <Label className="text-sm font-medium text-gray-600">Discount</Label>
+                    <Badge variant="outline" className="w-full py-1.5 text-center">${order?.discount.toFixed(2)}</Badge>
+                  </div>
+  
+                  {order?.rating && (
+                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                      <Label className="text-sm font-medium text-gray-600">Rating</Label>
+                      <Badge variant="outline" className="w-full py-1.5 text-center">{order.rating.toFixed(1)}</Badge>
+                    </div>
+                  )}
+  
+                  {order?.feedback && (
+                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                      <Label className="text-sm font-medium text-gray-600">Feedback</Label>
+                      <Badge variant="outline" className="w-full py-1.5 text-center">{order.feedback}</Badge>
+                    </div>
+                  )}
+  
+                  {order?.restaurantAddress && (
+                    <div className="col-span-2 bg-white p-4 rounded-lg shadow-sm">
+                      <Label className="text-sm font-medium text-gray-600">Restaurant Address</Label>
+                      <div className="space-y-2 mt-2">
+                        <p className="flex justify-between"><span className="text-gray-600">Name:</span> {order.restaurantAddress.name}</p>
+                        <p className="flex justify-between"><span className="text-gray-600">Address:</span> {order.restaurantAddress.address}</p>
+                        <p className="flex justify-between"><span className="text-gray-600">Mobile:</span> {order.restaurantAddress.mobile}</p>
+                        <p className="flex justify-between"><span className="text-gray-600">Location:</span> {order.restaurantAddress.latitude}, {order.restaurantAddress.longitude}</p>
+                      </div>
+                    </div>
+                  )}
+  
+                  {!order?.takeFromStore && (
+                    <div className="col-span-2 bg-white p-4 rounded-lg shadow-sm">
+                      <Label className="text-sm font-medium text-gray-600">Customer Details</Label>
+                      <div className="space-y-2 mt-2">
+                        <p className="flex justify-between"><span className="text-gray-600">Name:</span> {order?.userAddress?.name}</p>
+                        <p className="flex justify-between"><span className="text-gray-600">Mobile :</span> {order?.userAddress?.mobile}</p>
+                        <p className="flex justify-between"><span className="text-gray-600">Address:</span> {order?.userAddress?.address}</p>
+                        <p className="flex justify-between"><span className="text-gray-600">Location:</span> {order?.userAddress?.latitude}, {order?.userAddress?.longitude}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+  
+                <div className="mt-6 bg-white p-6 rounded-lg shadow-sm">
+                  <h3 className="text-lg font-semibold mb-4">Order Items</h3>
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Item</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Quantity</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Description</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Price</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Image</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {order?.orderItems.map((item) => (
+                        <tr key={item.id} className="border-t">
+                          <td className="px-4 py-3">{item.name}</td>
+                          <td className="px-4 py-3">{item.quantity}</td>
+                          <td className="px-4 py-3">{item.description}</td>
+                          <td className="px-4 py-3">${(typeof item.price === 'number' ? item.price : 0).toFixed(2)}</td>
+                          <td className="px-4 py-3">
+                            {item.imageLink ? (
+                              <img src={item.imageLink} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
+                            ) : (
+                              'No Image'
+                            )}
+                          </td>
+                          <td className="px-4 py-3">${(item.quantity * item.price).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="border-t">
+                        <td colSpan={5} className="px-4 py-3 text-right font-bold">Total:</td>
+                        <td className="px-4 py-3 font-bold">${Number(order?.total).toFixed(2)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 
