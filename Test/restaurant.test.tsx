@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import RestaurantDetails from '@/app/restaurants/page'; 
+import RestaurantDetails from '@/app/menu/page'; 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import '@testing-library/jest-dom';

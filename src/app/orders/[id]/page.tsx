@@ -7,10 +7,6 @@ import {
   ArrowLeftIcon, 
   Edit, 
   Trash2, 
-  MapPin, 
-  Clock, 
-  DollarSign, 
-  Star 
 } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from "@/components/ui/input";
@@ -158,6 +154,7 @@ const OrderDetails: React.FC = () => {
                   Back to Orders
                 </Button>
               </Link>
+              
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="text-black border-white hover:bg-white hover:text-black">
@@ -204,7 +201,45 @@ const OrderDetails: React.FC = () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-  
+          <div className="mt-6 bg-white p-6 rounded-lg shadow-sm">
+                  <h3 className="text-lg font-semibold mb-4">Order Items</h3>
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Item</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Quantity</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Description</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Price</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Image</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {order?.orderItems.map((item) => (
+                        <tr key={item.id} className="border-t">
+                          <td className="px-4 py-3">{item.name}</td>
+                          <td className="px-4 py-3">{item.quantity}</td>
+                          <td className="px-4 py-3">{item.description}</td>
+                          <td className="px-4 py-3">${(typeof item.price === 'number' ? item.price : 0).toFixed(2)}</td>
+                          <td className="px-4 py-3">
+                            {item.imageLink ? (
+                              <img src={item.imageLink} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
+                            ) : (
+                              'No Image'
+                            )}
+                          </td>
+                          <td className="px-4 py-3">${(item.quantity * item.price).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="border-t">
+                        <td colSpan={5} className="px-4 py-3 text-right font-bold">Total:</td>
+                        <td className="px-4 py-3 font-bold">${Number(order?.total).toFixed(2)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
           <AnimatePresence mode="wait">
             {isEditing ? (
               <motion.div 
@@ -358,10 +393,6 @@ const OrderDetails: React.FC = () => {
                     </Badge>
                   </div>
   
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <Label className="text-sm font-medium text-gray-600">Total</Label>
-                    <Badge variant="outline" className="w-full py-1.5 text-center">${order?.total.toFixed(2)}</Badge>
-                  </div>
   
                   <div className="bg-white p-4 rounded-lg shadow-sm">
                     <Label className="text-sm font-medium text-gray-600">Status</Label>
@@ -384,12 +415,7 @@ const OrderDetails: React.FC = () => {
                       {order?.takeFromStore ? "Pickup" : "Delivery"}
                     </Badge>
                   </div>
-  
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <Label className="text-sm font-medium text-gray-600">Delivery Charge</Label>
-                    <Badge variant="outline" className="w-full py-1.5 text-center">${order?.deliveryCharge.toFixed(2)}</Badge>
-                  </div>
-  
+
                   <div className="bg-white p-4 rounded-lg shadow-sm">
                     <Label className="text-sm font-medium text-gray-600">Discount</Label>
                     <Badge variant="outline" className="w-full py-1.5 text-center">${order?.discount.toFixed(2)}</Badge>
@@ -408,71 +434,10 @@ const OrderDetails: React.FC = () => {
                       <Badge variant="outline" className="w-full py-1.5 text-center">{order.feedback}</Badge>
                     </div>
                   )}
-  
-                  {order?.restaurantAddress && (
-                    <div className="col-span-2 bg-white p-4 rounded-lg shadow-sm">
-                      <Label className="text-sm font-medium text-gray-600">Restaurant Address</Label>
-                      <div className="space-y-2 mt-2">
-                        <p className="flex justify-between"><span className="text-gray-600">Name:</span> {order.restaurantAddress.name}</p>
-                        <p className="flex justify-between"><span className="text-gray-600">Address:</span> {order.restaurantAddress.address}</p>
-                        <p className="flex justify-between"><span className="text-gray-600">Mobile:</span> {order.restaurantAddress.mobile}</p>
-                        <p className="flex justify-between"><span className="text-gray-600">Location:</span> {order.restaurantAddress.latitude}, {order.restaurantAddress.longitude}</p>
-                      </div>
-                    </div>
-                  )}
-  
-                  {!order?.takeFromStore && (
-                    <div className="col-span-2 bg-white p-4 rounded-lg shadow-sm">
-                      <Label className="text-sm font-medium text-gray-600">Customer Details</Label>
-                      <div className="space-y-2 mt-2">
-                        <p className="flex justify-between"><span className="text-gray-600">Name:</span> {order?.userAddress?.name}</p>
-                        <p className="flex justify-between"><span className="text-gray-600">Mobile :</span> {order?.userAddress?.mobile}</p>
-                        <p className="flex justify-between"><span className="text-gray-600">Address:</span> {order?.userAddress?.address}</p>
-                        <p className="flex justify-between"><span className="text-gray-600">Location:</span> {order?.userAddress?.latitude}, {order?.userAddress?.longitude}</p>
-                      </div>
-                    </div>
-                  )}
+
                 </div>
   
-                <div className="mt-6 bg-white p-6 rounded-lg shadow-sm">
-                  <h3 className="text-lg font-semibold mb-4">Order Items</h3>
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Item</th>
-                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Quantity</th>
-                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Description</th>
-                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Price</th>
-                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Image</th>
-                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Subtotal</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {order?.orderItems.map((item) => (
-                        <tr key={item.id} className="border-t">
-                          <td className="px-4 py-3">{item.name}</td>
-                          <td className="px-4 py-3">{item.quantity}</td>
-                          <td className="px-4 py-3">{item.description}</td>
-                          <td className="px-4 py-3">${(typeof item.price === 'number' ? item.price : 0).toFixed(2)}</td>
-                          <td className="px-4 py-3">
-                            {item.imageLink ? (
-                              <img src={item.imageLink} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
-                            ) : (
-                              'No Image'
-                            )}
-                          </td>
-                          <td className="px-4 py-3">${(item.quantity * item.price).toFixed(2)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      <tr className="border-t">
-                        <td colSpan={5} className="px-4 py-3 text-right font-bold">Total:</td>
-                        <td className="px-4 py-3 font-bold">${Number(order?.total).toFixed(2)}</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
+            
               </motion.div>
             )}
           </AnimatePresence>

@@ -4,8 +4,8 @@ import "./globals.css";
 import React from "react";
 import { SessionProvider, useSession } from "next-auth/react";
 import { NotificationProvider } from "@/contexts/NotificationContext";
-import { usePathname } from "next/navigation";
-import { Home, ShoppingBag, Tag, LogOut, Settings } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Home, ShoppingBag, Tag, LogOut, Settings, Store } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,15 +22,15 @@ import { signOut } from "next-auth/react";
 import NotificationList from '@/components/NotificationList';
 
 const navItems = [
-  { href: '/restaurants', label: 'Restaurant Details', icon: Home },
   { href: '/orders', label: 'Orders', icon: ShoppingBag },
+  { href: '/menu', label: 'Menu', icon: Home },
   { href: '/coupons', label: 'Coupons', icon: Tag },
 ];
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
-
+  const router = useRouter()
   // Don't render layout for signin page
   if (pathname === '/sign-in' || status === 'loading') {
     return <>{children}</>;
@@ -38,7 +38,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <motion.div 
+      <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -54,9 +54,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">
-                  <AvatarImage 
-                    src={session?.user?.image || '/default-avatar.png'} 
-                    alt="User profile" 
+                  <AvatarImage
+                    src={session?.user?.image || '/default-avatar.png'}
+                    alt="User profile"
                   />
                   <AvatarFallback>
                     {session?.user?.name?.charAt(0) || 'U'}
@@ -66,8 +66,13 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
               <DropdownMenuContent className="ml-4 p-2">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  className="text-red-600 cursor-pointer" 
+                <DropdownMenuItem onSelect={() => router.push('/restaurants')}>
+                  <Store className="mr-2 h-4 w-4" />
+                  Restaurant Details
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-red-600 cursor-pointer"
                   onClick={() => signOut({ callbackUrl: '/sign-in' })}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
@@ -103,21 +108,21 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
       </motion.div>
-     
+
 
       {/* Main Content Area */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
         className="flex-1 overflow-auto relative"
       >
         <div className="m-2">
-        <NotificationList />
+          <NotificationList />
         </div>
-       
 
-        <motion.main 
+
+        <motion.main
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
