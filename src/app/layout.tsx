@@ -1,6 +1,7 @@
 'use client'
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
+import React from "react";
 import { SessionProvider, useSession } from "next-auth/react";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { usePathname } from "next/navigation";

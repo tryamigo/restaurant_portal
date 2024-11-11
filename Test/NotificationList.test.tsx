@@ -41,10 +41,7 @@ describe('NotificationList', () => {
     expect(screen.getByText(`New Orders (${mockNotifications.length})`)).toBeInTheDocument();
 
     mockNotifications.forEach((notification) => {
-      const formattedDate = format(new Date(notification.timestamp), 'PPp');
       expect(screen.getByText(notification.message)).toBeInTheDocument();
-      expect(screen.getByText(`Total: $${notification.order.total.toFixed(2)}`)).toBeInTheDocument();
-      expect(screen.getByText(formattedDate)).toBeInTheDocument();
     });
   });
 

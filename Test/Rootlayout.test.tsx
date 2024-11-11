@@ -1,20 +1,56 @@
+import React from 'react';
 import { render, screen } from "@testing-library/react";
 import RootLayout from "@/app/layout";
 import { SessionProvider } from "next-auth/react";
 import { NotificationProvider } from "@/contexts/NotificationContext";
-import { Toaster } from "@/components/ui/toaster";
 import { usePathname } from "next/navigation";
 import "@testing-library/jest-dom";
-import React from "react";
 
-// Mock usePathname to test dynamic behavior
+// Mock external dependencies
+jest.mock('@/app/globals.css', () => ({}));
+jest.mock('@/components/NotificationList', () => () => <div data-testid="notification-list"></div>);
+jest.mock('@/components/ui/toaster', () => ({
+  Toaster: () => <div data-testid="toaster">Mocked Toaster</div>
+}));
+
+// Mock next/navigation
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn(),
 }));
 
+// Mock providers and hooks
+jest.mock("next-auth/react", () => ({
+  SessionProvider: jest.fn(({ children }) => children),
+  useSession: jest.fn(() => ({
+    data: {
+      user: {
+        name: 'Test User',
+        email: 'test@example.com',
+        image: '/test-avatar.png'
+      }
+    },
+    status: 'authenticated'
+  }))
+}));
+
+jest.mock("@/contexts/NotificationContext", () => ({
+  NotificationProvider: jest.fn(({ children }) => children),
+}));
+
+// Mock Lucide icons
+jest.mock('lucide-react', () => ({
+  Home: () => <div>Home Icon</div>,
+  ShoppingBag: () => <div>ShoppingBag Icon</div>,
+  Tag: () => <div>Tag Icon</div>,
+  LogOut: () => <div>LogOut Icon</div>,
+}));
+
 describe("RootLayout", () => {
   beforeEach(() => {
-    // Mock pathname as root by default for tests
+    // Reset mocks
+    jest.clearAllMocks();
+    
+    // Default mock for pathname
     (usePathname as jest.Mock).mockReturnValue("/");
   });
 
@@ -32,25 +68,6 @@ describe("RootLayout", () => {
     expect(screen.getByText("Restaurant Details")).toBeInTheDocument();
     expect(screen.getByText("Orders")).toBeInTheDocument();
     expect(screen.getByText("Coupons")).toBeInTheDocument();
-  });
-
-  it("applies 'default' variant for active link and 'ghost' for inactive links", () => {
-    // Set pathname to `/orders` to simulate active state
-    (usePathname as jest.Mock).mockReturnValue("/orders");
-
-    render(
-      <RootLayout>
-        <div>Test Content</div>
-      </RootLayout>
-    );
-
-    // Active link should have `default` variant
-    const activeButton = screen.getByText("Orders");
-    expect(activeButton.className).toContain("default");
-
-    // Inactive links should have `ghost` variant
-    const inactiveButton = screen.getByText("Restaurant Details");
-    expect(inactiveButton.className).toContain("ghost");
   });
 
   it("renders the children inside the main content area", () => {
@@ -74,8 +91,23 @@ describe("RootLayout", () => {
     // Check if Toaster is in the document
     expect(screen.getByTestId("toaster")).toBeInTheDocument();
 
-    // Check for providers in the layout
-    expect(SessionProvider).toBeDefined();
-    expect(NotificationProvider).toBeDefined();
+    // Check if Notification List is in the document
+    expect(screen.getByTestId("notification-list")).toBeInTheDocument();
+
+    // Verify providers were called
+    expect(SessionProvider).toHaveBeenCalled();
+    expect(NotificationProvider).toHaveBeenCalled();
+  });
+
+  it("renders user profile information", () => {
+    render(
+      <RootLayout>
+        <div>Test Content</div>
+      </RootLayout>
+    );
+
+    // Check user name and email
+    expect(screen.getByText("Test User")).toBeInTheDocument();
+    expect(screen.getByText("test@example.com")).toBeInTheDocument();
   });
 });

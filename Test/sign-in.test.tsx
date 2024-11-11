@@ -1,123 +1,184 @@
-// Test/sign-in.test.tsx
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import '@testing-library/jest-dom';
-import { signIn, useSession } from "next-auth/react"; // We'll mock this as well
-import OTPLogin from "../src/app/restaurants/page"; // Adjust import according to your path
-import React from 'react';
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import OTPLogin from '@/app/sign-in/page';
 
-// Mock the necessary functions
-jest.mock("next-auth/react", () => ({
+// Mock dependencies
+jest.mock('next-auth/react', () => ({
   signIn: jest.fn(),
-  useSession: jest.fn(), // Mock useSession hook
+  useSession: jest.fn(),
 }));
 
-global.fetch = jest.fn().mockResolvedValue({
-  ok: true,
-  json: jest.fn().mockResolvedValue({ message: "OTP sent successfully" }),
-});
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(),
+  useSearchParams: () => ({
+    get: jest.fn().mockReturnValue('/'),
+  }),
+}));
 
-describe("OTPLogin", () => {
+// Mock components and icons
+jest.mock('@/components/ui/button', () => ({
+  Button: ({ children, ...props }: any) => <button {...props}>{children}</button>
+}));
+
+jest.mock('@/components/ui/input', () => ({
+  Input: ({ ...props }: any) => <input {...props} />
+}));
+
+jest.mock('lucide-react', () => ({
+  Loader2: () => <div data-testid="loader">Loading...</div>,
+  ShieldCheck: () => <div>ShieldCheck</div>,
+  AlertCircle: () => <div>AlertCircle</div>,
+}));
+
+describe('OTPLogin', () => {
+  const mockRouter = {
+    push: jest.fn(),
+  };
+
   beforeEach(() => {
-    // Reset all mocks before each test
+    // Clear all mocks
     jest.clearAllMocks();
 
-    // Provide mock implementation of useSession
-    // Mock session data and status (mock user not logged in for example)
+    // Setup default mocks
     (useSession as jest.Mock).mockReturnValue({
-      data: null, // No user logged in
+      data: null,
       status: "unauthenticated",
     });
+
+    (useRouter as jest.Mock).mockReturnValue(mockRouter);
+
+    // Mock global fetch
+    global.fetch = jest.fn();
   });
 
-  it("should render OTP login form", () => {
-    render(<OTPLogin />);
+  const renderComponent = () => {
+    return render(<OTPLogin />);
+  };
 
-    // Check if the OTP input fields are present
-    expect(screen.getByLabelText(/Phone Number/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/OTP/i)).toBeInTheDocument();
+  it('renders the initial login form', () => {
+    renderComponent();
+
+    // Check for mobile input
+    const mobileInput = screen.getByPlaceholderText('Enter 10-digit mobile number');
+    expect(mobileInput).toBeInTheDocument();
+
+    // Check for Send OTP button
+    const sendOtpButton = screen.getByText('Send OTP');
+    expect(sendOtpButton).toBeInTheDocument();
   });
 
-  it("should send OTP and show OTP input", async () => {
-    render(<OTPLogin />);
+  it('validates mobile number before sending OTP', async () => {
+    renderComponent();
 
-    // Find and interact with the phone number input
-    const phoneNumberInput = screen.getByLabelText(/Phone Number/i);
-    fireEvent.change(phoneNumberInput, { target: { value: "1234567890" } });
+    const mobileInput = screen.getByPlaceholderText('Enter 10-digit mobile number');
+    const sendOtpButton = screen.getByText('Send OTP');
 
-    // Find and click the 'Send OTP' button
-    const sendOtpButton = screen.getByText(/Send OTP/i);
+    // Invalid mobile number
+    fireEvent.change(mobileInput, { target: { value: '1234' } });
     fireEvent.click(sendOtpButton);
 
-    // Wait for the OTP ;
-
-    // Find and click the 'Send OTP' button
-    const sendOtpButton = screen.getByText(/Send OTP/i);
-    fireEvent.click(sendOtpButton);
-
-    // Now simulate entering OTP and logging in
-    const otpInput = screen.getByLabelText(/OTP/i);
-    fireEvent.change(otpInput, { target: { value: "123456" } });
-
-    const submitButton = screen.getByText(/Submit/i);
-    fireEvent.click(submitButton);
-
-    // Ensure the signIn function was called
+    // Check for error message
     await waitFor(() => {
-      expect(signIn).toHaveBeenCalledTimes(1);input to appear
-    await waitFor(() => {
-      expect(screen.getByLabelText(/OTP/i)).toBeInTheDocument();
+      expect(screen.getByText('Please enter a valid 10-digit mobile number')).toBeInTheDocument();
     });
   });
 
-  it("should handle OTP login", async () => {
-    render(<OTPLogin />);
+  it('sends OTP successfully', async () => {
+    // Mock successful OTP request
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ message: 'OTP sent successfully' }),
+    });
 
-    // Find and interact with the phone number input
-    const phoneNumberInput = screen.getByLabelText(/Phone Number/i);
-    fireEvent.change(phoneNumberInput, { target: { value: "1234567890" } })
-      expect(signIn).toHaveBeenCalledWith("credentials", {
-        username: "1234567890",
-        password: "123456",
-      });
+    renderComponent();
+
+    const mobileInput = screen.getByPlaceholderText('Enter 10-digit mobile number');
+    const sendOtpButton = screen.getByText('Send OTP');
+
+    // Enter valid mobile number
+    fireEvent.change(mobileInput, { target: { value: '+919876543210' } });
+    fireEvent.click(sendOtpButton);
+
+    // Wait for OTP inputs to appear
+    await waitFor(() => {
+      expect(screen.getByText('Enter 6-digit OTP')).toBeInTheDocument();
     });
   });
 
-  it("should display error if OTP request fails", async () => {
-    // Mock a failed fetch response
-    global.fetch = jest.fn().mockResolvedValueOnce({
+  it('handles login error', async () => {
+    // Mock OTP send
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ message: 'OTP sent successfully' }),
+    });
+
+    // Mock login error
+    (signIn as jest.Mock).mockResolvedValueOnce({
       ok: false,
-      json: jest.fn().mockResolvedValue({ message: "OTP request failed" }),
+      error: 'Invalid OTP',
     });
 
-    render(<OTPLogin />);
+    renderComponent();
 
-    const phoneNumberInput = screen.getByLabelText(/Phone Number/i);
-    fireEvent.change(phoneNumberInput, { target: { value: "1234567890" } });
+    // Send OTP
+    const mobileInput = screen.getByPlaceholderText('Enter 10-digit mobile number');
+    fireEvent.change(mobileInput, { target: { value: '+919876543210' } });
+    fireEvent.click(screen.getByText('Send OTP'));
 
-    const sendOtpButton = screen.getByText(/Send OTP/i);
-    fireEvent.click(sendOtpButton);
-
-    // Check if error message is displayed
+    // Wait for OTP inputs
     await waitFor(() => {
-      expect(screen.getByText(/OTP request failed/i)).toBeInTheDocument();
+      expect(screen.getByText('Enter 6-digit OTP')).toBeInTheDocument();
+    });
+
+    // Enter OTP
+    const otpInputs = screen.getAllByRole('textbox');
+    otpInputs.forEach((input, index) => {
+      fireEvent.change(input, { target: { value: String(index + 1) } });
+    });
+
+    // Click Login
+    fireEvent.click(screen.getByText('Login'));
+
+    // Verify error is displayed
+    await waitFor(() => {
+      expect(screen.getByText('Invalid OTP')).toBeInTheDocument();
     });
   });
 
-  it("should handle unexpected errors gracefully", async () => {
-    // Mock an unexpected error scenario (e.g., network issue)
-    global.fetch = jest.fn().mockRejectedValueOnce(new Error("Network Error"));
+  it('handles network error when sending OTP', async () => {
+    // Mock network error
+    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
 
-    render(<OTPLogin />);
+    renderComponent();
 
-    const phoneNumberInput = screen.getByLabelText(/Phone Number/i);
-    fireEvent.change(phoneNumberInput, { target: { value: "1234567890" } });
+    const mobileInput = screen.getByPlaceholderText('Enter 10-digit mobile number');
+    const sendOtpButton = screen.getByText('Send OTP');
 
-    const sendOtpButton = screen.getByText(/Send OTP/i);
+    // Enter valid mobile number
+    fireEvent.change(mobileInput, { target: { value: '+919876543210' } });
     fireEvent.click(sendOtpButton);
 
-    // Check if the error message for network issue is shown
+    // Verify error message
     await waitFor(() => {
-      expect(screen.getByText(/Network Error/i)).toBeInTheDocument();
+      expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument();
+    });
+  });
+
+  it('redirects to callback URL when authenticated', async () => {
+    // Mock authenticated session
+    (useSession as jest.Mock).mockReturnValue({
+      data: { user: { name: 'Test User' } },
+      status: 'authenticated',
+    });
+
+    renderComponent();
+
+    // Verify router.push was called
+    await waitFor(() => {
+      expect(mockRouter.push).toHaveBeenCalledWith('/');
     });
   });
 });

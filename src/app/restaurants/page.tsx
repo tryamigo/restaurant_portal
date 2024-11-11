@@ -95,7 +95,7 @@ const RestaurantDetails: React.FC = () => {
             console.error('Error updating restaurant:', error);
         }
     };
-
+    console.log(restaurant)
     const handleEditRestaurant = async () => {
         if (!editedRestaurant) return;
 
@@ -242,6 +242,7 @@ const RestaurantDetails: React.FC = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
                 className="container mx-auto p-6 max-w-4xl"
+                data-testid="loading-spinner"
             >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {[...Array(6)].map((_, index) => (
@@ -469,7 +470,7 @@ const RestaurantDetails: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {menu.map((item) => (
+                                {menu?.map((item) => (
                                     <tr key={item.id} className="border-b">
                                         {editingItemId === item.id ? (
                                             <>
