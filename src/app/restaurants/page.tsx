@@ -80,20 +80,20 @@ const RestaurantDetails: React.FC = () => {
     };
 
     const fetchMenu = async () => {
-        try{
-        const response = await fetch(`/api/restaurants/?id=${session?.user.id}&menu=true`, {
-            headers: {
-                Authorization: `Bearer ${session?.user.token}`,
+        try {
+            const response = await fetch(`/api/restaurants/?id=${session?.user.id}&menu=true`, {
+                headers: {
+                    Authorization: `Bearer ${session?.user.token}`,
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch menu');
             }
-        });
-        if (!response.ok) {
-            throw new Error('Failed to fetch menu');
+            const data = await response.json();
+            setMenu(data);
+        } catch (error) {
+            console.error('Error updating restaurant:', error);
         }
-        const data = await response.json();
-        setMenu(data);
-    } catch (error) {
-        console.error('Error updating restaurant:', error);
-    }
     };
 
     const handleEditRestaurant = async () => {
@@ -186,7 +186,6 @@ const RestaurantDetails: React.FC = () => {
             )
         );
     };
-    console.log(restaurant)
     const handleSaveEdit = async () => {
         if (!editingItemId) return;
 
@@ -323,26 +322,26 @@ const RestaurantDetails: React.FC = () => {
                             </DropdownMenu>
                         </div>
                         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Delete {deleteType === 'restaurant' ? 'Restaurant' : 'Menu Item'}
-            </DialogTitle>
-          </DialogHeader>
-          <DialogDescription>
-            Are you sure you want to delete this {deleteType === 'restaurant' ? 'restaurant' : 'menu item'}?
-            This action cannot be undone.
-          </DialogDescription>
-          <DialogFooter>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
-            </Button>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        Delete {deleteType === 'restaurant' ? 'Restaurant' : 'Menu Item'}
+                                    </DialogTitle>
+                                </DialogHeader>
+                                <DialogDescription>
+                                    Are you sure you want to delete this {deleteType === 'restaurant' ? 'restaurant' : 'menu item'}?
+                                    This action cannot be undone.
+                                </DialogDescription>
+                                <DialogFooter>
+                                    <Button variant="destructive" onClick={handleDelete}>
+                                        Delete
+                                    </Button>
+                                    <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                                        Cancel
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </CardHeader>
 
@@ -559,35 +558,96 @@ const RestaurantDetails: React.FC = () => {
                             </tbody>
                         </table>
 
-                        <div className="mt-4">
-                            <h3 className="text-lg font-semibold mb-2">Add New Item</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="bg-white shadow-md rounded-lg p-6  mx-auto mt-2">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Add New Item</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input id="name" value={newItem.name || ''} onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} />
+                                    <Label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-700">
+                                        Item Name
+                                    </Label>
+                                    <Input
+                                        id="name"
+                                        placeholder="Enter item name"
+                                        value={newItem.name || ''}
+                                        onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                                        className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                                    />
                                 </div>
                                 <div>
-                                    <Label htmlFor="description">Description</Label>
-                                    <Input id="description" value={newItem.description || ''} onChange={(e) => setNewItem({ ...newItem, description: e.target.value })} />
+                                    <Label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-700">
+                                        Description
+                                    </Label>
+                                    <Input
+                                        id="description"
+                                        placeholder="Item description"
+                                        value={newItem.description || ''}
+                                        onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                                        className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                                    />
                                 </div>
                                 <div>
-                                    <Label htmlFor="price">Price</Label>
-                                    <Input id="price" type="number" value={newItem.price || ''} onChange={(e) => setNewItem({ ...newItem, price: parseFloat(e.target.value) })} />
+                                    <Label htmlFor="price" className="block mb-2 text-sm font-medium text-gray-700">
+                                        Price
+                                    </Label>
+                                    <Input
+                                        id="price"
+                                        type="number"
+                                        placeholder="0.00"
+                                        value={newItem.price || ''}
+                                        onChange={(e) => setNewItem({ ...newItem, price: parseFloat(e.target.value) })}
+                                        className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                                    />
                                 </div>
                                 <div>
-                                    <Label htmlFor="ratings">Ratings</Label>
-                                    <Input id="ratings" type="number" value={newItem.ratings || ''} onChange={(e) => setNewItem({ ...newItem, ratings: parseFloat(e.target.value) })} />
+                                    <Label htmlFor="ratings" className="block mb-2 text-sm font-medium text-gray-700">
+                                        Ratings
+                                    </Label>
+                                    <Input
+                                        id="ratings"
+                                        type="number"
+                                        placeholder="0-5"
+                                        min="0"
+                                        max="5"
+                                        value={newItem.ratings || ''}
+                                        onChange={(e) => setNewItem({ ...newItem, ratings: parseFloat(e.target.value) })}
+                                        className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                                    />
                                 </div>
                                 <div>
-                                    <Label htmlFor="discounts">Discounts</Label>
-                                    <Input id="discounts" type="number" value={newItem.discounts || ''} onChange={(e) => setNewItem({ ...newItem, discounts: parseFloat(e.target.value) })} />
+                                    <Label htmlFor="discounts" className="block mb-2 text-sm font-medium text-gray-700">
+                                        Discount (%)
+                                    </Label>
+                                    <Input
+                                        id="discounts"
+                                        type="number"
+                                        placeholder="0-100"
+                                        min="0"
+                                        max="100"
+                                        value={newItem.discounts || ''}
+                                        onChange={(e) => setNewItem({ ...newItem, discounts: parseFloat(e.target.value) })}
+                                        className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                                    />
                                 </div>
                                 <div>
-                                    <Label htmlFor="imageLink">Image</Label>
-                                    <Input id="imageLink" value={newItem.imageLink || ''} onChange={(e) => setNewItem({ ...newItem, imageLink: e.target.value })} />
+                                    <Label htmlFor="imageLink" className="block mb-2 text-sm font-medium text-gray-700">
+                                        Image URL
+                                    </Label>
+                                    <Input
+                                        id="imageLink"
+                                        placeholder="https://example.com/image.jpg"
+                                        value={newItem.imageLink || ''}
+                                        onChange={(e) => setNewItem({ ...newItem, imageLink: e.target.value })}
+                                        className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                                    />
                                 </div>
-                                <div className="flex items-end">
-                                    <Button onClick={handleAddItem}><Plus className="h-4 w-4 mr-2" /> Add Item</Button>
+                                <div className="md:col-span-3 flex justify-end mt-4">
+                                    <Button
+                                        onClick={handleAddItem}
+                                        className=" text-white transition-colors duration-300"
+                                    >
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        Add Item
+                                    </Button>
                                 </div>
                             </div>
                         </div>

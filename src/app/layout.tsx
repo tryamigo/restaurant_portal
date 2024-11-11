@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
+import NotificationList from '@/components/NotificationList';
 
 const navItems = [
   { href: '/restaurants', label: 'Restaurant Details', icon: Home },
@@ -101,14 +102,20 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
       </motion.div>
+     
 
       {/* Main Content Area */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="flex-1 overflow-auto"
+        className="flex-1 overflow-auto relative"
       >
+        <div className="m-2">
+        <NotificationList />
+        </div>
+       
+
         <motion.main 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
