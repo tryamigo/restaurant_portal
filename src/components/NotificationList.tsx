@@ -3,15 +3,22 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { BellIcon } from 'lucide-react';
+import { BellIcon, EyeIcon } from 'lucide-react';
 import { useNotifications } from '@/contexts/NotificationContext';
 import { format } from 'date-fns';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const NotificationList = () => {
   const { notifications, dismissNotification } = useNotifications();
+  const router = useRouter();
+  const handleGoToOrder=(notification:any)=>{
+  
+    dismissNotification(notification.id)
+    router.push(`/orders/${notification.order.id}`);
 
+  }
   if (notifications.length === 0) return null;
-
   return (
     <div className="mb-4">
       <h3 className="text-xl font-semibold mb-2 flex items-center">
@@ -35,6 +42,13 @@ const NotificationList = () => {
                   {format(new Date(notification.timestamp), 'PPp')}
                 </p>
               </div>
+              <div className="flex items-center space-x-2">
+                <Link href={`/orders/${notification.order.id}`} passHref>
+                  <Button variant="outline" size="sm" onClick={()=>handleGoToOrder(notification)}>
+                    <EyeIcon className=" h-4 w-4" />
+                    Go to Order
+                  </Button>
+                </Link>
               <Button
                 onClick={() => dismissNotification(notification.id)}
                 variant="outline"
@@ -42,6 +56,7 @@ const NotificationList = () => {
               >
                 Dismiss
               </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

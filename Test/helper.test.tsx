@@ -1,87 +1,174 @@
-// Test/helper.test.tsx
-import { NextRequest } from 'next/server';
-import axios from 'axios';
-import { handleRequest } from '@/components/helper';
+import { NextRequest, NextResponse } from "next/server";
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import { handleRequest } from "@/components/helper";
 
+// Use jest.mocked for type-safe mocking
 jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-
-jest.mock('next/server', () => ({
-  NextRequest: jest.fn().mockImplementation(() => ({
-    headers: {
-      get: jest.fn().mockReturnValue('Bearer mockToken123'), // mock token header
+// Mock NextRequest and NextResponse
+jest.mock("next/server", () => {
+  const headers = new Headers();
+  return {
+    NextRequest: class {
+      headers = headers;
+      url = 'https://example.com';
+      method = 'GET';
+      nextUrl = { pathname: '/', searchParams: new URLSearchParams() };
+      cookies = { get: jest.fn() };
     },
-  })),
-  NextResponse: {
-    json: jest.fn().mockImplementation((data, { status }) => ({ json: () => data, status })),
-  },
-}));
+    NextResponse: {
+      json: jest.fn((data, options) => ({
+        status: options?.status || 200,
+        json: () => Promise.resolve(data),
+      })),
+    },
+  };
+});
 
 describe('handleRequest', () => {
-  const mockUrl = '/test';
-  const mockToken = 'mockToken123';
-  const mockData = { key: 'value' };
-  const mockParams = { paramKey: 'paramValue' };
+  // Helper to create a mock NextRequest
+  const createMockNextRequest = (token?: string): NextRequest => {
+    const mockHeaders = new Headers();
+    if (token) {
+      mockHeaders.set('Authorization', `Bearer ${token}`);
+    }
 
-  const createMockRequest = (token?: string): NextRequest => {
     return {
-      headers: {
-        get: (header: string) => (header === 'Authorization' && token ? `Bearer ${token}` : null),
-      },
-    } as unknown as NextRequest;
+      headers: mockHeaders,
+      url: 'https://example.com',
+      method: 'GET',
+      nextUrl: {
+        pathname: '/',
+        searchParams: new URLSearchParams(),
+      } as any,
+      cookies: {
+        get: jest.fn(),
+      } as any,
+    } as NextRequest;
   };
 
-  it('returns 401 if no token is provided', async () => {
-    const req = createMockRequest();
-
-    const response = await handleRequest(req, 'GET', mockUrl);
-
-    expect(response.status).toBe(401);
-    expect(await response.json()).toEqual({ error: 'Unauthorized: No token provided' });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.NEXT_PUBLIC_BACKEND_API_URL = 'https://api.example.com';
   });
 
-  it('returns 401 if token is invalid or expired', async () => {
-    const req = createMockRequest(mockToken);
-    mockedAxios.request.mockRejectedValue({
-      response: { status: 401, data: { error: 'Unauthorized: Invalid or expired token' } },
-    });
+  it('should successfully make a request with a valid token', async () => {
+    const mockToken = 'valid-token';
+    const mockRequest = createMockNextRequest(mockToken);
+    const mockMethod = 'GET';
+    const mockUrl = '/test-endpoint';
+    const mockResponseData = { message: 'Success' };
 
-    const response = await handleRequest(req, 'GET', mockUrl);
+    // Use jest.mocked and mock implementation
+    const mockedAxios = jest.mocked(axios);
+    mockedAxios.mockImplementation(() => 
+      Promise.resolve({
+        data: mockResponseData,
+        status: 200,
+      } as AxiosResponse)
+    );
 
-    expect(response.status).toBe(401);
-    expect(await response.json()).toEqual({ error: 'Unauthorized: Invalid or expired token' });
-  });
+    const response = await handleRequest(mockRequest, mockMethod, mockUrl);
 
-  it('makes a successful request with valid token', async () => {
-    const req = createMockRequest(mockToken);
-    const mockAxiosResponse = { data: { success: true }, status: 200 };
-    mockedAxios.request.mockResolvedValue(mockAxiosResponse);
-
-    const response = await handleRequest(req, 'POST', mockUrl, mockData, mockParams);
-
-    expect(mockedAxios.request).toHaveBeenCalledWith({
-      method: 'POST',
+    expect(mockedAxios).toHaveBeenCalledWith(expect.objectContaining({
+      method: mockMethod,
       url: `${process.env.NEXT_PUBLIC_BACKEND_API_URL}${mockUrl}`,
-      data: mockData,
-      params: mockParams,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${mockToken}`,
       },
-    });
+      data: undefined,
+      params: undefined,
+    }));
+
+    const jsonResponse = await response.json();
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual(mockAxiosResponse.data);
+    expect(jsonResponse).toEqual(mockResponseData);
   });
 
-  it('returns a 500 status if an error occurs during the request', async () => {
-    const req = createMockRequest(mockToken);
-    mockedAxios.request.mockRejectedValue({
-      response: { status: 500, data: { error: 'Server Error' } },
+  it('should handle 401 unauthorized error from axios', async () => {
+    const mockToken = 'invalid-token';
+    const mockRequest = createMockNextRequest(mockToken);
+    const mockMethod = 'GET';
+    const mockUrl = '/protected-resource';
+
+    // Mock implementation for error scenario
+    const mockedAxios = jest.mocked(axios);
+    mockedAxios.mockImplementation(() => 
+      Promise.reject({
+        response: {
+          status: 401,
+          data: { error: 'Invalid credentials' }
+        }
+      } as AxiosError)
+    );
+
+    const response = await handleRequest(mockRequest, mockMethod, mockUrl);
+
+    const jsonResponse = await response.json();
+    expect(response.status).toBe(401);
+    expect(jsonResponse).toEqual({ 
+      error: 'Unauthorized: Invalid or expired token' 
     });
+  });
 
-    const response = await handleRequest(req, 'GET', mockUrl);
+  it('should return 401 when no token is provided', async () => {
+    const mockRequest = createMockNextRequest();
+    const mockMethod = 'GET';
+    const mockUrl = '/protected-endpoint';
 
+    const response = await handleRequest(mockRequest, mockMethod, mockUrl);
+
+    const jsonResponse = await response.json();
+    expect(response.status).toBe(401);
+    expect(jsonResponse).toEqual({ 
+      error: 'Unauthorized: No token provided' 
+    });
+  });
+
+  it('should handle generic error from axios', async () => {
+    const mockToken = 'valid-token';
+    const mockRequest = createMockNextRequest(mockToken);
+    const mockMethod = 'GET';
+    const mockUrl = '/error-endpoint';
+
+    // Mock implementation for generic error
+    const mockedAxios = jest.mocked(axios);
+    mockedAxios.mockImplementation(() => 
+      Promise.reject({
+        response: {
+          status: 500,
+          data: { error: 'Internal Server Error' }
+        }
+      } as AxiosError)
+    );
+
+    const response = await handleRequest(mockRequest, mockMethod, mockUrl);
+
+    const jsonResponse = await response.json();
     expect(response.status).toBe(500);
-    expect(await response.json()).toEqual({ error: 'Server Error' });
+    expect(jsonResponse).toEqual({ 
+      error: 'Internal Server Error' 
+    });
+  });
+
+  it('should handle axios error without response', async () => {
+    const mockToken = 'valid-token';
+    const mockRequest = createMockNextRequest(mockToken);
+    const mockMethod = 'GET';
+    const mockUrl = '/network-error';
+
+    // Mock implementation for network error
+    const mockedAxios = jest.mocked(axios);
+    mockedAxios.mockImplementation(() => 
+      Promise.reject(new Error('Network Error'))
+    );
+
+    const response = await handleRequest(mockRequest, mockMethod, mockUrl);
+
+    const jsonResponse = await response.json();
+    expect(response.status).toBe(500);
+    expect(jsonResponse).toEqual({ 
+      error: 'An error occurred while processing your request' 
+    });
   });
 });

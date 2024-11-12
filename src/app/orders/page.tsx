@@ -1,9 +1,9 @@
 'use client'
+import React, { useEffect, useState } from 'react';
 import { Order, OrderStatus } from '@/components/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNotifications } from '@/contexts/NotificationContext';
 import { format } from 'date-fns';
 import { 
   EyeIcon, 
@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Tooltip,
@@ -31,7 +30,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import NotificationList from '@/components/NotificationList';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function OrdersPage() {
@@ -41,13 +39,12 @@ function OrdersPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
     const { data: session, status } = useSession();
-    const { notifications } = useNotifications();
 
     useEffect(() => {
         if (status === 'authenticated') {
             fetchOrders();
         }
-    }, [session, status, notifications]);
+    }, [session, status]);
 
     useEffect(() => {
         filterOrders();
@@ -103,9 +100,7 @@ function OrdersPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-        >
-            <NotificationList/>
-            
+        >            
             <Card className="shadow-lg border-none">
                 <CardHeader className="bg-black text-white">
                     <div className="flex justify-between items-center">

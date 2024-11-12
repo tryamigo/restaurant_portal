@@ -27,7 +27,13 @@ function OTPInput({ value, onChange }: { value: string, onChange: (val: string) 
       inputRefs.current[index + 1]?.focus();
     }
   };
-
+  useEffect(() => {
+    // Autofocus on the first input when OTP input becomes visible
+    if (inputRefs.current[0]) {
+      inputRefs.current[0].focus();
+    }
+  }, []);
+  
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace' && !value[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();

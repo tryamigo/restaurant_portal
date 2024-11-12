@@ -1,10 +1,11 @@
 'use client'
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
+import React from "react";
 import { SessionProvider, useSession } from "next-auth/react";
 import { NotificationProvider } from "@/contexts/NotificationContext";
-import { usePathname } from "next/navigation";
-import { Home, ShoppingBag, Tag, LogOut, Settings } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Home, ShoppingBag, Tag, LogOut, Settings, Store } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,17 +19,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
+import NotificationList from '@/components/NotificationList';
 
 const navItems = [
-  { href: '/restaurants', label: 'Restaurant Details', icon: Home },
   { href: '/orders', label: 'Orders', icon: ShoppingBag },
+  { href: '/menu', label: 'Menu', icon: Home },
   { href: '/coupons', label: 'Coupons', icon: Tag },
 ];
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
-
+  const router = useRouter()
   // Don't render layout for signin page
   if (pathname === '/sign-in' || status === 'loading') {
     return <>{children}</>;
@@ -36,7 +38,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <motion.div 
+      <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -48,13 +50,13 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* User Profile */}
-          <div className="mb-6 flex items-center space-x-3">
+          <div className="mb-6 flex flex-col items-center space-y-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">
-                  <AvatarImage 
-                    src={session?.user?.image || '/default-avatar.png'} 
-                    alt="User profile" 
+                  <AvatarImage
+                    src={session?.user?.image || '/default-avatar.png'}
+                    alt="User  profile"
                   />
                   <AvatarFallback>
                     {session?.user?.name?.charAt(0) || 'U'}
@@ -64,8 +66,13 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
               <DropdownMenuContent className="ml-4 p-2">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  className="text-red-600 cursor-pointer" 
+                <DropdownMenuItem onSelect={() => router.push('/restaurants')}>
+                  <Store className="mr-2 h-4 w-4" />
+                  Restaurant Details
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-red-600 cursor-pointer"
                   onClick={() => signOut({ callbackUrl: '/sign-in' })}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
@@ -73,9 +80,15 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <div>
-              <p className="font-semibold text-gray-800">{session?.user?.name || 'Restaurant User'}</p>
-              <p className="text-xs text-gray-500">{session?.user?.email}</p>
+            <div className="flex flex-col items-center space-y-3">
+              <div className="flex flex-col items-center">
+                <p className="font-semibold text-sm text-gray-800">Restaurant ID:</p>
+                <p className="font-semibold text-sm text-gray-800">{session?.user?.id || 'Restaurant User'}</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <p className="font-semibold text-sm text-gray-800">Restaurant No.:</p>
+                <p className="font-semibold text-sm text-gray-800">{session?.user?.mobile || 'Restaurant No.'}</p>
+              </div>
             </div>
           </div>
 
@@ -102,14 +115,20 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         </div>
       </motion.div>
 
+
       {/* Main Content Area */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="flex-1 overflow-auto"
+        className="flex-1 overflow-auto relative"
       >
-        <motion.main 
+        <div className="m-2">
+          <NotificationList />
+        </div>
+
+
+        <motion.main
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}

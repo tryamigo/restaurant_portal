@@ -4,8 +4,8 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules/', '/.next/'],
   
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1', // This resolves @ as the root directory for imports
-    '\\.css$': 'identity-obj-proxy', // Mock CSS imports (for Jest)
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
   },
 
   transform: {

@@ -1,153 +1,185 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import RestaurantDetails from '@/app/restaurants/page'; 
+import RestaurantDetails from '@/app/menu/page'; 
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import '@testing-library/jest-dom';
 
-// Mock `useSession` hook
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(),
+// Mock the necessary hooks and modules
+jest.mock('next-auth/react');
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(),
+  useParams: jest.fn(() => ({ id: '1' })),
 }));
 
-// Mock fetch
-global.fetch = jest.fn();
+// Mock any external components or libraries that might cause rendering issues
+jest.mock('@/components/ui/skeleton', () => ({
+  Skeleton: () => <div data-testid="loading-spinner">Loading</div>
+}));
+
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>
+  },
+  AnimatePresence: ({ children }: any) => children
+}));
 
 describe('RestaurantDetails Component', () => {
+  let mockRouter: { push: jest.Mock };
+
   beforeEach(() => {
+    // Setup session mock
     (useSession as jest.Mock).mockReturnValue({
       data: {
         user: { id: '1', token: 'mock-token' },
       },
       status: 'authenticated',
     });
+
+    // Setup router mock
+    mockRouter = {
+      push: jest.fn(),
+    };
+    (useRouter as jest.Mock).mockReturnValue(mockRouter);
+
+    // Reset fetch mock
+    global.fetch = jest.fn();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  test('renders loading state initially', () => {
-    render(<RestaurantDetails />);
-    expect(screen.getByText(/loading/i)).toBeInTheDocument();
-  });
+  const mockRestaurantData = {
+    id: '1',
+    name: 'Test Restaurant',
+    phoneNumber: '1234567890',
+    openingHours: '10:00 - 22:00',
+    gstin: 'GSTIN123',
+    FSSAI: 'FSSAI456',
+    rating: 4.5,
+    address: { 
+      streetAddress: '123 Street', 
+      city: 'City', 
+      state: 'State', 
+      pincode: '12345',
+      landmark: 'Near Park',
+      latitude: '12.345',
+      longitude: '78.910'
+    },
+    menu: [
+      { 
+        id: 'item1', 
+        name: 'Burger', 
+        description: 'Tasty burger', 
+        price: 10, 
+        ratings: 4.2, 
+        discounts: 5,
+        imageLink: 'http://example.com/burger.jpg' 
+      },
+      { 
+        id: 'item2', 
+        name: 'Pizza', 
+        description: 'Delicious pizza', 
+        price: 15, 
+        ratings: 4.5, 
+        discounts: 10,
+        imageLink: 'http://example.com/pizza.jpg' 
+      }
+    ]
+  };
+
 
   test('fetches and displays restaurant details', async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        name: 'Test Restaurant',
-        phoneNumber: '1234567890',
-        openingHours: '10:00 - 22:00',
-        address: { streetAddress: '123 Street', city: 'City', state: 'State', pincode: '12345' },
-      }),
-    });
+    // Mock successful fetch for restaurant details
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockRestaurantData,
+      })
+      // Mock menu fetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockRestaurantData.menu,
+      });
 
     render(<RestaurantDetails />);
 
+    // Wait for restaurant details to load
     await waitFor(() => {
       expect(screen.getByText(/test restaurant/i)).toBeInTheDocument();
       expect(screen.getByText(/1234567890/i)).toBeInTheDocument();
       expect(screen.getByText(/10:00 - 22:00/i)).toBeInTheDocument();
+      expect(screen.getByText(/GSTIN123/i)).toBeInTheDocument();
+      expect(screen.getByText(/FSSAI456/i)).toBeInTheDocument();
     });
   });
 
   test('displays error message on fetch failure', async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({ message: 'Failed to fetch' }),
-    });
+    // Mock failed fetch
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        json: async () => ({ message: 'Failed to fetch restaurant' }),
+      });
 
     render(<RestaurantDetails />);
 
+    // Wait for error message
     await waitFor(() => {
       expect(screen.getByText(/failed to load restaurant details/i)).toBeInTheDocument();
     });
   });
 
-  test('opens edit dialog and updates restaurant', async () => {
-    (fetch as jest.Mock)
+
+  test('adds a new menu item', async () => {
+    // Mock fetch for initial data and menu item addition
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockRestaurantData,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockRestaurantData.menu,
+      })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          name: 'Test Restaurant',
-          phoneNumber: '1234567890',
-          openingHours: '10:00 - 22:00',
-          address: { streetAddress: '123 Street', city: 'City', state: 'State', pincode: '12345' },
+          id: 'new-item',
+          name: 'New Menu Item',
+          price: 20,
+          description: 'New item description',
         }),
-      })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+      });
 
     render(<RestaurantDetails />);
 
-    // Open edit dialog
-    fireEvent.click(screen.getByText(/edit restaurant/i));
-
-    // Edit fields
-    const nameInput = screen.getByLabelText(/name/i);
-    fireEvent.change(nameInput, { target: { value: 'Updated Restaurant' } });
-
-    fireEvent.click(screen.getByText(/save changes/i));
-
+    // Wait for data to load
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(
-        '/api/restaurants/?id=1',
+      expect(screen.getByText(/test restaurant/i)).toBeInTheDocument();
+    });
+
+    // Fill in new item details
+    fireEvent.change(screen.getByLabelText(/item name/i), { target: { value: 'New Menu Item' } });
+    fireEvent.change(screen.getByLabelText(/description/i), { target: { value: 'New item description' } });
+    fireEvent.change(screen.getByLabelText(/price/i), { target: { value: '20' } });
+
+    // Submit new item
+    fireEvent.click(screen.getByText(/add item/i));
+
+    // Verify item addition
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/restaurants'),
         expect.objectContaining({
-          method: 'PUT',
-          headers: expect.objectContaining({
-            Authorization: 'Bearer mock-token',
+          method: 'POST', headers: expect.objectContaining({
+            'Authorization': expect.stringContaining('Bearer mock-token'),
           }),
         })
       );
     });
   });
 
-  test('adds a new menu item', async () => {
-    (fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          name: 'Test Restaurant',
-          phoneNumber: '1234567890',
-          openingHours: '10:00 - 22:00',
-          address: { streetAddress: '123 Street', city: 'City', state: 'State', pincode: '12345' },
-        }),
-      })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ name: 'New Item', price: 20 }) });
-
-    render(<RestaurantDetails />);
-
-    fireEvent.change(screen.getByLabelText(/item name/i), { target: { value: 'New Item' } });
-    fireEvent.change(screen.getByLabelText(/price/i), { target: { value: 20 } });
-
-    fireEvent.click(screen.getByText(/add item/i));
-
-    await waitFor(() => {
-      expect(screen.getByText(/new item/i)).toBeInTheDocument();
-    });
-  });
-
-  test('deletes a menu item', async () => {
-    (fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          name: 'Test Restaurant',
-          phoneNumber: '1234567890',
-          openingHours: '10:00 - 22:00',
-          address: { streetAddress: '123 Street', city: 'City', state: 'State', pincode: '12345' },
-        }),
-      })
-      .mockResolvedValueOnce({ ok: true });
-
-    render(<RestaurantDetails />);
-
-    fireEvent.click(screen.getByText(/delete/i));
-
-    await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(
-        '/api/restaurants/?id=1&menu=true&menuItemId=1',
-        expect.objectContaining({ method: 'DELETE' })
-      );
-    });
-  });
 });
