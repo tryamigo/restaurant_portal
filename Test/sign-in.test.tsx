@@ -5,6 +5,7 @@ import { signIn, useSession } from "next-auth/react"; // We'll mock this as well
 import OTPLogin from "../src/app/restaurants/page"; // Adjust import according to your path
 import React from 'react';
 
+
 // Mock the necessary functions
 jest.mock("next-auth/react", () => ({
   signIn: jest.fn(),
@@ -44,10 +45,6 @@ describe("OTPLogin", () => {
     const phoneNumberInput = screen.getByLabelText(/Phone Number/i);
     fireEvent.change(phoneNumberInput, { target: { value: "1234567890" } });
 
-    // Find and click the 'Send OTP' button
-    const sendOtpButton = screen.getByText(/Send OTP/i);
-    fireEvent.click(sendOtpButton);
-
     // Wait for the OTP ;
 
     // Find and click the 'Send OTP' button
@@ -63,7 +60,8 @@ describe("OTPLogin", () => {
 
     // Ensure the signIn function was called
     await waitFor(() => {
-      expect(signIn).toHaveBeenCalledTimes(1);input to appear
+      expect(signIn).toHaveBeenCalledTimes(1);
+    });
     await waitFor(() => {
       expect(screen.getByLabelText(/OTP/i)).toBeInTheDocument();
     });
@@ -120,4 +118,3 @@ describe("OTPLogin", () => {
       expect(screen.getByText(/Network Error/i)).toBeInTheDocument();
     });
   });
-});

@@ -1,12 +1,11 @@
 // Test/helper.test.tsx
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import axios from 'axios';
 import { handleRequest } from '@/components/helper';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-// Mock NextRequest and NextResponse
 jest.mock('next/server', () => ({
   NextRequest: jest.fn().mockImplementation(() => ({
     headers: {
@@ -14,8 +13,7 @@ jest.mock('next/server', () => ({
     },
   })),
   NextResponse: {
-    json: jest.fn().mockReturnValue({}),
-    error: jest.fn().mockReturnValue({}),
+    json: jest.fn().mockImplementation((data, { status }) => ({ json: () => data, status })),
   },
 }));
 
@@ -61,7 +59,7 @@ describe('handleRequest', () => {
 
     const response = await handleRequest(req, 'POST', mockUrl, mockData, mockParams);
 
-    expect(mockedAxios).toHaveBeenCalledWith({
+    expect(mockedAxios.request).toHaveBeenCalledWith({
       method: 'POST',
       url: `${process.env.NEXT_PUBLIC_BACKEND_API_URL}${mockUrl}`,
       data: mockData,
