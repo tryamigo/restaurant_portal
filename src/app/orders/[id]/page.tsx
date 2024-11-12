@@ -39,6 +39,7 @@ import { Order, OrderStatus } from '@/components/types';
 import { useSession } from 'next-auth/react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
 
 const OrderDetails: React.FC = () => {
   const params = useParams();
@@ -236,7 +237,13 @@ const OrderDetails: React.FC = () => {
                     <td className="px-4 py-3">${(typeof item.price === 'number' ? item.price : 0).toFixed(2)}</td>
                     <td className="px-4 py-3">
                       {item.imageLink ? (
-                        <img src={item.imageLink} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
+                        <Image
+                        src={item.imageLink||''}
+                        alt={item.name}
+                        width={64}
+                        height={64}
+                        className="w-16 h-16 object-cover rounded"
+                    /> 
                       ) : (
                         'No Image'
                       )}

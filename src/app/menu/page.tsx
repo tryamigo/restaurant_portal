@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MenuItem, Restaurant } from '@/components/types';
-import { AddressFields } from '@/components/AddressFields';
 import { useSession } from 'next-auth/react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
@@ -29,6 +28,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import Image from 'next/image';
 
 const RestaurantDetails: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -62,7 +62,7 @@ const RestaurantDetails: React.FC = () => {
         } catch (error) {
             console.error('Error updating restaurant:', error);
         }
-        finally{
+        finally {
             setIsLoading(false);
         }
     };
@@ -194,8 +194,6 @@ const RestaurantDetails: React.FC = () => {
         );
     }
 
-
-
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -318,8 +316,14 @@ const RestaurantDetails: React.FC = () => {
                                                 <td className="py-2">{item.ratings}</td>
                                                 <td className="py-2">{item.discounts}</td>
                                                 <td className="py-2">
-                                                    <img src={item.imageLink} alt={item.name} className="w-16 h-16 object-cover rounded" />
-                                                </td>
+                                                    <Image
+                                                        src={item.imageLink||''}
+                                                        alt={item.name}
+                                                        width={64}
+                                                        height={64}
+                                                        className="w-16 h-16 object-cover rounded"
+                                                    />  
+                                                     </td>
                                                 <td className="py-2">
                                                     <Button onClick={() => handleEditItem(item)}><Edit className="h-4 w-4" /></Button>
                                                 </td>
