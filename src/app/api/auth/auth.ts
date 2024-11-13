@@ -33,7 +33,7 @@ export const authOptions: any = {
           });
   
           const data = await response.json();
-
+          console.log(data.error)
           if (response.ok && data.token) {
             return { id: data.restaurant.id, mobile:data.restaurant.mobile, token: data.token } as User;
           } else {
