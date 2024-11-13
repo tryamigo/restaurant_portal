@@ -50,6 +50,11 @@ beforeAll(() => {
   global.fetch = jest.fn();
 });
 
+function resizeWindow(width: number) {
+  global.innerWidth = width;
+  global.dispatchEvent(new Event('resize'));
+}
+
 
 describe('OTPLoginContent Component', () => {
   let mockRouter: any;
@@ -82,6 +87,56 @@ describe('OTPLoginContent Component', () => {
     // Check for Send OTP button
     expect(screen.getByText('Send OTP')).toBeInTheDocument();
   });
+
+    // Test For responsiveness
+
+    test('should render OTP login form correctly on large screens', () => {
+      // Simulate a large screen (e.g., desktop)
+      resizeWindow(1200); // Simulate desktop screen width
+  
+      render(<OTPLoginContent />);
+  
+      // Check for the initial layout
+      expect(screen.getByText(/Secure OTP Login/i)).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/Enter 10-digit mobile number/i)).toBeInTheDocument();
+      expect(screen.getByText(/Send OTP/i)).toBeInTheDocument();
+    }); 
+
+
+  test('should render OTP login form correctly on small screens', () => {
+    // Simulate a small screen (e.g., mobile)
+    resizeWindow(375);
+
+    render(<OTPLoginContent />);
+
+    // Check for mobile view responsiveness
+    expect(screen.getByText(/Secure OTP Login/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Enter 10-digit mobile number/i)).toBeInTheDocument();
+    expect(screen.getByText(/Send OTP/i)).toBeInTheDocument();
+
+    // // Ensure the form is touch-friendly and elements are appropriately sized
+    // const input = screen.getByPlaceholderText(/Enter 10-digit mobile number/i);
+    // expect(input).toHaveStyle('width: 100%'); // Inputs should take full width on mobile
+    // const button = screen.getByText(/Send OTP/i); // Or "Login" button if OTP is sent
+    // expect(button).toHaveStyle('width: 100%'); // Buttons should also take full width on mobile
+
+  });
+
+  test('should render OTP login form correctly on tablet screens', () => {
+    // Simulate a tablet screen (e.g., 768px)
+    resizeWindow(768); // Simulate tablet screen width
+
+    render(<OTPLoginContent />);
+
+    // Check for the initial layout
+    expect(screen.getByText(/Secure OTP Login/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Enter 10-digit mobile number/i)).toBeInTheDocument();
+    expect(screen.getByText(/Send OTP/i)).toBeInTheDocument();
+
+
+  });
+
+  
 
   it('shows error message for invalid mobile number', async () => {
     renderComponent();
@@ -466,4 +521,70 @@ await waitFor(() => {
 
     // Verify the OTP submission only happens once
     expect(signIn).toHaveBeenCalledTimes(1);
+
+    test('should handle OTP request with simultaneous account login', async () => {
+      (useSession as jest.Mock).mockReturnValue({ data: { user: { id: 'user1' } }, status: 'authenticated' });
+  
+      render(<OTPLoginContent />);
+      const mobileInput = screen.getByPlaceholderText('Enter 10-digit mobile number');
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+  
+      fireEvent.change(mobileInput, { target: { value: '+919876543210' } });
+      fireEvent.click(sendOtpButton);
+  
+      await waitFor(() => expect(screen.getByText(/Sending.../i)).toBeInTheDocument());
+  
+      expect(signIn).toHaveBeenCalledTimes(1);
+      expect(signIn).toHaveBeenCalledWith('credentials', expect.objectContaining({
+        mobile: '+919876543210',
+        otp: '',
+      }));
+
+    });
+
+    //OTP Request with Number Associated to Multiple Accounts
+  test('should prompt user to select an account when OTP is requested for a mobile number linked to multiple accounts', async () => {
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      json: () => ({ message: 'OTP sent successfully' }),
+    });
+
+    render(<OTPLoginContent />);
+    const mobileInput = screen.getByPlaceholderText('Enter 10-digit mobile number');
+    const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+
+    fireEvent.change(mobileInput, { target: { value: '+919876543210' } });
+    fireEvent.click(sendOtpButton);
+
+    await waitFor(() => expect(screen.getByText(/sending.../i)).toBeInTheDocument());
+
+    // Mock the API response for multiple accounts linked to the same number
+    // You should update the implementation to handle multiple accounts in your actual code
+    expect(screen.getByText(/select or specify an account/i)).toBeInTheDocument();
+  });
+
+
+    // OTP Entry During Network Failure
+  test('should show network error if OTP is submitted during network failure', async () => {
+    global.fetch = jest.fn().mockImplementationOnce(() => {
+      return Promise.reject(new Error('Network error'));
+    });
+
+    render(<OTPLoginContent />);
+    const mobileInput = screen.getByPlaceholderText('Enter 10-digit mobile number');
+    const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+
+    fireEvent.change(mobileInput, { target: { value: '+919876543210' } });
+    fireEvent.click(sendOtpButton);
+
+    await waitFor(() => expect(screen.getByText(/sending.../i)).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText(/enter 6-digit otp/i), { target: { value: '123456' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /login/i }));
+
+    await waitFor(() => expect(screen.getByText(/network error. please check your connection/i)).toBeInTheDocument());
+  });
+
+
+    
   });
