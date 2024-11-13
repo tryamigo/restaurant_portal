@@ -80,16 +80,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <div className="flex flex-col items-center space-y-3">
-              <div className="flex flex-col items-center">
-                <p className="font-semibold text-sm text-gray-800">Restaurant ID:</p>
-                <p className="font-semibold text-sm text-gray-800">{session?.user?.id || 'Restaurant User'}</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <p className="font-semibold text-sm text-gray-800">Restaurant No.:</p>
-                <p className="font-semibold text-sm text-gray-800">{session?.user?.mobile || 'Restaurant No.'}</p>
-              </div>
-            </div>
           </div>
 
           {/* Navigation */}
