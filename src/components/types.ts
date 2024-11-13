@@ -103,9 +103,9 @@ export interface Coupon {
   title: string;
   description: string;
   discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
-  discountValue: number;
-  minOrderValue?: number;
-  maxDiscount?: number;
+  discountValue: string;
+  minOrderValue?: string;
+  maxDiscount?: string;
   couponCode: string;
   usageLimit?: number;
   eligibleOrders?:number,
