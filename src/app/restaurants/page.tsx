@@ -118,7 +118,7 @@ const RestaurantDetails: React.FC = () => {
         }
     };
 
-
+console.log(restaurant)
     if (isLoading) {
         return (
             <motion.div
@@ -178,7 +178,7 @@ const RestaurantDetails: React.FC = () => {
             transition={{ duration: 0.5 }}
         >
             <Card className="shadow-lg border-none">
-                <CardHeader className="bg-black text-white">
+            <CardHeader className="bg-black text-white sticky top-0 z-10">
                     <div className="flex justify-between items-center">
                         <CardTitle className="text-2xl font-bold">Restaurant Details</CardTitle>
                         <div className="flex space-x-4">
@@ -346,7 +346,3 @@ const RestaurantDetails: React.FC = () => {
 };
 
 export default RestaurantDetails;
-
-
-
-

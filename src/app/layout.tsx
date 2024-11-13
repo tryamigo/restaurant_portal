@@ -5,7 +5,7 @@ import React from "react";
 import { SessionProvider, useSession } from "next-auth/react";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, ShoppingBag, Tag, LogOut, Settings, Store } from "lucide-react";
+import { Home, ShoppingBag, Tag, LogOut, Store } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -30,27 +30,26 @@ const navItems = [
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
-  const router = useRouter()
+  const router = useRouter();
+
   // Don't render layout for signin page
   if (pathname === '/sign-in' || status === 'loading') {
     return <>{children}</>;
   }
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="flex h-screen bg-gray-100">
       <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="w-64 bg-white shadow-xl border-r"
+        className="w-64 bg-white shadow-lg border-r border-gray-200"
       >
         <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">Restaurant Portal</h1>
-          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">Restaurant Portal</h1>
 
           {/* User Profile */}
-          <div className="mb-6 flex flex-col items-center space-y-3">
+          <div className="flex flex-col items-center mb-6">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">
@@ -93,7 +92,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 <Link href={item.href} passHref>
                   <Button
                     variant={pathname === item.href || (pathname === '/' && item.href === '/orders') ? "default" : "ghost"}
-                    className="w-full justify-start"
+                    className="w-full justify-start  hover:bg-gray-200 hover:text-black"
                   >
                     <item.icon className="mr-2 h-4 w-4" />
                     {item.label}
@@ -105,24 +104,22 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         </div>
       </motion.div>
 
-
       {/* Main Content Area */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="flex-1 overflow-auto relative"
+        className="flex-1 overflow-auto relative p-4"
       >
-        <div className="m-2">
+        <div className="mb-4">
           <NotificationList />
         </div>
-
 
         <motion.main
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="p-6 bg-transparent"
+          className="bg-white rounded-lg shadow-md p-4"
         >
           <AnimatePresence mode="wait">
             {children}
