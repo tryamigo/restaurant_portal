@@ -33,6 +33,7 @@ const CouponsPage = () => {
     maxDiscount: 0,
     couponCode: "",
     usageLimit: 0,
+    eligibleOrders:0,
     startDate: "",
     endDate: "",
   });
@@ -119,6 +120,7 @@ const CouponsPage = () => {
         maxDiscount: 0,
         couponCode: "",
         usageLimit: 0,
+        eligibleOrders:0,
         startDate: "",
         endDate: "",
       });
@@ -322,6 +324,22 @@ const CouponsPage = () => {
                       setNewCoupon({
                         ...newCoupon,
                         discountValue: Number(e.target.value),
+                      })
+                    }
+                    required
+                  />{" "}
+                </div>{" "}
+                <div className="space-y-2">
+                  {" "}
+                  <Label htmlFor="eligibleOrders">Eligible Orders</Label>{" "}
+                  <Input
+                    type="number"
+                    id="eligibleOrders"
+                    value={newCoupon.eligibleOrders || ""}
+                    onChange={(e) =>
+                      setNewCoupon({
+                        ...newCoupon,
+                        eligibleOrders: Number(e.target.value),
                       })
                     }
                     required

@@ -108,7 +108,9 @@ export interface Coupon {
   maxDiscount?: number;
   couponCode: string;
   usageLimit?: number;
+  eligibleOrders?:number,
   startDate: string;
   endDate: string;
   isActive: boolean;
 }
+
