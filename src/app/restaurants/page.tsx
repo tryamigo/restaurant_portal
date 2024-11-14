@@ -31,9 +31,7 @@ import {
     X,
     ArrowLeftIcon
 } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { toast } from "@/hooks/use-toast";
 import { Skeleton } from '@/components/ui/skeleton';
 
 const RestaurantDetails: React.FC = () => {
@@ -118,7 +116,6 @@ const RestaurantDetails: React.FC = () => {
         }
     };
 
-console.log(restaurant)
     if (isLoading) {
         return (
             <motion.div

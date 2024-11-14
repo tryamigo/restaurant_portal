@@ -96,7 +96,7 @@ const OrderDetails: React.FC = () => {
       console.error('Error updating order:', error);
     }
   };
-
+console.log(order?.orderItems)
   const calculateOrderTotals = (items: OrderItem[]) => {
     const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
     const discount = order?.discount || 0;
@@ -199,7 +199,7 @@ const OrderDetails: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">{item.quantity}</td>
-                <td className="px-6 py-4 whitespace-nowrap">${item.price.toFixed(2)}</td>
+                <td className="px-6 py-4 whitespace-nowrap">${item.price ? Number(item.price).toFixed(2) : 'N/A'}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right">${(item.price * item.quantity).toFixed(2)}</td>
               </tr>
             ))}

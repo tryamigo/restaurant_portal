@@ -163,7 +163,6 @@ const CouponsPage = () => {
       });
     }
   };
-  console.log(coupons)
   const handleUpdateCouponStatus = async (id: string, isActive: boolean) => {
     try {
       const response = await fetch(`/api/restaurants/coupons?id=${id}`, {

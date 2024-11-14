@@ -22,7 +22,7 @@ export function useSSE() {
     return () => {
       eventSource.close();
     };
-  }, [session?.user.id]);  // Re-run the effect if restaurantId changes
+  }, []);  // Re-run the effect if restaurantId changes
 
   return events;
 }
