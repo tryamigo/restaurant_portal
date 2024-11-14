@@ -118,7 +118,7 @@ const RestaurantDetails: React.FC = () => {
         }
     };
 
-
+console.log(restaurant)
     if (isLoading) {
         return (
             <motion.div
@@ -346,7 +346,3 @@ const RestaurantDetails: React.FC = () => {
 };
 
 export default RestaurantDetails;
-
-
-
-
