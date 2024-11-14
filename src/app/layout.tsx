@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
 import NotificationList from '@/components/NotificationList';
+import { useSocketNotifications } from "@/hooks/useSocketNotifications";
+import Notifications from "@/components/Notifications";
 
 const navItems = [
   { href: '/orders', label: 'Orders', icon: ShoppingBag },
@@ -31,7 +33,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
-
+  console.log(session?.user.token)
+    // useSocketNotifications();
   // Don't render layout for signin page
   if (pathname === '/sign-in' || status === 'loading') {
     return <>{children}</>;
@@ -112,7 +115,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         className="flex-1 overflow-auto relative p-4"
       >
         <div className="mb-4">
-          <NotificationList />
+          {/* <NotificationList /> */}
+            <Notifications/>
         </div>
 
         <motion.main
