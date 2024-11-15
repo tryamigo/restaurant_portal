@@ -175,13 +175,13 @@ const RestaurantDetails: React.FC = () => {
             transition={{ duration: 0.5 }}
         >
             <Card className="shadow-lg border-none">
-                <CardHeader className="bg-black text-white">
+                <CardHeader className="bg-[#007AFF] text-white">
                     <div className="flex justify-between items-center">
                         <CardTitle className="text-2xl font-bold">Restaurant Details</CardTitle>
                         <div className="flex space-x-4">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm" className="text-black border-white/30">
+                                    <Button variant="outline" size="sm" className="text-[#007AFF] border-white/30">
                                         Options
                                     </Button>
                                 </DropdownMenuTrigger>

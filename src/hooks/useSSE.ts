@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 export function useSSE() {
   const [events, setEvents] = useState<any[]>([]);
   const {data:session} = useSession()
+  console.log(events)
   useEffect(() => {
     // Ensure the restaurantId is passed into the URL for SSE
     const eventSource = new EventSource(`http://localhost:3001/sse/events?restaurantId=${session?.user.id}`);
@@ -24,5 +25,4 @@ export function useSSE() {
     };
   }, []);  // Re-run the effect if restaurantId changes
 
-  return events;
-}
+  return { events, setEvents };}

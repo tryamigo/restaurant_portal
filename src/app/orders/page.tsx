@@ -50,7 +50,7 @@ function OrdersPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
     const { data: session, status } = useSession();
-    const events = useSSE()
+    const {events,setEvents} = useSSE()
     useEffect(() => {
         if (status === 'authenticated') {
             fetchOrders();

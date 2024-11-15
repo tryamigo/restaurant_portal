@@ -14,7 +14,7 @@ export default function Loading() {
     >
       <div className="text-center">
         <Loader2 
-          className="mx-auto mb-4 h-16 w-16 text-black animate-spin" 
+          className="mx-auto mb-4 h-16 w-16 text-[#007AFF] animate-spin" 
         />
         <p className="text-xl font-semibold text-gray-700">
           Loading... Please wait

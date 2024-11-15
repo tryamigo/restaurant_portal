@@ -1,5 +1,4 @@
 // components/Notifications.tsx
-// components/Notifications.tsx
 'use client'
 
 import { useState, useEffect, useMemo } from 'react';
@@ -45,7 +44,8 @@ interface NotificationItem {
 }
 
 export default function Notifications() {
-  const events = useSSE();
+    const { events, setEvents } = useSSE();
+ 
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
     try {
       const savedNotifications = localStorage.getItem('notifications');
@@ -53,7 +53,7 @@ export default function Notifications() {
     } catch (error) {
       console.error("Error parsing saved notifications:", error);
       return [];
-    }
+    } 
   });
   const [isOpen, setIsOpen] = useState(false);
 
@@ -131,6 +131,7 @@ export default function Notifications() {
     setNotifications(prev => 
       prev.filter(notif => !notif.read)
     );
+    setEvents([]);
   };
 
   const renderNotificationItem = (notification: NotificationItem) => {
@@ -249,9 +250,3 @@ export default function Notifications() {
     </Popover>
   );
 }
-
-
-
-
-
-
