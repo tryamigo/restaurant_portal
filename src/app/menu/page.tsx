@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MenuItem, Restaurant } from "@/components/types";
 import { useSession } from "next-auth/react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-
+import { z } from 'zod';
 import {
   Dialog,
   DialogContent,
@@ -30,6 +30,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
+const MenuItemSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters long" }),
+  description: z.string().min(5, { message: "Description must be at least 5 characters long" }),
+  price: z.number().min(0, { message: "Price must be a positive number" }),
+  ratings: z.number().min(0, { message: "Ratings must be between 0 and 5" }).max(5, { message: "Ratings must be between 0 and 5" }),
+  discounts: z.number().min(0, { message: "Discount must be between 0 and 100" }).max(100, { message: "Discount must be between 0 and 100" }),
+  imageLink: z.string().url({ message: "Invalid image URL" }).optional().or(z.literal('')),
+});
 
 const MenuDetails: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -45,6 +53,8 @@ const MenuDetails: React.FC = () => {
     discounts: 0,
     imageLink: "",
   });
+  const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [menuItemToDelete, setMenuItemToDelete] = useState<string | null>(null);
   const [isAddItemDialogOpen, setIsAddItemDialogOpen] = useState(false);
@@ -84,36 +94,47 @@ const MenuDetails: React.FC = () => {
   };
 
   const handleAddItem = async () => {
-    if (newItem.name && newItem.description && newItem.price > 0) {
-      try {
-        const response = await fetch(
-          `/api/restaurants/?id=${session?.user.id}&menu=true`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${session?.user.token}`,
-            },
-            body: JSON.stringify(newItem),
-          }
-        );
+    try {
+      // Validate the new item
+      const validatedItem = MenuItemSchema.parse(newItem);
 
-        if (response.ok) {
-          const addedItem = await response.json();
-          setMenu([...menu, addedItem]);
-          setNewItem({
-            name: "",
-            description: "",
-            price: 0,
-            discounts: 0,
-            imageLink: "",
-          });
-          setIsAddItemDialogOpen(false); // Close dialog after adding
-        } else {
-          console.error("Failed to add menu item");
+      // Clear previous validation errors
+      setValidationErrors({});
+
+      const response = await fetch(
+        `/api/restaurants/?id=${session?.user.id}&menu=true`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.user.token}`,
+          },
+          body: JSON.stringify(validatedItem),
         }
-      } catch (error) {
-        console.error("Error adding menu item:", error);
+      );
+
+      if (response.ok) {
+        const addedItem = await response.json();
+        setMenu([...menu, addedItem]);
+        setNewItem({
+          name: "",
+          description: "",
+          price: 0,
+          discounts: 0,
+          imageLink: "",
+        });
+        setIsAddItemDialogOpen(false); // Close dialog after adding
+      } else {
+        console.error("Failed to add menu item");
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Handle validation errors
+        const errors = error.errors.reduce((acc, curr) => {
+          acc[curr.path[0]] = curr.message;
+          return acc;
+        }, {} as { [key: string]: string });
+        setValidationErrors(errors);
       }
     }
   };
@@ -139,7 +160,11 @@ const MenuDetails: React.FC = () => {
     try {
       const itemToUpdate = menu.find((item) => item.id === editingItemId);
       if (!itemToUpdate) throw new Error("Item not found");
+      // Validate the item before updating
+      const validatedItem = MenuItemSchema.parse(itemToUpdate);
 
+      // Clear previous validation errors
+      setValidationErrors({});
       const response = await fetch(
         `/api/restaurants/?id=${session?.user.id}&menu=true&menuItemId=${editingItemId}`,
         {
@@ -160,7 +185,14 @@ const MenuDetails: React.FC = () => {
       setMenu(updatedMenu);
       setEditingItemId(null);
     } catch (error) {
-      console.error("Error updating menu item:", error);
+      if (error instanceof z.ZodError) {
+        // Handle validation errors
+        const errors = error.errors.reduce((acc, curr) => {
+          acc[curr.path[0]] = curr.message;
+          return acc;
+        }, {} as { [key: string]: string });
+        setValidationErrors(errors);
+      }
     }
   };
 
@@ -305,6 +337,9 @@ const MenuDetails: React.FC = () => {
                               handleEditChange(item.id, "name", e.target.value)
                             }
                           />
+                          {validationErrors.name && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <Input
@@ -317,6 +352,9 @@ const MenuDetails: React.FC = () => {
                               )
                             }
                           />
+                          {validationErrors.description && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.description}</p>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <Input
@@ -330,6 +368,9 @@ const MenuDetails: React.FC = () => {
                               )
                             }
                           />
+                          {validationErrors.price && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.price}</p>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <Input
@@ -343,6 +384,9 @@ const MenuDetails: React.FC = () => {
                               )
                             }
                           />
+                          {validationErrors.ratings && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.ratings}</p>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <Input
@@ -356,6 +400,9 @@ const MenuDetails: React.FC = () => {
                               )
                             }
                           />
+                          {validationErrors.discounts && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.discounts}</p>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <Input
@@ -368,6 +415,9 @@ const MenuDetails: React.FC = () => {
                               )
                             }
                           />
+                          {validationErrors.imageLink && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.imageLink}</p>
+                          )}
                         </td>
                         <td className="px-6 py-4 flex space-x-2">
                           <Button
@@ -392,7 +442,7 @@ const MenuDetails: React.FC = () => {
                         <td className="px-6 py-4">{item.name}</td>
                         <td className="px-6 py-4">{item.description}</td>
                         <td className="px-6 py-4">
-                        ₹{Number(item.price).toFixed(2)}
+                          ₹{Number(item.price).toFixed(2)}
                         </td>
                         <td className="px-6 py-4">{item.ratings}</td>
                         <td className="px-6 py-4">{item.discounts}%</td>
@@ -456,6 +506,9 @@ const MenuDetails: React.FC = () => {
                 }
                 className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
               />
+              {validationErrors.name && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
+              )}
             </div>
             <div>
               <Label
@@ -473,6 +526,9 @@ const MenuDetails: React.FC = () => {
                 }
                 className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
               />
+              {validationErrors.description && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.description}</p>
+              )}
             </div>
             <div>
               <Label
@@ -491,6 +547,9 @@ const MenuDetails: React.FC = () => {
                 }
                 className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
               />
+              {validationErrors.price && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.price}</p>
+              )}
             </div>
             <div>
               <Label
@@ -514,6 +573,9 @@ const MenuDetails: React.FC = () => {
                 }
                 className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
               />
+              {validationErrors.ratings && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.ratings}</p>
+              )}
             </div>
             <div>
               <Label
@@ -537,6 +599,9 @@ const MenuDetails: React.FC = () => {
                 }
                 className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
               />
+              {validationErrors.discounts && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.discounts}</p>
+              )}
             </div>
             <div>
               <Label
@@ -554,6 +619,9 @@ const MenuDetails: React.FC = () => {
                 }
                 className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
               />
+              {validationErrors.imageLink && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.imageLink}</p>
+              )}
             </div>
           </div>
           <DialogFooter>

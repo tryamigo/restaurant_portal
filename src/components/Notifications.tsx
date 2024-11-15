@@ -1,15 +1,12 @@
 // components/Notifications.tsx
+// components/Notifications.tsx
 'use client'
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSSE } from '../hooks/useSSE';
 import { ShoppingBag, Check, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from 'next/link';
@@ -72,8 +69,6 @@ export default function Notifications() {
   // Process new events and add to notifications
   useEffect(() => {
     if (events && events.length > 0) {
-
-      // Create new notifications with unique identifiers
       const newNotifications: NotificationItem[] = events.map(event => ({
         ...event,
         id: event.order.id, // Use order ID as unique identifier
@@ -81,14 +76,13 @@ export default function Notifications() {
         timestamp: new Date()
       }));
 
-      // Filter out duplicates more comprehensively
+      // Filter out duplicates
       const uniqueNewNotifications = newNotifications.filter(
         newNotif => !notifications.some(existingNotif => 
           existingNotif.id === newNotif.id && 
           existingNotif.type === newNotif.type
         )
       );
-
 
       // Add new notifications to the existing list
       if (uniqueNewNotifications.length > 0) {
@@ -98,7 +92,7 @@ export default function Notifications() {
         ]);
       }
     }
-  }, [events, notifications]);
+  }, [events]); // Remove notifications dependency to avoid stale closure
 
   // Memoized unread notifications count
   const unreadCount = useMemo(() => {
@@ -117,7 +111,7 @@ export default function Notifications() {
     setIsOpen(false);
   };
 
-  // Mark all notifications as read
+ // Mark all notifications as read
   const markAllAsRead = () => {
     setNotifications(prev => 
       prev.map(notif => ({ ...notif, read: true }))
@@ -255,3 +249,9 @@ export default function Notifications() {
     </Popover>
   );
 }
+
+
+
+
+
+

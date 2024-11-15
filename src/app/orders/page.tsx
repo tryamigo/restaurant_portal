@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSSE } from '@/hooks/useSSE';
 
 // Status Icons Mapping
 const STATUS_ICONS = {
@@ -49,12 +50,12 @@ function OrdersPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
     const { data: session, status } = useSession();
-
+    const events = useSSE()
     useEffect(() => {
         if (status === 'authenticated') {
             fetchOrders();
         }
-    }, [session, status]);
+    }, [session, status,events]);
 
     useEffect(() => {
         filterOrders();

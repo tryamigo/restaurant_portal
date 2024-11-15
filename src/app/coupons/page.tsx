@@ -26,6 +26,57 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { z } from 'zod';
+import {   isBefore,isValid,parse } from 'date-fns';
+
+
+// Coupon Schema Validation
+const CouponSchema = z.object({
+  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
+  description: z.string().max(1000, "Description is too long").optional(),
+  discountType: z.enum(["PERCENTAGE", "FIXED_AMOUNT"]),
+  discountValue: z.number()
+    .min(0, "Discount value cannot be negative")
+    .max(100, "Discount value cannot exceed 100%"),
+  minOrderValue: z.number().min(0, "Minimum order value cannot be negative"),
+  maxDiscount: z.number().min(0, "Maximum discount cannot be negative"),
+  couponCode: z.string()
+    .min(3, "Coupon code must be at least 3 characters")
+    .max(20, "Coupon code is too long")
+    .regex(/^[A-Z0-9]+$/, "Coupon code can only contain uppercase letters and numbers"),
+  usageLimit: z.number().min(0, "Usage limit cannot be negative"),
+  eligibleOrders: z.number().min(0, "Eligible orders cannot be negative"),
+  startDate: z.date(),
+  endDate: z.date(),
+}).superRefine((data, ctx) => {
+  // Validate that end date is not before start date
+  if (isBefore(data.endDate, data.startDate)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: "End date cannot be before start date",
+      path: ['endDate']
+    });
+  }
+
+  // Validate discount value against max discount for fixed amount
+  if (data.discountType === "FIXED_AMOUNT" && data.discountValue > data.maxDiscount) {
+    ctx.addIssue({
+      code: 'custom',
+      message: "Discount value cannot exceed maximum discount",
+      path: ['discountValue']
+    });
+  }
+
+  // Validate minimum order value against maximum discount
+  if (data.minOrderValue > data.maxDiscount) {
+    ctx.addIssue({
+      code: 'custom',
+      message: "Minimum order value cannot be greater than maximum discount",
+      path: ['minOrderValue']
+    });
+  }
+});
+
 const CouponsPage = () => {
   const { data: session, status } = useSession();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -46,6 +97,9 @@ const CouponsPage = () => {
   });
   const [searchCode, setSearchCode] = useState("");
   const [foundCoupon, setFoundCoupon] = useState<Coupon | null>(null);
+  const [validationErrors, setValidationErrors] = useState<{
+    [key: string]: string;
+  }>({});
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -67,6 +121,56 @@ const CouponsPage = () => {
     };
   }, [searchCode]);
 
+  const validateCoupon = async () => {
+    try {
+      // Validate date format first
+      const parseDate = (dateString: string) => {
+        // Validate date format (YYYY-MM-DD)
+        const parsedDate = parse(dateString, 'yyyy-MM-dd', new Date());
+        
+        if (!isValid(parsedDate)) {
+          throw new Error('Invalid date format. Use YYYY-MM-DD');
+        }
+        
+        return parsedDate;
+      };
+  
+      // Convert string inputs to appropriate types
+      const couponData = {
+        ...newCoupon,
+        discountValue: parseFloat(newCoupon.discountValue),
+        minOrderValue: parseFloat(newCoupon.minOrderValue || '0'),
+        maxDiscount: parseFloat(newCoupon.maxDiscount || '0'),
+        usageLimit: Number(newCoupon.usageLimit),
+        eligibleOrders: Number(newCoupon.eligibleOrders),
+        startDate: parseDate(newCoupon.startDate),
+        endDate: parseDate(newCoupon.endDate),
+      };
+  
+      // Validate using Zod schema
+      await CouponSchema.parseAsync(couponData);
+      
+      // Clear any previous validation errors
+      setValidationErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Transform Zod errors into a more usable format
+        const errors = error.errors.reduce((acc:any, curr) => {
+          acc[curr.path[0]] = curr.message;
+          return acc;
+        }, {});
+        
+        setValidationErrors(errors);
+      } else if (error instanceof Error) {
+        // Handle other errors (like date parsing)
+        setValidationErrors({ 
+          general: error.message 
+        });
+      }
+      return false;
+    }
+  };
   const fetchCoupons = async () => {
     try {
       const response = await fetch("/api/restaurants/coupons", {
@@ -91,6 +195,11 @@ const CouponsPage = () => {
 
   const handleAddCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
+    const isValid = await validateCoupon();
+
+    // Validate coupon before submission
+    if (isValid) {
+     
     try {
       const response = await fetch("/api/restaurants/coupons", {
         method: "POST",
@@ -135,6 +244,7 @@ const CouponsPage = () => {
       });
       setIsAddingCoupon(false);
     }
+  }
   };
 
   const handleDeleteCoupon = async (id: string) => {
@@ -512,6 +622,9 @@ const CouponsPage = () => {
                   }
                   required
                 />
+                 {validationErrors.title && (
+                <p className="text-red-500 text-sm">{validationErrors.title}</p>
+              )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
@@ -524,7 +637,11 @@ const CouponsPage = () => {
                       description: e.target.value,
                     })
                   }
+                  required
                 />
+                 {validationErrors.description && (
+                <p className="text-red-500 text-sm">{validationErrors.description}</p>
+              )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="discountType">Discount Type</Label>
@@ -535,7 +652,11 @@ const CouponsPage = () => {
                       discountType: value as "PERCENTAGE" | "FIXED_AMOUNT",
                     })
                   }
+                  required
                 >
+                   {validationErrors.discountType && (
+                <p className="text-red-500 text-sm">{validationErrors.discountType }</p>
+              )}
                   <SelectTrigger>
                     <SelectValue placeholder="Select discount type" />
                   </SelectTrigger>
@@ -559,6 +680,11 @@ const CouponsPage = () => {
                   }
                   required
                 />
+                 {validationErrors.discountValue && (
+                <p className="text-red-500 text-sm">
+                  {validationErrors.discountValue}
+                </p>
+              )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="eligibleOrders">Eligible Orders</Label>
@@ -574,6 +700,9 @@ const CouponsPage = () => {
                   }
                   required
                 />
+                 {validationErrors.eligibleOrders && (
+                <p className="text-red-500 text-sm">{validationErrors.eligibleOrders }</p>
+              )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="minOrderValue">Minimum Order Value</Label>
@@ -587,7 +716,11 @@ const CouponsPage = () => {
                       minOrderValue: e.target.value,
                     })
                   }
+                  required
                 />
+                {validationErrors.minOrderValue && (
+                <p className="text-red-500 text-sm">{validationErrors.minOrderValue }</p>
+              )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="maxDiscount">Maximum Discount</Label>
@@ -601,7 +734,11 @@ const CouponsPage = () => {
                       maxDiscount: e.target.value,
                     })
                   }
+                  required
                 />
+                {validationErrors.maxDiscount && (
+                <p className="text-red-500 text-sm">{validationErrors.maxDiscount }</p>
+              )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="couponCode">Coupon Code</Label>
@@ -612,6 +749,9 @@ const CouponsPage = () => {
                     setNewCoupon({ ...newCoupon, couponCode: e.target.value })
                   }
                 />
+                 {validationErrors.couponCode && (
+                <p className="text-red-500 text-sm">{validationErrors.couponCode }</p>
+              )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="usageLimit">Usage Limit</Label>
@@ -625,7 +765,11 @@ const CouponsPage = () => {
                       usageLimit: Number(e.target.value),
                     })
                   }
+                  required
                 />
+                  {validationErrors.usageLimit && (
+                <p className="text-red-500 text-sm">{validationErrors.usageLimit }</p>
+              )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="startDate">Start Date</Label>
@@ -638,6 +782,9 @@ const CouponsPage = () => {
                   }
                   required
                 />
+                 {validationErrors.startDate && (
+                <p className="text-red-500 text-sm">{validationErrors.startDate }</p>
+              )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="endDate">End Date</Label>
@@ -650,10 +797,30 @@ const CouponsPage = () => {
                   }
                   required
                 />
+                 {validationErrors.endDate && (
+                <p className="text-red-500 text-sm">{validationErrors.endDate }</p>
+              )}
               </div>
             </div>
             <div className="flex justify-end">
-              <Button type="button" onClick={() => setIsAddingCoupon(false)} className="mr-2">
+              <Button type="button" onClick={() => {
+                 setNewCoupon({
+                  title: "",
+                  description: "",
+                  discountType: "PERCENTAGE",
+                  discountValue: "",
+                  minOrderValue: "",
+                  maxDiscount: "",
+                  couponCode: "",
+                  usageLimit: 0,
+                  eligibleOrders: 0,
+                  startDate: "",
+                  endDate: "",
+                });
+                setIsAddingCoupon(false)
+                setValidationErrors({})
+                }}
+                 className="mr-2">
                 Cancel
               </Button>
               <Button type="submit">Add Coupon</Button>
