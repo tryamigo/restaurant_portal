@@ -3,7 +3,6 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import React from "react";
 import { SessionProvider, useSession } from "next-auth/react";
-import { NotificationProvider } from "@/contexts/NotificationContext";
 import { usePathname, useRouter } from "next/navigation";
 import { Home, ShoppingBag, Tag, LogOut, Store, Bell } from "lucide-react";
 import Link from "next/link";
@@ -146,12 +145,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <SessionProvider>
-          <NotificationProvider>
             <LayoutContent>
               {children}
             </LayoutContent>
             <Toaster />
-          </NotificationProvider>
         </SessionProvider>
       </body>
     </html>

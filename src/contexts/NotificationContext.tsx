@@ -1,55 +1,55 @@
-// contexts/NotificationContext.tsx
-'use client';
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+// // contexts/NotificationContext.tsx
+// 'use client';
+// import React, { createContext, useContext, useEffect, useState } from 'react';
+// import { useSession } from 'next-auth/react';
 
-interface OrderNotification {
-  id: string;
-  type: string;
-  message: string;
-  order: any;
-  timestamp: string;
-}
+// interface OrderNotification {
+//   id: string;
+//   type: string;
+//   message: string;
+//   order: any;
+//   timestamp: string;
+// }
 
-interface NotificationContextType {
-  notifications: OrderNotification[];
-  addNotification: (notification: OrderNotification) => void;
-  dismissNotification: (id: string) => void;
-}
+// interface NotificationContextType {
+//   notifications: OrderNotification[];
+//   addNotification: (notification: OrderNotification) => void;
+//   dismissNotification: (id: string) => void;
+// }
 
-const NotificationContext = createContext<NotificationContextType>({
-  notifications: [],
-  addNotification: () => {},
-  dismissNotification: () => {},
-});
+// const NotificationContext = createContext<NotificationContextType>({
+//   notifications: [],
+//   addNotification: () => {},
+//   dismissNotification: () => {},
+// });
 
-export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
-  const [notifications, setNotifications] = useState<OrderNotification[]>([]);
+// export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
+//   const [notifications, setNotifications] = useState<OrderNotification[]>([]);
 
-  const addNotification = (newNotification: OrderNotification) => {
-    setNotifications(prev => {
-      // Prevent duplicate notifications
-      if (prev.some(n => n.id === newNotification.id)) {
-        return prev;
-      }
-      return [newNotification, ...prev];
-    });
-  };
+//   const addNotification = (newNotification: OrderNotification) => {
+//     setNotifications(prev => {
+//       // Prevent duplicate notifications
+//       if (prev.some(n => n.id === newNotification.id)) {
+//         return prev;
+//       }
+//       return [newNotification, ...prev];
+//     });
+//   };
 
-  const dismissNotification = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
-  };
+//   const dismissNotification = (id: string) => {
+//     setNotifications(prev => prev.filter(n => n.id !== id));
+//   };
 
-  return (
-    <NotificationContext.Provider value={{ 
-      notifications, 
-      addNotification, 
-      dismissNotification 
-    }}>
-      {children}
-    </NotificationContext.Provider>
-  );
-};
+//   return (
+//     <NotificationContext.Provider value={{ 
+//       notifications, 
+//       addNotification, 
+//       dismissNotification 
+//     }}>
+//       {children}
+//     </NotificationContext.Provider>
+//   );
+// };
 
-export const useNotifications = () => useContext(NotificationContext);
+// export const useNotifications = () => useContext(NotificationContext);
 
