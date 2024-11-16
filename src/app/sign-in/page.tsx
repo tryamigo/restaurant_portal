@@ -216,8 +216,7 @@ function OTPLoginContent() {
               <Input
                 id="mobile"
                 type="tel"
-                placeholder="Enter 10-digit mobile number"
-                value={mobile}
+                placeholder="+91 | Enter 10-digit mobile number"                value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
                 className="focus:ring-2 focus:ring-blue-500"
               />

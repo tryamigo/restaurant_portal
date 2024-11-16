@@ -114,9 +114,9 @@ const getStatusColor = (status: OrderStatus): "default" | "secondary" | "destruc
             className="container mx-auto px-4 py-8"
         >            
             <div className="bg-white shadow-lg rounded-xl overflow-hidden">
-                <div className="bg-gradient-to-r from-gray-800 to-gray-700 text-white p-6">
+                <div className=" text-white p-6">
                     <div className="flex justify-between items-center">
-                        <h1 className="text-3xl font-bold">Orders Management</h1>
+                        <h1 className="text-3xl text  font-bold">Orders Management</h1>
                         <div className="flex space-x-4">
                             <div className="relative flex-grow max-w-md">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -131,7 +131,7 @@ const getStatusColor = (status: OrderStatus): "default" | "secondary" | "destruc
                                 value={statusFilter} 
                                 onValueChange={(value) => setStatusFilter(value as OrderStatus | 'all')}
                             >
-                                <SelectTrigger className="w-[180px] bg-white/10 border-white/20 text-white">
+                                <SelectTrigger className="w-[180px] background  border-white/20 text-white">
                                     <SelectValue placeholder="Filter by Status">
                                         {statusFilter === 'all' ? 'All Status' : statusFilter}
                                     </SelectValue>

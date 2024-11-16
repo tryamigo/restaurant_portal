@@ -35,7 +35,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         className="w-64 bg-white shadow-lg border-r border-gray-200"
       >
         <div className="p-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">Restaurant Portal</h1>
+          <h1 className="text-2xl font-bold text mb-6">Restaurant Portal</h1>
 
           {/* Navigation */}
           <nav className="space-y-2">
@@ -48,7 +48,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 <Link href={item.href} passHref>
                   <Button
                     variant={pathname === item.href || (pathname === '/' && item.href === '/orders') ? "default" : "ghost"}
-                    className="w-full justify-start hover:bg-gray-200 hover:text-[#007AFF]"
+                    className="w-full justify-start background text-white hover:bg-gray-200 hover:text-black"
                   >
                     <item.icon className="mr-2 h-4 w-4" />
                     {item.label}

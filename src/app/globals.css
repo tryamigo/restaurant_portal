@@ -76,3 +76,11 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.text{
+  color: #007AFF;
+}
+
+.background{
+  background-color: #007AFF;
+}

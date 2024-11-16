@@ -124,6 +124,7 @@ export default function Notifications() {
     setNotifications(prev => 
       prev.filter(notif => notif.id !== notificationId)
     );
+    setEvents([]);
   };
 
   // Remove all read notifications

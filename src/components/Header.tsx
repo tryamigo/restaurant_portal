@@ -29,7 +29,7 @@ function Header() {
    {/* Header */}
    <header className="bg-white shadow-sm py-3 px-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text">
               {navItems.find(item => item.href === pathname)?.label || 'Dashboard'}
             </h2>
           </div>

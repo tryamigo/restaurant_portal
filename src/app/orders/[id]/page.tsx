@@ -96,7 +96,7 @@ const OrderDetails: React.FC = () => {
       console.error('Error updating order:', error);
     }
   };
-console.log(order?.orderItems)
+  console.log(order?.orderItems)
   const calculateOrderTotals = (items: OrderItem[]) => {
     const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
     const discount = order?.discount || 0;
@@ -117,7 +117,7 @@ console.log(order?.orderItems)
   const { subtotal, discount, total } = calculateOrderTotals(order.orderItems);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -126,8 +126,8 @@ console.log(order?.orderItems)
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Order #{order.id}</h1>
-          <p className="text-gray-500">
+          <h1 className="text-3xl font-bold text ">Order #{order.id}</h1>
+          <p className="text ">
             Placed on {format(new Date(order.orderTime), 'MMMM dd, yyyy at hh:mm a')}
           </p>
         </div>
@@ -138,7 +138,8 @@ console.log(order?.orderItems)
               Back to Orders
             </Button>
           </Link>
-          <Button onClick={() => setIsEditDialogOpen(true)}>
+          <Button className="background text-white hover:bg-[#0056b3] transition-colors duration-300 flex items-center"
+            onClick={() => setIsEditDialogOpen(true)}>
             Update Status
           </Button>
         </div>
@@ -150,19 +151,19 @@ console.log(order?.orderItems)
           <div className="flex items-center space-x-4">
             {StatusIcon[order.status as keyof typeof StatusIcon]}
             <div>
-              <h2 className="text-xl font-semibold capitalize">{order.status}</h2>
+              <h2 className="text-xl text font-semibold capitalize">{order.status}</h2>
               <p className="text-gray-500">Current order status</p>
             </div>
           </div>
-          <Badge 
+          <Badge
             variant="outline"
             className={`
               capitalize 
               ${order.status === 'delivered' ? 'text-green-600 border-green-600' :
                 order.status === 'preparing' ? 'text-blue-600 border-blue-600' :
-                order.status === 'on the way' ? 'text-orange-600 border-orange-600' :
-                'text-gray-600 border-gray-600'
-            }`}
+                  order.status === 'on the way' ? 'text-orange-600 border-orange-600' :
+                    'text-gray-600 border-gray-600'
+              }`}
           >
             {order.status}
           </Badge>
@@ -185,11 +186,11 @@ console.log(order?.orderItems)
               <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap flex items-center space-x-4">
                   {item.imageLink && (
-                    <Image 
-                      src={item.imageLink} 
-                      alt={item.name} 
-                      width={48} 
-                      height={48} 
+                    <Image
+                      src={item.imageLink}
+                      alt={item.name}
+                      width={48}
+                      height={48}
                       className="rounded-md object-cover"
                     />
                   )}
@@ -225,7 +226,7 @@ console.log(order?.orderItems)
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Order Status</DialogTitle>
+            <DialogTitle className='text'>Edit Order Status</DialogTitle>
             <DialogDescription>
               Update the status of this order.
             </DialogDescription>
@@ -251,11 +252,12 @@ console.log(order?.orderItems)
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              <Button onClick={() => setIsEditDialogOpen(false)}>
                 Cancel
               </Button>
             </DialogClose>
-            <Button onClick={handleEditOrder}>Save Changes</Button>
+            <Button className="background text-white hover:bg-[#0056b3] transition-colors duration-300 flex items-center"
+              onClick={handleEditOrder}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

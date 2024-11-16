@@ -175,13 +175,14 @@ const RestaurantDetails: React.FC = () => {
             transition={{ duration: 0.5 }}
         >
             <Card className="shadow-lg border-none">
-                <CardHeader className="bg-[#007AFF] text-white">
+                <CardHeader className="text ">
                     <div className="flex justify-between items-center">
                         <CardTitle className="text-2xl font-bold">Restaurant Details</CardTitle>
                         <div className="flex space-x-4">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm" className="text-[#007AFF] border-white/30">
+                                    <Button className="background text-white hover:bg-[#0056b3] transition-colors duration-300 flex items-center"
+                                        size="sm" >
                                         Options
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -218,7 +219,7 @@ const RestaurantDetails: React.FC = () => {
                                     <Button variant="destructive" onClick={handleDeleteRestaurant}>
                                         Delete
                                     </Button>
-                                    <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                                    <Button onClick={() => setIsDeleteDialogOpen(false)}>
                                         Cancel
                                     </Button>
                                 </DialogFooter>
@@ -299,8 +300,9 @@ const RestaurantDetails: React.FC = () => {
                                     />
                                 </div>
                                 <div className="flex gap-2 mt-4">
-                                    <Button onClick={handleEditRestaurant}>Save Changes</Button>
-                                    <Button variant="outline" onClick={() => {
+                                    <Button className="background text-white hover:bg-[#0056b3] transition-colors duration-300 flex items-center"
+                                        onClick={handleEditRestaurant}>Save Changes</Button>
+                                    <Button onClick={() => {
                                         setIsEditing(false);
                                         setEditedRestaurant(null);
                                     }}>Cancel</Button>

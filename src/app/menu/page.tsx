@@ -26,8 +26,6 @@ import {
   ArrowLeftIcon,
   Package,
 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 const MenuItemSchema = z.object({
@@ -44,7 +42,6 @@ const MenuDetails: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { data: session, status } = useSession();
   const [menu, setMenu] = useState<MenuItem[]>([]);
-  const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [newItem, setNewItem] = useState<Omit<MenuItem, "id">>({
     name: "",
     description: "",
@@ -58,6 +55,8 @@ const MenuDetails: React.FC = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [menuItemToDelete, setMenuItemToDelete] = useState<string | null>(null);
   const [isAddItemDialogOpen, setIsAddItemDialogOpen] = useState(false);
+  const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+  const [currentEditItem, setCurrentEditItem] = useState<MenuItem | null>(null);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -93,43 +92,73 @@ const MenuDetails: React.FC = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleAddItem = async () => {
+  const handleSubmitItem = async () => {
     try {
-      // Validate the new item
+      // Validate the item
       const validatedItem = MenuItemSchema.parse(newItem);
 
       // Clear previous validation errors
       setValidationErrors({});
 
-      const response = await fetch(
-        `/api/restaurants/?id=${session?.user.id}&menu=true`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.user.token}`,
-          },
-          body: JSON.stringify(validatedItem),
-        }
-      );
+      if (formMode === 'add') {
+        // Add new item logic
+        const response = await fetch(
+          `/api/restaurants/?id=${session?.user.id}&menu=true`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session?.user.token}`,
+            },
+            body: JSON.stringify(validatedItem),
+          }
+        );
 
-      if (response.ok) {
-        const addedItem = await response.json();
-        setMenu([...menu, addedItem]);
-        setNewItem({
-          name: "",
-          description: "",
-          price: 0,
-          discounts: 0,
-          imageLink: "",
-        });
-        setIsAddItemDialogOpen(false); // Close dialog after adding
+        if (response.ok) {
+          const addedItem = await response.json();
+          setMenu([...menu, addedItem]);
+        } else {
+          console.error("Failed to add menu item");
+        }
       } else {
-        console.error("Failed to add menu item");
+        // Edit existing item logic
+        if (!currentEditItem) return;
+        const response = await fetch(
+          `/api/restaurants/?id=${session?.user.id}&menu=true&menuItemId=${currentEditItem.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session?.user.token}`,
+            },
+            body: JSON.stringify({ ...currentEditItem, ...validatedItem }),
+          }
+        );
+
+        if (response.ok) {
+          const updatedItem = await response.json();
+          setMenu(menu.map(item =>
+            item.id === currentEditItem.id ? updatedItem : item
+          ));
+        } else {
+          console.error("Failed to update menu item");
+        }
       }
+
+      // Reset form and close dialog
+      setNewItem({
+        name: "",
+        description: "",
+        price: 0,
+        ratings: 0,
+        discounts: 0,
+        imageLink: "",
+      });
+      setIsAddItemDialogOpen(false);
+      setCurrentEditItem(null);
+      setFormMode('add');
     } catch (error) {
       if (error instanceof z.ZodError) {
-        // Handle validation errors
         const errors = error.errors.reduce((acc, curr) => {
           acc[curr.path[0]] = curr.message;
           return acc;
@@ -140,62 +169,18 @@ const MenuDetails: React.FC = () => {
   };
 
   const handleEditItem = (item: MenuItem) => {
-    setEditingItemId(item.id);
+    setCurrentEditItem(item);
+    setNewItem({
+      name: item.name,
+      description: item.description,
+      price: Number(item.price),
+      ratings: Number(item.ratings),
+      discounts: Number(item.discounts),
+      imageLink: item.imageLink || '',
+    });
+    setFormMode('edit');
+    setIsAddItemDialogOpen(true);
   };
-
-  const handleEditChange = (
-    itemId: string,
-    field: keyof MenuItem,
-    value: string | number
-  ) => {
-    setMenu((prevMenu) =>
-      prevMenu.map((item) =>
-        item.id === itemId ? { ...item, [field]: value } : item
-      )
-    );
-  };
-  const handleSaveEdit = async () => {
-    if (!editingItemId) return;
-
-    try {
-      const itemToUpdate = menu.find((item) => item.id === editingItemId);
-      if (!itemToUpdate) throw new Error("Item not found");
-      // Validate the item before updating
-      const validatedItem = MenuItemSchema.parse(itemToUpdate);
-
-      // Clear previous validation errors
-      setValidationErrors({});
-      const response = await fetch(
-        `/api/restaurants/?id=${session?.user.id}&menu=true&menuItemId=${editingItemId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.user.token}`,
-          },
-          body: JSON.stringify(itemToUpdate),
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to update menu item");
-      const updatedItem = await response.json();
-      const updatedMenu = menu.map((item) =>
-        item.id === editingItemId ? updatedItem : item
-      );
-      setMenu(updatedMenu);
-      setEditingItemId(null);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        // Handle validation errors
-        const errors = error.errors.reduce((acc, curr) => {
-          acc[curr.path[0]] = curr.message;
-          return acc;
-        }, {} as { [key: string]: string });
-        setValidationErrors(errors);
-      }
-    }
-  };
-
   const handleDeleteItem = async () => {
     if (!menuItemToDelete) return;
     try {
@@ -217,9 +202,19 @@ const MenuDetails: React.FC = () => {
       console.error("Error deleting menu item:", error);
     }
   };
-
-  const handleCancelEdit = () => {
-    setEditingItemId(null);
+  const handleDialogClose = () => {
+    setIsAddItemDialogOpen(false);
+    setNewItem({
+      name: "",
+      description: "",
+      price: 0,
+      ratings: 0,
+      discounts: 0,
+      imageLink: "",
+    });
+    setValidationErrors({});
+    setFormMode('add');
+    setCurrentEditItem(null);
   };
 
   if (isLoading) {
@@ -265,12 +260,12 @@ const MenuDetails: React.FC = () => {
       className="container mx-auto px-4 py-8"
     >
       <div className="bg-white shadow-lg rounded-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-gray-800 to-gray-700 text-white p-6">
+        <div className=" text p-6">
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold">Menu Details</h1>
             <Button
               onClick={() => setIsAddItemDialogOpen(true)}
-              className="bg-white/10 text-white hover:bg-white/20 transition-colors duration-300 flex items-center"
+              className="background text-white hover:bg-[#0056b3]  transition-colors duration-300 flex items-center"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Item
@@ -324,170 +319,63 @@ const MenuDetails: React.FC = () => {
                     </div>
                   </td>
                 </tr>
-              ) : (
-                menu?.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    {editingItemId === item.id ? (
-                      // Editing Mode
-                      <>
-                        <td className="px-6 py-4">
-                          <Input
-                            value={item.name || ""}
-                            onChange={(e) =>
-                              handleEditChange(item.id, "name", e.target.value)
-                            }
-                          />
-                          {validationErrors.name && (
-                            <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <Input
-                            value={item.description || ""}
-                            onChange={(e) =>
-                              handleEditChange(
-                                item.id,
-                                "description",
-                                e.target.value
-                              )
-                            }
-                          />
-                          {validationErrors.description && (
-                            <p className="text-red-500 text-sm mt-1">{validationErrors.description}</p>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <Input
-                            type="number"
-                            value={item.price || ""}
-                            onChange={(e) =>
-                              handleEditChange(
-                                item.id,
-                                "price",
-                                e.target.value ? parseFloat(e.target.value) : 0
-                              )
-                            }
-                          />
-                          {validationErrors.price && (
-                            <p className="text-red-500 text-sm mt-1">{validationErrors.price}</p>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <Input
-                            type="number"
-                            value={item.ratings || ""}
-                            onChange={(e) =>
-                              handleEditChange(
-                                item.id,
-                                "ratings",
-                                e.target.value ? parseFloat(e.target.value) : 0
-                              )
-                            }
-                          />
-                          {validationErrors.ratings && (
-                            <p className="text-red-500 text-sm mt-1">{validationErrors.ratings}</p>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <Input
-                            type="number"
-                            value={item.discounts || ""}
-                            onChange={(e) =>
-                              handleEditChange(
-                                item.id,
-                                "discounts",
-                                e.target.value ? parseFloat(e.target.value) : 0
-                              )
-                            }
-                          />
-                          {validationErrors.discounts && (
-                            <p className="text-red-500 text-sm mt-1">{validationErrors.discounts}</p>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <Input
-                            value={item.imageLink || ""}
-                            onChange={(e) =>
-                              handleEditChange(
-                                item.id,
-                                "imageLink",
-                                e.target.value
-                              )
-                            }
-                          />
-                          {validationErrors.imageLink && (
-                            <p className="text-red-500 text-sm mt-1">{validationErrors.imageLink}</p>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 flex space-x-2">
-                          <Button
-                            onClick={handleSaveEdit}
-                            className="text-white "
-                          >
-                            <Save className="h-4 w-4 mr-2" />
-                            Save
-                          </Button>
-                          <Button
-                            onClick={handleCancelEdit}
-                            variant="destructive"
-                          >
-                            <X className="h-4 w-4 mr-2" />
-                            Cancel
-                          </Button>
-                        </td>
-                      </>
-                    ) : (
-                      // View Mode
-                      <>
-                        <td className="px-6 py-4">{item.name}</td>
-                        <td className="px-6 py-4">{item.description}</td>
-                        <td className="px-6 py-4">
-                          ₹{Number(item.price).toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4">{item.ratings}</td>
-                        <td className="px-6 py-4">{item.discounts}%</td>
-                        <td className="px-6 py-4">
-                          <Image
-                            src={item.imageLink || ""}
-                            alt={item.name}
-                            width={64}
-                            height={64}
-                            className="w-16 h-16 object-cover rounded"
-                          />
-                        </td>
-                        <td className="px-6 py-4 flex space-x-2">
-                          <Button
-                            onClick={() => handleEditItem(item)}
-                            variant="ghost"
-                            size="lg"
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </Button>
-                          <Button
-                            onClick={() => openDeleteDialog(item.id)}
-                            variant="destructive"
-                            size="lg"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </Button>
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                ))
-              )}
+              ) :
+                (
+                  menu?.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">{item.name}</td>
+                      <td className="px-6 py-4">{item.description}</td>
+                      <td className="px-6 py-4">
+                        ₹{Number(item.price).toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4">{item.ratings}</td>
+                      <td className="px-6 py-4">{item.discounts}%</td>
+                      <td className="px-6 py-4">
+                        <Image
+                          src={item.imageLink || ""}
+                          alt={item.name}
+                          width={64}
+                          height={64}
+                          className="w-16 h-16 object-cover rounded"
+                        />
+                      </td>
+                      <td className="px-6 py-4 flex space-x-2">
+                        <Button
+                          onClick={() => handleEditItem(item)}
+                          className="background hover:bg-[#0056b3] "
+                          size="lg"
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={() => openDeleteDialog(item.id)}
+                          variant="destructive"
+                          size="lg"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                )}
             </tbody>
           </table>
         </div>
       </div>
 
       {/* Add Item Dialog */}
-      <Dialog open={isAddItemDialogOpen} onOpenChange={setIsAddItemDialogOpen}>
+      <Dialog open={isAddItemDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          handleDialogClose();
+        }
+        setIsAddItemDialogOpen(open);
+      }}
+      >
         <DialogContent className="sm: max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Add New Menu Item</DialogTitle>
+          <DialogHeader className="text">
+            {formMode === 'add' ? 'Add New Menu Item' : 'Edit Menu Item'}
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -500,7 +388,7 @@ const MenuDetails: React.FC = () => {
               <Input
                 id="name"
                 placeholder="Enter item name"
-                value={newItem.name}
+                value={newItem.name || ''}
                 onChange={(e) =>
                   setNewItem({ ...newItem, name: e.target.value })
                 }
@@ -520,7 +408,7 @@ const MenuDetails: React.FC = () => {
               <Input
                 id="description"
                 placeholder="Item description"
-                value={newItem.description}
+                value={newItem.description || ''}
                 onChange={(e) =>
                   setNewItem({ ...newItem, description: e.target.value })
                 }
@@ -541,9 +429,9 @@ const MenuDetails: React.FC = () => {
                 id="price"
                 type="number"
                 placeholder="0.00"
-                value={newItem.price}
+                value={newItem.price||''}
                 onChange={(e) =>
-                  setNewItem({ ...newItem, price: parseFloat(e.target.value) })
+                  setNewItem({ ...newItem, price: Number(parseFloat(e.target.value).toFixed(2)) })
                 }
                 className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
               />
@@ -564,11 +452,11 @@ const MenuDetails: React.FC = () => {
                 placeholder="0-5"
                 min="0"
                 max="5"
-                value={newItem.ratings}
+                value={newItem.ratings||''}
                 onChange={(e) =>
                   setNewItem({
                     ...newItem,
-                    ratings: parseFloat(e.target.value),
+                    ratings: Number(parseFloat(e.target.value).toFixed(2)),
                   })
                 }
                 className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
@@ -590,11 +478,11 @@ const MenuDetails: React.FC = () => {
                 placeholder="0-100"
                 min="0"
                 max="100"
-                value={newItem.discounts}
+                value={newItem.discounts||''}
                 onChange={(e) =>
                   setNewItem({
                     ...newItem,
-                    discounts: parseFloat(e.target.value),
+                    discounts: Number(parseFloat(e.target.value).toFixed(2)),
                   })
                 }
                 className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
@@ -626,14 +514,23 @@ const MenuDetails: React.FC = () => {
           </div>
           <DialogFooter>
             <Button
-              onClick={handleAddItem}
-              className=""
+              onClick={handleSubmitItem}
+              className="background hover:bg-[#0056b3] "
             >
-              Add Item
+              {formMode === 'add' ? 'Add Item' : 'Update Item'}
             </Button>
             <Button
-              variant="outline"
-              onClick={() => setIsAddItemDialogOpen(false)}
+              onClick={() => {
+                setNewItem({
+                  name: "",
+                  description: "",
+                  price: 0,
+                  ratings: 0,
+                  discounts: 0,
+                  imageLink: "",
+                });
+                setValidationErrors({})
+                setIsAddItemDialogOpen(false)}}
             >
               Cancel
             </Button>
@@ -641,33 +538,26 @@ const MenuDetails: React.FC = () => {
         </DialogContent>
       </Dialog>
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        {" "}
         <DialogContent>
-          {" "}
           <DialogHeader>
-            {" "}
-            <DialogTitle> Delete Menu Item </DialogTitle>{" "}
-          </DialogHeader>{" "}
+            <DialogTitle> Delete Menu Item </DialogTitle>
+          </DialogHeader>
           <DialogDescription>
-            {" "}
             Are you sure you want to delete this menu item? This action cannot
-            be undone.{" "}
-          </DialogDescription>{" "}
+            be undone.
+          </DialogDescription>
           <DialogFooter>
-            {" "}
             <Button variant="destructive" onClick={handleDeleteItem}>
-              {" "}
-              Delete{" "}
-            </Button>{" "}
+              Delete
+            </Button>
             <Button
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
             >
-              {" "}
-              Cancel{" "}
-            </Button>{" "}
-          </DialogFooter>{" "}
-        </DialogContent>{" "}
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
     </motion.div>
   );
