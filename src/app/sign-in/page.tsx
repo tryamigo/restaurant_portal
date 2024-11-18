@@ -11,13 +11,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { MobileIcon } from "@radix-ui/react-icons"
+import { Badge } from "@/components/ui/badge"
 
 function OTPInput({ value, onChange }: { value: string, onChange: (val: string) => void }) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (index: number, val: string) => {
     if (!/^\d*$/.test(val)) return;
-    if (val.length > 1) return;  
+    if (val.length > 1) return;
     const newValue = value.split('');
     newValue[index] = val;
     onChange(newValue.join(''));
@@ -40,10 +41,10 @@ function OTPInput({ value, onChange }: { value: string, onChange: (val: string) 
       inputRefs.current[index - 1]?.focus();
     }
     // Prevent non-numeric input
-    if (!/^\d$/.test(e.key) && 
-      e.key !== 'Backspace' && 
-      e.key !== 'ArrowLeft' && 
-      e.key !== 'ArrowRight' && 
+    if (!/^\d$/.test(e.key) &&
+      e.key !== 'Backspace' &&
+      e.key !== 'ArrowLeft' &&
+      e.key !== 'ArrowRight' &&
       e.key !== 'Tab') {
       e.preventDefault();
     }
@@ -68,16 +69,16 @@ function OTPInput({ value, onChange }: { value: string, onChange: (val: string) 
 }
 
 function OTPLoginContent() {
-  const { data: session, status } = useSession()
-  const [mobile, setMobile] = useState("")
-  const [otp, setOtp] = useState("")
-  const [otpSent, setOtpSent] = useState(false)
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [resendCooldown, setResendCooldown] = useState(0)
+  const { data: session, status } = useSession();
+  const [mobile, setMobile] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const router = useRouter();
-  const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackurl') || '/'; 
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackurl') || '/';
   const resendTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -86,10 +87,9 @@ function OTPLoginContent() {
     }
   }, [session, status, router, callbackUrl]);
 
-  // Start cooldown timer for resend
   const startResendCooldown = (duration: number) => {
-    setResendCooldown(duration); // Set cooldown to the given duration (30 seconds)
-    
+    setResendCooldown(duration);
+
     resendTimerRef.current = setInterval(() => {
       setResendCooldown((prevCooldown) => {
         if (prevCooldown <= 1) {
@@ -104,16 +104,13 @@ function OTPLoginContent() {
   };
 
   const handleResendOTP = () => {
-    // Only allow resend if not in cooldown
     if (resendCooldown === 0) {
       requestOtp(true);
     }
   };
 
   const requestOtp = async (isResend: boolean = false) => {
-    // Mobile number validation
-    const mobileRegex = /^\+91[6-9]\d{9}$/;
-    if (!mobileRegex.test(mobile)) {
+    if (mobile.length !== 10) {
       setError("Please enter a valid 10-digit mobile number");
       return;
     }
@@ -125,17 +122,16 @@ function OTPLoginContent() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/auth/restaurants/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile}),
+        body: JSON.stringify({ mobile: `+91${mobile}` }),
       });
 
       const data = await res.json();
       if (res.ok) {
         setOtpSent(true);
-        // Start cooldown only if it's the first OTP request or a resend
         if (!isResend) {
-          startResendCooldown(30); // Start cooldown for 30 seconds
+          startResendCooldown(30);
         } else {
-          startResendCooldown(30); // Reset cooldown for resend
+          startResendCooldown(30);
         }
         console.log(data.message);
       } else {
@@ -161,7 +157,7 @@ function OTPLoginContent() {
     try {
       const result = await signIn("credentials", {
         redirect: false,
-        mobile,
+        mobile: `+91${mobile}`,
         otp,
       });
 
@@ -177,10 +173,10 @@ function OTPLoginContent() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
@@ -213,30 +209,44 @@ function OTPLoginContent() {
               <Label htmlFor="mobile" className="flex items-center">
                 <MobileIcon className="mr-2 w-4 h-4" /> Mobile Number
               </Label>
-              <Input
-                id="mobile"
-                type="tel"
-                placeholder="+91 | Enter 10-digit mobile number"                value={mobile}
-                onChange={(e) => setMobile(e.target.value)}
-                className="focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="flex items-center">
+                <Badge variant={"secondary"} className="p-3 text-sm outline-none">
+                  +91
+                </Badge>
+                <Input
+                  id="mobile"
+                  type="tel"
+                  placeholder="Enter 10-digit mobile number"
+                  value={mobile}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    if (value.length <= 10) setMobile(value);
+                  }}
+                  className="flex-1 border-0 focus:ring-0 focus:outline-none px-3"
+                />
+              </div>
             </div>
+            <div className="mt-1 text-sm text-gray-500">
+              {mobile.length < 10
+                ? `${10 - mobile.length} digits remaining`
+                : "Ready to send OTP"}
+            </div>
+
           </motion.div>
 
           <AnimatePresence>
             {otpSent && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3 }}
                 className="space-y-2"
               >
                 <Label>Enter 6-digit OTP</Label>
                 <OTPInput value={otp} onChange={setOtp} />
-                {/* Resend OTP Section */}
                 <div className="flex items-center justify-center">
- <Button 
+                  <Button
                     variant="link"
                     onClick={handleResendOTP}
                     disabled={resendCooldown > 0}
@@ -273,12 +283,20 @@ function OTPLoginContent() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
           {!otpSent ? (
-            <Button onClick={() => requestOtp(false)} disabled={loading} className="w-full bg-gray-800 hover:bg-blue-700 transition duration-200">
+            <Button
+              onClick={() => requestOtp(false)}
+              disabled={loading}
+              className="w-full bg-gray-800 hover:bg-blue-700 transition duration-200"
+            >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {loading ? "Sending..." : "Send OTP"}
             </Button>
           ) : (
-            <Button onClick={loginWithOtp} disabled={loading} className="w-full bg-gray-800 hover:bg-blue-700 transition duration-200">
+            <Button
+              onClick={loginWithOtp}
+              disabled={loading}
+              className="w-full bg-gray-800 hover:bg-blue-700 transition duration-200"
+            >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {loading ? "Logging in..." : "Login"}
             </Button>

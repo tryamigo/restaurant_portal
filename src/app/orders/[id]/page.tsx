@@ -36,6 +36,8 @@ import { Order, OrderItem, OrderStatus } from '@/components/types';
 import { useSession } from 'next-auth/react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
+import Header from '@/components/Header';
+import { CustomButton } from '@/components/CustomButton';
 
 const StatusIcon = {
   pending: <Clock className="text-yellow-500" />,
@@ -117,13 +119,16 @@ const OrderDetails: React.FC = () => {
   const { subtotal, discount, total } = calculateOrderTotals(order.orderItems);
 
   return (
+    <>
+     <Header/>
+   
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto max-w-6xl px-4 py-8"
+      className="container mx-auto max-w-6xl px-4 py-12"
     >
-      {/* Header */}
+   
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text ">Order #{order.id}</h1>
@@ -133,15 +138,15 @@ const OrderDetails: React.FC = () => {
         </div>
         <div className="flex items-center space-x-4">
           <Link href="/orders">
-            <Button variant="outline" className="flex items-center">
+            <CustomButton >
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
               Back to Orders
-            </Button>
+            </CustomButton>
           </Link>
-          <Button className="background text-white hover:bg-[#0056b3] transition-colors duration-300 flex items-center"
+          <CustomButton 
             onClick={() => setIsEditDialogOpen(true)}>
             Update Status
-          </Button>
+          </CustomButton>
         </div>
       </div>
 
@@ -159,9 +164,9 @@ const OrderDetails: React.FC = () => {
             variant="outline"
             className={`
               capitalize 
-              ${order.status === 'delivered' ? 'text-green-600 border-green-600' :
-                order.status === 'preparing' ? 'text-blue-600 border-blue-600' :
-                  order.status === 'on the way' ? 'text-orange-600 border-orange-600' :
+              ${order.status === 'Delivered' ? 'text-green-600 border-green-600' :
+                order.status === 'Preparing' ? 'text-blue-600 border-blue-600' :
+                  order.status === 'On the way' ? 'text-orange-600 border-orange-600' :
                     'text-gray-600 border-gray-600'
               }`}
           >
@@ -256,12 +261,13 @@ const OrderDetails: React.FC = () => {
                 Cancel
               </Button>
             </DialogClose>
-            <Button className="background text-white hover:bg-[#0056b3] transition-colors duration-300 flex items-center"
-              onClick={handleEditOrder}>Save Changes</Button>
+            <CustomButton
+              onClick={handleEditOrder}>Save Changes</CustomButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </motion.div>
+    </>
   );
 };
 

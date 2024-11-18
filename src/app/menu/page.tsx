@@ -25,9 +25,12 @@ import {
   X,
   ArrowLeftIcon,
   Package,
+  Search,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
+import Header from "@/components/Header";
+import { CustomButton } from "@/components/CustomButton";
 const MenuItemSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters long" }),
   description: z.string().min(5, { message: "Description must be at least 5 characters long" }),
@@ -51,18 +54,36 @@ const MenuDetails: React.FC = () => {
     imageLink: "",
   });
   const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
-
+  const [searchTerm, setSearchTerm] = useState('');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [menuItemToDelete, setMenuItemToDelete] = useState<string | null>(null);
   const [isAddItemDialogOpen, setIsAddItemDialogOpen] = useState(false);
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
   const [currentEditItem, setCurrentEditItem] = useState<MenuItem | null>(null);
+  const [filteredMenu, setFilteredMenu] = useState<MenuItem[]>([]);
 
   useEffect(() => {
     if (status === "authenticated") {
       fetchMenu();
     }
   }, [session, status]);
+
+  useEffect(() => {
+    filterMenu();
+  }, [menu, searchTerm]);
+
+  const filterMenu = () => {
+    let filtered = menu;
+
+    if (searchTerm) {
+      filtered = filtered.filter(item => 
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredMenu(filtered);
+  };
 
   const fetchMenu = async () => {
     setIsLoading(true);
@@ -253,26 +274,21 @@ const MenuDetails: React.FC = () => {
   }
 
   return (
+    <>
+       <Header 
+                onAddItem={() => setIsAddItemDialogOpen(true)}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+            />
+   
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto px-4 py-8"
+      className="container mx-auto px-4 py-12"
     >
       <div className="bg-white shadow-lg rounded-xl overflow-hidden">
-        <div className=" text p-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold">Menu Details</h1>
-            <Button
-              onClick={() => setIsAddItemDialogOpen(true)}
-              className="background text-white hover:bg-[#0056b3]  transition-colors duration-300 flex items-center"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Item
-            </Button>
-          </div>
-        </div>
-
+   
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-100 border-b">
@@ -310,18 +326,20 @@ const MenuDetails: React.FC = () => {
                         ))}
                     </tr>
                   ))
-              ) : menu?.length === 0 ? (
+              ) : filteredMenu?.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center py-12 text-gray-500">
                     <div className="flex flex-col items-center space-y-4">
-                      <Package className="w-16 h-16 text-gray-300" />
-                      <p className="text-xl">No menu items found</p>
+                    <Search className="w-16 h-16 text-gray-300" />
+                        <p className="text-xl">
+                          {searchTerm ? "No menu items found" : "No menu items available"}
+                        </p>
                     </div>
                   </td>
                 </tr>
               ) :
                 (
-                  menu?.map((item) => (
+                  filteredMenu?.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">{item.name}</td>
                       <td className="px-6 py-4">{item.description}</td>
@@ -340,14 +358,13 @@ const MenuDetails: React.FC = () => {
                         />
                       </td>
                       <td className="px-6 py-4 flex space-x-2">
-                        <Button
+                        <CustomButton
                           onClick={() => handleEditItem(item)}
-                          className="background hover:bg-[#0056b3] "
-                          size="lg"
+                          className="w-20"                          
                         >
                           <Edit className="h-4 w-4 mr-2" />
                           Edit
-                        </Button>
+                        </CustomButton>
                         <Button
                           onClick={() => openDeleteDialog(item.id)}
                           variant="destructive"
@@ -513,12 +530,11 @@ const MenuDetails: React.FC = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button
+            <CustomButton
               onClick={handleSubmitItem}
-              className="background hover:bg-[#0056b3] "
             >
               {formMode === 'add' ? 'Add Item' : 'Update Item'}
-            </Button>
+            </CustomButton>
             <Button
               onClick={() => {
                 setNewItem({
@@ -550,16 +566,16 @@ const MenuDetails: React.FC = () => {
             <Button variant="destructive" onClick={handleDeleteItem}>
               Delete
             </Button>
-            <Button
-              variant="outline"
+            <CustomButton
               onClick={() => setIsDeleteDialogOpen(false)}
             >
               Cancel
-            </Button>
+            </CustomButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </motion.div>
+    </>
   );
 };
 

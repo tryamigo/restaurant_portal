@@ -84,3 +84,7 @@ body {
 .background{
   background-color: #007AFF;
 }
+
+.customBorder{
+  border: 1px solid #007AFF;
+}

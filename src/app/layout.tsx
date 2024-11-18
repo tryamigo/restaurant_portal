@@ -8,7 +8,6 @@ import { Home, ShoppingBag, Tag, LogOut, Store, Bell } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import Header from "@/components/Header";
 const navItems = [
   { href: '/orders', label: 'Orders', icon: ShoppingBag },
   { href: '/menu', label: 'Menu', icon: Home },
@@ -47,10 +46,30 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
               >
                 <Link href={item.href} passHref>
                   <Button
-                    variant={pathname === item.href || (pathname === '/' && item.href === '/orders') ? "default" : "ghost"}
-                    className="w-full justify-start background text-white hover:bg-gray-200 hover:text-black"
+                    variant="ghost"
+                    className={`
+      w-full 
+      justify-start 
+      hover:bg-blue-50 
+      hover:text-blue-600 
+      ${pathname === item.href || (pathname === '/' && item.href === '/orders')
+                        ? "bg-blue-50 text"
+                        : "text-gray-700"
+                      }
+      transition-colors 
+      duration-200 
+      ease-in-out
+    `}
                   >
-                    <item.icon className="mr-2 h-4 w-4" />
+                    <item.icon className={`
+      mr-2 
+      h-4 
+      w-4 
+      ${pathname === item.href || (pathname === '/' && item.href === '/orders')
+                        ? "text"
+                        : "text-gray-500"
+                      }
+    `} />
                     {item.label}
                   </Button>
                 </Link>
@@ -60,24 +79,20 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         </div>
       </motion.div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        
-          <Header/>
-        {/* Main Content */}
-        <motion.main
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="flex-1 overflow-auto p-4 bg-gray-100"
-        >
-          <div className="bg-white rounded-lg shadow-md p-4">
-            <AnimatePresence mode="wait">
-              {children}
-            </AnimatePresence>
-          </div>
-        </motion.main>
-      </div>
+      {/* Main Content */}
+      <motion.main
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="flex-1 overflow-auto p-4 bg-gray-100"
+      >
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <AnimatePresence mode="wait">
+            {children}
+          </AnimatePresence>
+        </div>
+      </motion.main>
+
     </div>
   );
 }
@@ -91,10 +106,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <SessionProvider>
-            <LayoutContent>
-              {children}
-            </LayoutContent>
-            <Toaster />
+          <LayoutContent>
+            {children}
+          </LayoutContent>
+          <Toaster />
         </SessionProvider>
       </body>
     </html>

@@ -68,6 +68,7 @@ export default function Notifications() {
 
   // Process new events and add to notifications
   useEffect(() => {
+    const notificationSound = new Audio('/sounds/notification-sound.mp3');
     if (events && events.length > 0) {
       const newNotifications: NotificationItem[] = events.map(event => ({
         ...event,
@@ -86,6 +87,9 @@ export default function Notifications() {
 
       // Add new notifications to the existing list
       if (uniqueNewNotifications.length > 0) {
+        notificationSound.play().catch(error => {
+            console.error("Error playing notification sound:", error);
+          });
         setNotifications(prev => [
           ...uniqueNewNotifications,
           ...prev
@@ -124,7 +128,7 @@ export default function Notifications() {
     setNotifications(prev => 
       prev.filter(notif => notif.id !== notificationId)
     );
-    setEvents([]);
+     setEvents((prev)=>prev.filter(pre => pre.order.id !==notificationId))
   };
 
   // Remove all read notifications

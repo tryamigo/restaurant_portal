@@ -9,7 +9,7 @@ export function useSSE() {
     // Only establish SSE connection if user is authenticated
     if (status === 'authenticated' && session?.user?.id) {
       const eventSource = new EventSource(
-        `http://localhost:3001/sse/events?restaurantId=${session.user.id}`
+        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/sse/events?restaurantId=${session.user.id}`
       );
 
       eventSource.onmessage = (event) => {
