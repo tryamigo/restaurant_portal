@@ -205,7 +205,7 @@ function OrdersPage() {
                                                         </Tooltip>
                                                     </TooltipProvider>
                                                     <div className="text-xs text-gray-500">
-                                                        Total: ${Number(order.total).toFixed(2)}
+                                                        Total: ₹{Number(order.total).toFixed(2)}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
@@ -216,13 +216,13 @@ function OrdersPage() {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="text-sm">
-                                                        <div>Subtotal: ${Number(order.total - order.deliveryCharge + order.discount).toFixed(2)}</div>
+                                                        <div>Subtotal: ₹{Number(order.total - order.deliveryCharge + order.discount).toFixed(2)}</div>
                                                         <div className="text-xs text-gray-500">
-                                                            Delivery: ${Number(order.deliveryCharge).toFixed(2)}
+                                                            Delivery: ₹{Number(order.deliveryCharge).toFixed(2)}
                                                         </div>
                                                         {order.discount > 0 && (
                                                             <div className="text-xs text-green-500">
-                                                                Discount: -${Number(order.discount).toFixed(2)}
+                                                                Discount: -₹{Number(order.discount).toFixed(2)}
                                                             </div>
                                                         )}
                                                     </div>

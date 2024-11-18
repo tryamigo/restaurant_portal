@@ -108,8 +108,8 @@ const CouponsPage = () => {
     startDate: "",
     endDate: "",
   });
-  const [searchCode, setSearchCode] = useState("");
-  const [foundCoupon, setFoundCoupon] = useState<Coupon | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredCoupon,setFilteredCoupon]=useState<Coupon[]>([])
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
@@ -120,19 +120,6 @@ const CouponsPage = () => {
     }
   }, [session, status]);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (searchCode) {
-        handleFindCouponByCode(searchCode);
-      } else {
-        setFoundCoupon(null);
-      }
-    }, 500); // 500ms debounce delay
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchCode]);
 
   const validateCoupon = async () => {
     try {
@@ -259,7 +246,6 @@ const CouponsPage = () => {
       }
     }
   };
-
   const handleDeleteCoupon = async (id: string) => {
     try {
       const response = await fetch(`/api/restaurants/coupons?id=${id}`, {
@@ -285,6 +271,21 @@ const CouponsPage = () => {
         variant: "destructive",
       });
     }
+  };
+  useEffect(() => {
+    filterCoupon();
+  }, [coupons, searchTerm]);
+
+  const filterCoupon = () => {
+    let filtered = coupons;
+
+    if (searchTerm) {
+      filtered = filtered.filter(item => 
+        item.couponCode.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredCoupon(filtered);
   };
   const handleUpdateCouponStatus = async (id: string, isActive: boolean) => {
     try {
@@ -315,41 +316,6 @@ const CouponsPage = () => {
     }
   };
 
-  const handleFindCouponByCode = async (code: string) => {
-    try {
-      const response = await fetch(`/api/restaurants/coupons?code=${code}`, {
-        headers: {
-          Authorization: `Bearer ${session?.user.token}`,
-        },
-      });
-
-      if (!response.ok) throw new Error("Failed to find coupon");
-
-      const data = await response.json();
-      if (data.coupon) {
-        setFoundCoupon(data.coupon);
-        toast({
-          title: "Success",
-          description: "Coupon found",
-        });
-      } else {
-        setFoundCoupon(null);
-        toast({
-          title: "Info",
-          description: "No coupon found with this code",
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      setFoundCoupon(null);
-      toast({
-        title: "Error",
-        description: "Failed to find coupon",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (isLoading) {
     return (
       <div data-testid="loading-spinner" className="flex justify-center items-center h-screen">
@@ -361,8 +327,8 @@ const CouponsPage = () => {
   return (
     <>
       <Header
-        searchTerm={searchCode}
-        setSearchTerm={setSearchCode}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
         onAddItem={() => setIsAddingCoupon(true)}
       />
       <motion.div
@@ -379,9 +345,9 @@ const CouponsPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {coupons.length > 0 ? (
+              {filteredCoupon?.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {coupons.map((coupon) => (
+                  {filteredCoupon?.map((coupon) => (
                     <motion.div
                       key={coupon.id}
                       whileHover={{ scale: 1.05 }}
@@ -473,129 +439,6 @@ const CouponsPage = () => {
                 </div>
               )}
             </motion.div>
-
-            {/* Found Coupon Section with Enhanced UI */}
-            {foundCoupon && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-8"
-              >
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 shadow-lg">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-2xl font-bold text-blue-800">Found Coupon Details</h3>
-                    <Badge
-                      variant={foundCoupon.isActive ? "default" : "destructive"}
-                      className="text-sm"
-                    >
-                      {foundCoupon.isActive ? "Active" : "Inactive"}
-                    </Badge>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="text-lg font-semibold text-blue-700 mb-4">Basic Information</h4>
-                      <div className="space-y-2">
-                        <p className="text-gray-600">
-                          <strong className="text-blue-700">Coupon Code:</strong>
-                          <span className="ml-2 text-gray-800">{foundCoupon.couponCode}</span>
-                        </p>
-                        <p className="text-gray-600">
-                          <strong className="text-blue-700">Title:</strong>
-                          <span className="ml-2 text-gray-800">{foundCoupon.title}</span>
-                        </p>
-                        <p className="text-gray-600">
-                          <strong className="text-blue-700">Description:</strong>
-                          <span className="ml-2 text-gray-800">{foundCoupon.description}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-lg font-semibold text-blue-700 mb-4">Discount Details</h4>
-                      <div className="space-y-2">
-                        <p className="text-gray-600">
-                          <strong className="text-blue-700">Discount Type:</strong>
-                          <span className="ml-2 text-gray-800">
-                            {foundCoupon.discountType === "PERCENTAGE"
-                              ? "Percentage"
-                              : "Fixed Amount"}
-                          </span>
-                        </p>
-                        <p className="text-gray-600">
-                          <strong className="text-blue-700">Discount Value:</strong>
-                          <span className="ml-2 text-gray-800">
-                            {foundCoupon.discountType === "PERCENTAGE"
-                              ? `${foundCoupon.discountValue}%`
-                              : `₹${parseFloat(foundCoupon.discountValue).toFixed(2)}`}
-                          </span>
-                        </p>
-                        <p className="text-gray-600">
-                          <strong className="text-blue-700">Minimum Order Value:</strong>
-                          <span className="ml-2 text-gray-800">
-                            ₹{parseFloat(foundCoupon.minOrderValue ?? '0').toFixed(2)}
-                          </span>
-                        </p>
-                        <p className="text-gray-600">
-                          <strong className="text-blue-700">Maximum Discount:</strong>
-                          <span className="ml-2 text-gray-800">
-                            ₹{parseFloat(foundCoupon.maxDiscount ?? '0').toFixed(2)}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-lg font-semibold text-blue-700 mb-4">Usage Details</h4>
-                      <div className="space-y-2">
-                        <p className="text-gray-600">
-                          <strong className="text-blue-700">Usage Limit:</strong>
-                          <span className="ml-2 text-gray-800">{foundCoupon.usageLimit}</span>
-                        </p>
-                        <p className="text-gray-600">
-                          <strong className="text-blue-700">Eligible Orders:</strong>
-                          <span className="ml-2 text-gray-800">{foundCoupon.eligibleOrders ?? 'N/A'}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-lg font-semibold text-blue-700 mb-4">Validity</h4>
-                      <div className="space-y-2">
-                        <p className="text-gray-600">
-                          <strong className="text-blue-700">Start Date:</strong>
-                          <span className="ml-2 text-gray-800">
-                            {format(new Date(foundCoupon.startDate), 'dd MMM yyyy')}
-                          </span>
-                        </p>
-                        <p className="text-gray-600">
-                          <strong className="text-blue-700">End Date:</strong>
-                          <span className="ml-2 text-gray-800">
-                            {format(new Date(foundCoupon.endDate), 'dd MMM yyyy')}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex justify-end space-x-3">
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleDeleteCoupon(foundCoupon.id)}
-                    >
-                      Delete Coupon
-                    </Button>
-                    <CustomButton
-                      onClick={() =>
-                        handleUpdateCouponStatus(foundCoupon.id, !foundCoupon.isActive)
-                      }
-                    >
-                      {foundCoupon.isActive ? "Deactivate" : "Activate"}
-                    </CustomButton>
-                  </div>
-                </div>
-              </motion.div>
-            )}
           </CardContent>
         </div>
 

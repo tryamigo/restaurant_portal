@@ -1,7 +1,7 @@
 // components/Notifications.tsx
 'use client'
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSSE } from '../hooks/useSSE';
 import { ShoppingBag, Check, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -57,18 +57,32 @@ export default function Notifications() {
   });
   const [isOpen, setIsOpen] = useState(false);
 
+  const playNotificationSound = useCallback(() => {
+    if (typeof window !== 'undefined' && window.Audio) {
+      try {
+        const audio = new Audio('/sounds/notification-sound.mp3');
+        audio.play().catch(error => {
+          console.error("Error playing notification sound:", error);
+        });
+      } catch (error) {
+        console.error("Error creating audio element:", error);
+      }
+    }
+  }, []);
+
   // Update localStorage whenever notifications change
   useEffect(() => {
-    try {
-      localStorage.setItem('notifications', JSON.stringify(notifications));
-    } catch (error) {
-      console.error("Error saving notifications to localStorage:", error);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+      } catch (error) {
+        console.error("Error saving notifications to localStorage:", error);
+      }
     }
   }, [notifications]);
 
   // Process new events and add to notifications
   useEffect(() => {
-    const notificationSound = new Audio('/sounds/notification-sound.mp3');
     if (events && events.length > 0) {
       const newNotifications: NotificationItem[] = events.map(event => ({
         ...event,
@@ -87,9 +101,8 @@ export default function Notifications() {
 
       // Add new notifications to the existing list
       if (uniqueNewNotifications.length > 0) {
-        notificationSound.play().catch(error => {
-            console.error("Error playing notification sound:", error);
-          });
+        playNotificationSound();
+
         setNotifications(prev => [
           ...uniqueNewNotifications,
           ...prev
@@ -144,7 +157,7 @@ export default function Notifications() {
       <div 
         key={notification.id} 
         className={`
-          border-b last:border-b-0 
+          border-b last:border-b-0  
           ${!notification.read ? 'bg-blue-50' : 'bg-white'}
           hover:bg-gray-100 
           transition duration-200
@@ -200,6 +213,7 @@ export default function Notifications() {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
+        <div>
         <Button variant="ghost" size="icon" className="relative" onClick={() => setIsOpen(!isOpen)}>
           <ShoppingBag className="h-5 w-5" />
           {unreadCount > 0 && (
@@ -211,6 +225,7 @@ export default function Notifications() {
             </Badge>
           )}
         </Button>
+        </div>
       </PopoverTrigger>
       <PopoverContent className="w-96 p-0 mr-2">
         <div className="flex items-center justify-between p-4 border-b">

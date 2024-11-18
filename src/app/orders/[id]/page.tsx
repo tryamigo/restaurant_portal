@@ -129,14 +129,11 @@ const OrderDetails: React.FC = () => {
       className="container mx-auto max-w-6xl px-4 py-12"
     >
    
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text ">Order #{order.id}</h1>
-          <p className="text ">
-            Placed on {format(new Date(order.orderTime), 'MMMM dd, yyyy at hh:mm a')}
-          </p>
+      <div className="flex justify-between items-center ">
+        <div className=''>
+          <h1 className="text-3xl font-bold  ">Order #{order.id}</h1>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex  space-x-4">
           <Link href="/orders">
             <CustomButton >
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
@@ -149,7 +146,11 @@ const OrderDetails: React.FC = () => {
           </CustomButton>
         </div>
       </div>
-
+     <div className='mb-2'>
+     <p className="text-gray-700">
+            Placed on {format(new Date(order.orderTime), 'MMMM dd, yyyy at hh:mm a')}
+          </p>
+     </div>
       {/* Order Status */}
       <div className="bg-white shadow-md rounded-lg p-6 mb-8">
         <div className="flex items-center justify-between">
@@ -157,9 +158,9 @@ const OrderDetails: React.FC = () => {
             {StatusIcon[order.status as keyof typeof StatusIcon]}
             <div>
               <h2 className="text-xl text font-semibold capitalize">{order.status}</h2>
-              <p className="text-gray-500">Current order status</p>
             </div>
           </div>
+          <div className='flex items-center'>
           <Badge
             variant="outline"
             className={`
@@ -172,7 +173,11 @@ const OrderDetails: React.FC = () => {
           >
             {order.status}
           </Badge>
+          </div>
         </div>
+        <div>
+          <p className="text-gray-500">Current order status</p>
+          </div>
       </div>
 
       {/* Order Items */}
@@ -205,8 +210,8 @@ const OrderDetails: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">{item.quantity}</td>
-                <td className="px-6 py-4 whitespace-nowrap">${item.price ? Number(item.price).toFixed(2) : 'N/A'}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">${(item.price * item.quantity).toFixed(2)}</td>
+                <td className="px-6 py-4 whitespace-nowrap">₹{item.price ? Number(item.price).toFixed(2) : 'N/A'}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-right">₹{(item.price * item.quantity).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
