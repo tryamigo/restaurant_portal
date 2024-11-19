@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { MenuItem, Restaurant } from "@/components/types";
+import { motion } from "framer-motion";
+import { MenuItem } from "@/components/types";
 import { useSession } from "next-auth/react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { z } from 'zod';
 import {
   Dialog,
@@ -17,14 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
-  MoreHorizontal,
   Edit,
-  Plus,
-  Save,
   Trash2,
-  X,
-  ArrowLeftIcon,
-  Package,
   Search,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -145,9 +139,10 @@ const MenuDetails: React.FC = () => {
       // Prepare item data with image links
       const itemData = {
         ...newItem,
-        ...(imageUploadResult && { imageLink: imageUploadResult })
+        ...(imageUploadResult && { imageLink: "https://image.navya.so/"+imageUploadResult })
 
       };
+      console.log(imageUploadResult)
       // Validate the item
       const validatedItem = MenuItemSchema.parse(itemData);
 
@@ -238,6 +233,7 @@ const MenuDetails: React.FC = () => {
     setFormMode('edit');
     setIsAddItemDialogOpen(true);
   };
+  console.log(menu)
   const handleDeleteItem = async () => {
     if (!menuItemToDelete) return;
     try {
@@ -327,7 +323,7 @@ const MenuDetails: React.FC = () => {
         <div className="bg-white shadow-lg rounded-xl overflow-hidden">
 
           {/* Desktop Table */}
-          <div className="hidden md:block overflow-x-auto">
+          <div className="hidden w-full md:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-100 border-b">
                 <tr>
@@ -389,7 +385,16 @@ const MenuDetails: React.FC = () => {
                         <td className="px-6 py-4">{item.ratings}</td>
                         <td className="px-6 py-4">{item.discounts}%</td>
                         <td className="px-6 py-4">
-
+                        {item.imageLink && (
+                        <Image 
+                          src={item.imageLink} 
+                          alt={item.name} 
+                          width={50} 
+                          height={50} 
+                          className="object-cover rounded"
+                        />
+                        
+                      )}
                         </td>
                         <td className="px-6 py-4">{item.cuisine}</td>
                         <td className="px-6 py-4">{item.vegOrNonVeg}</td>
@@ -622,7 +627,7 @@ const MenuDetails: React.FC = () => {
               </div>
             </div>
             <DialogFooter>
-              <CustomButton onClick={handleSubmitItem}>
+              <CustomButton className="justify-center mt-2 md:mt-0" onClick={handleSubmitItem}>
                 {formMode === 'add' ? 'Add Item' : 'Update Item'}
               </CustomButton>
               <Button

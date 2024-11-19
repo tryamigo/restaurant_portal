@@ -6,12 +6,6 @@ import { AddressFields } from '@/components/AddressFields';
 import { useSession } from 'next-auth/react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
     Dialog,
     DialogContent,
     DialogDescription,
@@ -22,15 +16,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import {
-    MoreHorizontal,
-    Edit,
-    Plus,
-    Save,
-    Trash2,
-    X,
-    ArrowLeftIcon
-} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import Header from '@/components/Header';
@@ -40,8 +25,6 @@ const RestaurantDetails: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { data: session, status } = useSession();
-    const [editingItemId, setEditingItemId] = useState<string | null>(null);
-    const [newItem, setNewItem] = useState<Omit<MenuItem, 'id'>>({ name: '', description: '', price: 0, ratings: 0, discounts: 0, imageLink: '' });
     const [isEditing, setIsEditing] = useState(false);
     const [editedRestaurant, setEditedRestaurant] = useState<Restaurant | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);

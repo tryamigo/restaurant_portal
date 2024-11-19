@@ -1,10 +1,10 @@
 'use client'
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
-import React, { useState } from "react";
+import React from "react";
 import { SessionProvider, useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
-import { Home, ShoppingBag, Tag, Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Home, ShoppingBag, Tag } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,7 +16,7 @@ const navItems = [
 ];
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const pathname = usePathname();
 
   // Don't render layout for signin page

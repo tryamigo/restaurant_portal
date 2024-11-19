@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,13 +17,10 @@ import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
 import { Coupon } from "@/components/types";
 import { motion } from "framer-motion";
-import { PlusCircle, Search, Tag } from "lucide-react";
+import { Tag } from "lucide-react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { z } from 'zod';
@@ -444,7 +441,7 @@ return (
         {/* Modal for Adding Coupon */}
         <Dialog open={isAddingCoupon} onOpenChange={setIsAddingCoupon}>
           <DialogContent className="max-h-[90vh] overflow-y-auto">
-            <DialogTitle className="text-lg md:text-xl">Add New Coupon</DialogTitle>
+            <DialogTitle className="text-lg text text-center md:text-xl">Add New Coupon</DialogTitle>
             <form onSubmit={handleAddCoupon} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -673,7 +670,7 @@ return (
                 </Button>
                 <CustomButton 
                   type="submit" 
-                  className="w-full md:w-auto"
+                  className="w-full justify-center md:w-auto"
                 >
                   Add Coupon
                 </CustomButton>

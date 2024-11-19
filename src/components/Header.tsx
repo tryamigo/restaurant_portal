@@ -57,10 +57,10 @@ function Header({ searchTerm, setSearchTerm, statusFilter, setStatusFilter, onAd
             <div className="flex space-x-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <CustomButton 
+                  <Button className='outline-none text customBorder hover:bg-blue-100 hover:text' variant={"ghost"} 
                   >
                     Options
-                  </CustomButton>
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={restaurantActions?.onEditRestaurant}>

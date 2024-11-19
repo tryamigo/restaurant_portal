@@ -8,8 +8,7 @@ import {
   Clock,
   Package,
   Truck,
-  CheckCircle2,
-  DollarSign
+  CheckCircle2
 } from 'lucide-react';
 import Link from 'next/link';
 import { Label } from "@/components/ui/label";
@@ -138,14 +137,14 @@ const OrderDetails: React.FC = () => {
         </div>
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto">
           <Link href="/orders" className="w-full md:w-auto">
-            <CustomButton className="w-full">
+            <CustomButton className="w-full justify-center">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
               Back to Orders
             </CustomButton>
           </Link>
           <CustomButton 
             onClick={() => setIsEditDialogOpen(true)}
-            className="w-full md:w-auto"
+            className="w-full md:w-auto justify-center"
           >
             Update Status
           </CustomButton>
@@ -153,12 +152,12 @@ const OrderDetails: React.FC = () => {
       </div>
 
       {/* Order Status */}
-      <div className="bg-white shadow-md rounded-lg p-4 md:p-6 mb-6">
+      <div className="bg-white  shadow-md rounded-lg p-4 md:p-6 mb-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
-          <div className="flex items-center space-x-4 mb-4 md:mb-0">
+          <div className="flex items-center space-x-4  mb-4 md:mb-0">
             {StatusIcon[order.status as keyof typeof StatusIcon]}
             <div>
-              <h2 className="text-lg md:text-xl font-semibold capitalize">{order.status}</h2>
+              <h2 className="text-lg md:text-xl font-semibold  capitalize">{order.status}</h2>
               <p className="text-xs md:text-sm text-gray-500">Current order status</p>
             </div>
           </div>
