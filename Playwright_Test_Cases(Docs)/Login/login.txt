@@ -1,0 +1,73 @@
+### End To End Testing Using Playwright
+
+#### 1. Test Case Name: Should Display All Necessary Elements for Login on Page Load
+- **Description**: Verify that all the necessary elements, such as the mobile input field and the Send OTP button, are visible when the page loads.
+- **Input**: No input needed, just page load.
+- **Preconditions**: The OTP login page is loaded.
+- **Expected Result**: Mobile input and Send OTP button should be visible, while the Login button and OTP input fields should not be visible.
+
+#### 2. Test Case Name: Should Disable Send OTP Button When Mobile Field is Empty
+- **Description**: Verify that the Send OTP button is disabled when the mobile input field is empty or has partial input.
+- **Input**: Empty mobile input field or partial input (e.g., '123456').
+- **Preconditions**: OTP login page is loaded.
+- **Expected Result**: Send OTP button should remain disabled until a valid mobile number is entered.
+
+#### 3. Test Case Name: Should Show an Error for Invalid Mobile Number
+- **Description**: Verify that an error message is displayed when an invalid mobile number (less than 10 digits) is entered.
+- **Input**: Invalid mobile number ('12345').
+- **Preconditions**: OTP login page is loaded.
+- **Expected Result**: An error message stating "Please enter a valid 10-digit mobile number" should be displayed.
+
+#### 4. Test Case Name: Should Successfully Request OTP for a Valid Mobile Number
+- **Description**: Verify that the OTP input field and Login button appear after a valid mobile number is entered and the Send OTP button is clicked.
+- **Input**: Valid mobile number ('+911234567890').
+- **Preconditions**: OTP login page is loaded.
+- **Expected Result**: OTP input field should appear, and the Login button should be visible. The Send OTP button should be hidden, and the Resend OTP button should be visible.
+
+#### 5. Test Case Name: Should Disable Resend OTP Button During Cooldown Period
+- **Description**: Verify that the Resend OTP button is disabled during the cooldown period after an OTP request.
+- **Input**: Valid mobile number ('+911234567890').
+- **Preconditions**: OTP login page is loaded.
+- **Expected Result**: Resend OTP button should be disabled with a cooldown timer.
+
+#### 6. Test Case Name: Should Re-enable Resend OTP Button After Cooldown Expires
+- **Description**: Verify that the Resend OTP button becomes enabled after the cooldown period.
+- **Input**: Valid mobile number ('+911234567890').
+- **Preconditions**: OTP login page is loaded.
+- **Expected Result**: After the cooldown period, the Resend OTP button should become enabled.
+
+#### 7. Test Case Name: Should Allow Only Numeric Characters in OTP Fields
+- **Description**: Verify that only numeric characters can be entered into OTP fields.
+- **Input**: Non-numeric characters ('a'), followed by numeric characters ('1').
+- **Preconditions**: OTP input fields are visible after OTP request.
+- **Expected Result**: Non-numeric characters should not be entered, and only numeric characters should be accepted.
+
+#### 8. Test Case Name: Should Move Focus to Next OTP Input on Valid Entry and Back on Deletion
+- **Description**: Verify that the focus automatically moves to the next OTP input field after a valid entry and back to the previous field when deleting a character.
+- **Input**: OTP input fields are filled with valid numbers (e.g., '1', '2', '3').
+- **Preconditions**: OTP fields are visible after OTP request.
+- **Expected Result**: The focus should move to the next field after entering a value and return to the previous field upon pressing backspace.
+
+#### 9. Test Case Name: Should Display Error When OTP is Incomplete and Login is Attempted
+- **Description**: Verify that an error message is displayed when attempting to login with an incomplete OTP.
+- **Input**: Incomplete OTP ('12').
+- **Preconditions**: OTP fields are filled partially.
+- **Expected Result**: An error message stating "Please enter the complete 6-digit OTP" should be displayed.
+
+#### 10. Test Case Name: Should Successfully Log in with Correct OTP
+- **Description**: Verify that the user successfully logs in after entering the correct OTP.
+- **Input**: Correct OTP ('123456').
+- **Preconditions**: OTP input fields are visible.
+- **Expected Result**: The user should be redirected to the post-login page (e.g., '/').
+  
+#### 11. Test Case Name: Should Handle Resend OTP Request Successfully After Cooldown
+- **Description**: Verify that the OTP request is handled successfully after the cooldown period.
+- **Input**: Valid mobile number ('+911234567890').
+- **Preconditions**: OTP has already been requested, and the cooldown period has expired.
+- **Expected Result**: Resend OTP button should become visible and functional after the cooldown period.
+
+#### 12. Test Case Name: Should Display Loading Spinner During OTP Request and Login
+- **Description**: Verify that a loading spinner is displayed during OTP request and login processing.
+- **Input**: Valid mobile number and OTP.
+- **Preconditions**: OTP login page is loaded.
+- **Expected Result**: Loading spinner should appear during both the OTP request and login steps.

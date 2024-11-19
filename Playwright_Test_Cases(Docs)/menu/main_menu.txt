@@ -1,0 +1,78 @@
+# 1. Editing Existing Items
+
+## Test Case: Inline editing of menu items
+- Precondition: User is authenticated and navigated to the menu management page.
+- Steps:
+    1. Locate an existing menu item and click the "Edit" icon/button.
+    2. Modify the item’s details inline (e.g., change the name or price).
+    3. Click the "Save" button.
+- Expected Result:
+    - The server receives the updated data.
+    - Changes are reflected in the UI without requiring a page reload.
+    - A success message is displayed (e.g., *"Item updated successfully"*).
+
+## Test Case: Canceling inline edits
+- Steps:
+    1. Click the "Edit" button for a menu item.
+    2. Modify the item’s details inline.
+    3. Click the "Cancel" button.
+- Expected Result:
+    - No changes are saved to the server.
+    - The UI reverts to its original state, showing the item’s previous details.
+
+# 2. Deleting Items
+
+## Test Case: Deletion with confirmation dialog
+- Precondition: User is authenticated and navigated to the menu management page.
+- Steps:
+    1. Locate an existing menu item and click the "Delete" icon/button.
+    2. Confirm the deletion in the confirmation dialog.
+- Expected Result:
+    - A delete request is sent to the server.
+    - The item is removed from the UI upon successful deletion.
+    - A success message is displayed (e.g., *"Item deleted successfully"*).
+
+## Test Case: Canceling deletion
+- Steps:
+    1. Locate an existing menu item and click the "Delete" icon/button.
+    2. Cancel the action in the confirmation dialog.
+- Expected Result:
+    - No delete request is sent to the server.
+    - The item remains visible in the UI, and no changes are made.
+
+# 3. Fetching Menu Items
+
+## Test Case: Fetching menu data
+- Precondition: User is authenticated.
+- Steps:
+    1. Load the menu management page.
+- Expected Result:
+    - A loading spinner is displayed during the fetch process.
+    - Menu items are rendered in the UI once the data is successfully fetched.
+
+## Test Case: Error handling during fetch
+- Precondition: Simulate a failed fetch request (e.g., 500 Internal Server Error).
+- Steps:
+    1. Load the menu management page.
+- Expected Result:
+    - An error message is displayed (e.g., *"Failed to load menu items. Please try again."*).
+    - The user can retry fetching the data by clicking a "Retry" button or similar.
+
+# 4. UI Responsiveness
+
+## Test Case: Visibility and layout of content in mobile view
+- Precondition: Switch the viewport to a mobile resolution (e.g., 375x667).
+- Steps:
+    1. Navigate to the menu management page.
+- Expected Result:
+    - The UI adapts to the mobile screen size.
+    - Key elements (e.g., menu items, buttons) remain accessible and usable.
+    - Items and buttons should be displayed clearly without overlap or horizontal scrolling.
+
+## Test Case: Visibility and layout of content in laptop view
+- Precondition: Switch the viewport to a laptop resolution (e.g., 1366x768).
+- Steps:
+    1. Navigate to the menu management page.
+- Expected Result:
+    - The UI displays all content properly without overlapping or misalignment.
+    - Elements such as buttons, menu items, and form fields are arranged in a user-friendly layout, ensuring the content is fully visible on the screen without any elements being cut off.

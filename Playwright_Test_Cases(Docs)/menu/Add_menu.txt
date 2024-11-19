@@ -1,0 +1,173 @@
+# **Test Cases for Add Item Page**
+
+## 1. Verify UI Elements on Load
+
+- **Test Case**: Verify all necessary fields and buttons are visible
+- **Precondition**: User is authenticated and on the "Add Item" page.
+- **Steps**:
+    1. Navigate to the "Add Item" page.
+    2. Verify the visibility of the following UI elements:
+        - Form title: "Add New Item".
+        - Fields: "Item Name", "Description", "Price", "Ratings", "Discount", "Image URL".
+        - Button: "Add Item".
+- **Expected Result**:
+    - All fields and buttons are visible and properly labeled.
+
+---
+
+## 2. Verify Required Field Validation
+
+- **Test Case**: Verify validation when fields are empty
+- **Precondition**: User is on the "Add Item" page.
+- **Steps**:
+    1. Leave all fields empty.
+    2. Click the "Add Item" button.
+- **Expected Result**:
+    - Appropriate error messages are displayed for each required field:
+        - Name must be at least 2 characters long.
+        - Description is required.
+        - Price is required.
+        - Rating is required.
+        - Discount is required.
+        - Image URL is required.
+
+---
+
+## 3. Verify Input Validation for Numeric Fields
+
+- **Test Case**: Verify validation for the "Price", "Ratings", and "Discount" fields
+- **Precondition**: User is on the "Add Item" page.
+- **Steps**:
+    1. Enter invalid data in numeric fields:
+        - "Price": Enter a non-numeric value (e.g., "abc").
+        - "Ratings": Enter a number outside the range (e.g., -1 or 6).
+        - "Discount": Enter a number outside the range (e.g., -10 or 110).
+    2. Click the "Add Item" button.
+- **Expected Result**:
+    - Validation errors are displayed for each field with invalid input:
+        - Price must be a valid number.
+        - Ratings must be between 0 and 5.
+        - Discount must be between 0 and 100.
+
+---
+
+## 4. Verify Adding a Valid Item
+
+- **Test Case**: Verify successful item addition
+- **Precondition**: User is on the "Add Item" page.
+- **Steps**:
+    1. Enter valid data in all fields:
+        - "Item Name": "Pizza".
+        - "Description": "Cheese Pizza".
+        - "Price": "10.99".
+        - "Ratings": "4".
+        - "Discount": "20".
+        - "Image URL": "https://example.com/image.jpg".
+    2. Click the "Add Item" button.
+- **Expected Result**:
+    - The item is added successfully.
+    - A confirmation message is displayed.
+
+---
+
+## 5. Verify Behavior When Image URL is Invalid
+
+- **Test Case**: Verify behavior for invalid image URL
+- **Precondition**: User is on the "Add Item" page.
+- **Steps**:
+    1. Enter valid data in all fields except "Image URL":
+        - Enter an invalid URL (e.g., "invalid-url").
+    2. Click the "Add Item" button.
+- **Expected Result**:
+    - A validation error is displayed for the "Image URL" field.
+    - Invalid Image URL.
+
+---
+
+## 6. Verify Maximum and Minimum Field Lengths
+
+- **Test Case**: Verify character length restrictions
+- **Precondition**: User is on the "Add Item" page.
+- **Steps**:
+    1. Enter text exceeding the maximum allowed length in "Item Name" and "Description".
+    2. Attempt to proceed.
+- **Expected Result**:
+    - Validation errors are displayed for fields exceeding the maximum length:
+        - Item Name is too long.
+        - Description is too long.
+
+---
+
+## 7. Verify Image Preview Feature (If Applicable)
+
+- **Test Case**: Verify image preview after entering URL
+- **Precondition**: User is on the "Add Item" page.
+- **Steps**:
+    1. Enter a valid image URL in the "Image URL" field.
+    2. Check if the image preview is displayed (if feature is implemented).
+- **Expected Result**:
+    - The image preview is shown for valid URLs.
+
+---
+
+## 8. Verify Error Handling for Server Failures
+
+- **Test Case**: Verify behavior on server error
+- **Precondition**: Simulate a server error (e.g., 500 Internal Server Error).
+- **Steps**:
+    1. Fill in all fields with valid data.
+    2. Click the "Add Item" button.
+- **Expected Result**:
+    - An error message is displayed.
+    - The user can retry or navigate away without data loss.
+    - Msg - Server Error, please try again.
+
+---
+
+## 9. Verify Accessibility
+
+- **Test Case**: Verify form accessibility for all users
+- **Precondition**: User is on the "Add Item" page.
+- **Steps**:
+    1. Check that all labels are associated with their input fields.
+    2. Verify that the form is navigable using only the keyboard.
+    3. Check screen reader compatibility.
+- **Expected Result**:
+    - The form is accessible to users with disabilities.
+
+---
+
+## 10. Verify UI Elements on Load on Mobile
+
+- **Test Case**: Verify all necessary fields and buttons are visible on mobile
+- **Precondition**: User is authenticated and on the "Add Item" page.
+- **Steps**:
+    1. Navigate to the "Add Item" page.
+    2. Verify the visibility of the following UI elements:
+        - Form title: "Add New Item".
+        - Fields: "Item Name", "Description", "Price", "Ratings", "Discount", "Image URL".
+        - Button: "Add Item".
+- **Expected Result**:
+    - All fields and buttons are visible and properly labeled.
+
+---
+
+## 11. Verify Cancel Button Functionality
+
+- **Test Case**: Verify that the "Cancel" button works correctly and behaves as expected.
+- **Precondition**:
+    - User is authenticated and navigates to the "Add Item" page.
+    - The "Add Item" form is visible with the "Cancel" button.
+- **Expected Result**:
+    - The "Cancel" button should redirect the user to the correct page and clear any unsaved data, functioning without errors or issues.
+
+---
+
+## 12. Verify Dialog Box Closes After Adding Item
+
+- **Test Case**: Verify that the dialog box closes after the "Add Item" button is clicked and the item is added successfully.
+- **Precondition**:
+    - User is authenticated and navigates to the "Add Item" page.
+    - The "Add Item" form is visible with all necessary fields filled out.
+- **Expected Result**:
+    - After clicking the "Add Item" button, the dialog box should close and the item should be successfully added, with the user being redirected to the correct page or the form closed.

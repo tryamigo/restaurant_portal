@@ -1,0 +1,51 @@
+# **Test Cases for Coupon Management**
+
+## 1. Coupon Fetching
+
+- **Test Case**: Validating the display of coupons fetched from the API.
+- **Precondition**: User is authenticated and navigates to the coupon management page.
+- **Expected Result**:
+  - All coupons are fetched successfully and displayed in the UI without delays or errors.
+  - Each coupon element is fully visible, and its details (e.g., title, code, status, discount value) match the fetched API data exactly.
+  - A loading spinner is displayed during the fetch process.
+  - If no coupons are available, an informative message is shown (e.g., *"No coupons available"*).
+
+## 2. Delete Coupon
+
+- **Test Case**: Deleting an existing coupon.
+- **Precondition**: User is on the coupon management page and the list of coupons is displayed.
+- **Expected Result**:
+  - The coupon is removed from the UI without requiring a page reload.
+  - A success message is displayed (e.g., *"Coupon deleted successfully"*).
+
+## 3. Update Coupon Status
+
+- **Test Case**: Updating the coupon status (activate/deactivate).
+- **Precondition**: User is on the coupon management page and the list of coupons is displayed.
+- **Expected Result**:
+  - The UI reflects the status change (e.g., showing "Active" or "Inactive").
+  - A success message is displayed (e.g., *"Coupon status updated successfully"*).
+
+## 4. Search Coupon
+
+- **Test Case**: Searching for a coupon by its code with debounce effect.
+- **Precondition**: User is on the coupon management page and the search bar is visible.
+- **Expected Result**:
+  - Coupons are filtered in real-time based on the search input.
+  - **Clear search**: After clearing the search term, all coupons should be visible again.
+  - If no matching coupon is found, a message is displayed (e.g., *"No coupons found"*).
+  - The search results are updated dynamically without requiring a page reload.
+
+## 5. UI/UX for Coupon Main Page (Laptop View)
+
+- **Test Case**: Ensure a responsive and user-friendly coupon main page for laptop view.
+- **Precondition**: User is on the coupon main page.
+- **Expected Result**:
+  - The UI displays all content properly without overlapping or misalignment.
+
+## 6. UI/UX for Add Coupon on Mobile View
+
+- **Test Case**: Ensure a responsive and user-friendly coupon main page for mobile view.
+- **Precondition**: User is on the coupon main page.
+- **Expected Result**:
+  - The UI displays all content properly without overlapping or misalignment.

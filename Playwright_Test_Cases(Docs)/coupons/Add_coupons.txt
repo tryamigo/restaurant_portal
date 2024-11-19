@@ -1,0 +1,294 @@
+### 1. Verify UI Elements on Load
+**Test Case**: Verify all necessary fields and buttons are visible  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Navigate to the CouponsPage.  
+  2. Ensure the following UI elements are visible:  
+     - "Coupon Management" title.  
+     - "Search coupons" input field with a search icon.  
+     - "Add New Coupon" button.  
+     - All the fields for the coupon details form (Title, Description, Discount Type, Discount Value, Minimum Order Value, Maximum Discount, Coupon Code, Usage Limit, Start Date, End Date).  
+     - "Add Coupon" button.  
+- **Expected Result**:  
+  - All the necessary fields and buttons for adding a coupon are visible and interactable.
+
+---
+
+### 2. Add a Coupon Successfully
+**Test Case**: Add a coupon with valid inputs  
+- **Precondition**: User is authenticated and has access to the restaurant coupons page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in all required fields with valid data:  
+     - Title: "10% Off on All Orders"  
+     - Description: "Enjoy 10% discount on your entire order."  
+     - Discount Type: "Percentage"  
+     - Discount Value: "10"  
+     - Minimum Order Value: "50"  
+     - Maximum Discount: "20"  
+     - Coupon Code: "SAVE10"  
+     - Usage Limit: "100"  
+     - Start Date: "2024-12-01"  
+     - End Date: "2024-12-31"  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The coupon should be added successfully.  
+  - A success toast message should appear saying "Coupon added successfully".  
+  - The coupon list should refresh, and the new coupon should appear in the list.
+
+---
+
+### 3. Add Coupon Without Required Fields
+**Test Case**: Try adding a coupon without required fields (empty form)  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Leave all fields empty.  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The form should not submit.  
+  - The required fields should show validation errors, e.g., "Title is required", "Coupon Code is required", etc.
+
+---
+
+### 4. Add Coupon with Invalid Discount Value
+**Test Case**: Try adding a coupon with an invalid discount value (negative number)  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in the fields with valid data except for:  
+     - Discount Value: "-10" (Invalid negative discount).  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The form should not submit.  
+  - The "Discount Value" field should show a validation message, e.g., "Discount Value cannot be negative".
+
+---
+
+### 5. Add Coupon with Invalid Coupon Code
+**Test Case**: Try adding a coupon with a duplicate coupon code  
+- **Precondition**: User is authenticated and the coupon code already exists in the system.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in the fields with valid data, but use a coupon code that already exists (e.g., "SAVE10").  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The form should not submit.  
+  - The coupon code field should display an error message: "Coupon code already exists".
+
+---
+
+### 6. Add Coupon with Invalid Date Range
+**Test Case**: Try adding a coupon with an end date earlier than the start date  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in the fields with valid data except for:  
+     - Start Date: "2024-12-01"  
+     - End Date: "2024-11-01" (End date is earlier than start date).  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The form should not submit.  
+  - The date fields should display a validation message, e.g., "End date cannot be earlier than start date".
+
+
+---
+
+### 7. Cancel Add Coupon Process
+**Test Case**: Cancel the coupon creation process  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in some fields (e.g., title, description).  
+  3. Click on the "Cancel" button or the "Add New Coupon" button again to close the form.  
+- **Expected Result**:  
+  - The form should close without submitting.  
+  - Any filled-in values should be cleared.
+
+---
+
+### 8. Verify Adding Coupon with Maximum Length Fields
+**Test Case**: Add a coupon with maximum length values for all fields  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in all fields with maximum possible values:  
+     - Title: "A very long title that exceeds the normal length"  
+     - Description: "A very long description that exceeds the normal length. It should describe the coupon in great detail."  
+     - Coupon Code: "MAXDISCOUNT2024"  
+     - Fill in other fields similarly with long values.  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The coupon should be added successfully.  
+  - The coupon details should display correctly without truncation or overflow issues.
+
+---
+
+### 9. Verify Loading State While Adding Coupon
+**Test Case**: Verify loading state when adding a coupon  
+- **Precondition**: User is authenticated and the "Add Coupon" button is clicked.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in the required coupon fields.  
+  3. Submit the form by clicking the "Add Coupon" button.  
+- **Expected Result**:  
+  - A loading spinner or similar indicator should appear while the coupon is being added.  
+  - Once the coupon is added, the spinner should disappear, and the success toast should appear.
+
+---
+
+
+### 10. Verify Coupon Deletion
+**Test Case**: Verify deleting a coupon  
+- **Precondition**: User has added at least one coupon.  
+- **Steps**:  
+  1. In the coupon list, click the "Delete" button for a coupon.  
+  2. Confirm the deletion when prompted.  
+- **Expected Result**:  
+  - The coupon should be deleted successfully.  
+  - The coupon list should refresh, and the deleted coupon should no longer appear.
+
+---
+
+### 11. Test Invalid Coupon Code Format
+**Test Case**: Add a coupon with an invalid coupon code format  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in the fields with valid data except for the Coupon Code:  
+     - Use an invalid coupon code, e.g., "SAVE 10!" (contains spaces or special characters).  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The form should not submit.  
+  - A validation message should appear for the coupon code, e.g., "Coupon code can only contain letters and numbers, no spaces or special characters."
+
+---
+
+### 12. Test Discount Value Greater than Maximum Discount
+**Test Case**: Add a coupon where the discount value exceeds the maximum discount  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in the fields with valid data except for:  
+     - Discount Value: "25" (discount value exceeds maximum discount).  
+     - Maximum Discount: "20".  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The form should not submit.  
+  - A validation message should appear, e.g., "Discount value cannot exceed maximum discount."
+
+---
+
+### 13. Test Coupon Creation with Same Start and End Date
+**Test Case**: Add a coupon where the start date and end date are the same  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in all the fields with valid data except for:  
+     - Start Date: "2024-12-01".  
+     - End Date: "2024-12-01" (same as start date).  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The coupon should be added successfully.  
+  - The system should allow the same start and end date (if this behavior is acceptable for the business logic).
+
+---
+
+
+### 14. Test Coupon Creation with Empty Description
+**Test Case**: Add a coupon with an empty description  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in all required fields except for:  
+     - Description: Leave the description field empty.  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The coupon should still be added successfully (assuming description is optional).  
+  - If the description is required, an error message should appear indicating that the description is missing.
+
+---
+
+### 15. Test Coupon Creation with Minimum Order Value Greater Than Maximum Discount
+**Test Case**: Add a coupon where the minimum order value is higher than the maximum discount  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in the fields with valid data except for:  
+     - Minimum Order Value: "50".  
+     - Maximum Discount: "20" (Maximum discount is less than the minimum order value).  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The form should not submit.  
+  - A validation message should appear, e.g., "Minimum order value cannot be less than maximum discount."
+
+---
+
+### 16. Test Empty Coupon Code Field
+**Test Case**: Add a coupon without a coupon code  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in the fields with valid data except for:  
+     - Coupon Code: Leave the coupon code field empty.  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The form should not submit.  
+  - A validation message should appear indicating the coupon code is required.
+
+---
+
+### 17. Test Coupon Code Autogeneration (if applicable)
+**Test Case**: Verify that coupon code is auto-generated if left empty  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in the fields with valid data except for:  
+     - Coupon Code: Leave the coupon code field empty.  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - If auto-generation is implemented, the coupon code should be automatically generated (e.g., "AUTO123").  
+  - The coupon should be added successfully with the generated coupon code.
+
+---
+
+### 18. Test Invalid Date Format
+**Test Case**: Add a coupon with an invalid date format  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in the fields with valid data except for:  
+     - Start Date: "12-01-2024" (invalid date format).  
+     - End Date: "12/31/2024" (invalid date format).  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The form should not submit.  
+  - A validation message should appear indicating an invalid date format.
+
+---
+
+### 19. Test Coupon with Large Input Text (Long Title/Description)
+**Test Case**: Add a coupon with a very long title or description  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Click on the "Add New Coupon" button.  
+  2. Fill in the fields with valid data except for:  
+     - Title: Use a very long title (e.g., 200 characters).  
+     - Description: Use a very long description (e.g., 1000 characters).  
+  3. Click on the "Add Coupon" button.  
+- **Expected Result**:  
+  - The coupon should be added successfully.  
+  - The system should correctly handle long text and either truncate or show it properly in the list without overflow.
+
+---
+
+### 20. Test Mobile Responsiveness
+**Test Case**: Verify the "Add Coupon" functionality on mobile devices  
+- **Precondition**: User is authenticated and on the Coupons Page.  
+- **Steps**:  
+  1. Open the Coupons Page on a mobile device or simulate mobile view.  
+  2. Check if the "Add New Coupon" button and form fields are properly displayed and usable.  
+  3. Attempt to add a coupon while in mobile view.  
+- **Expected Result**:  
+  - The UI should be responsive, and all elements should adjust correctly to fit mobile screens.  
+  - The form should function as expected, and users should be able to add coupons without issues.
