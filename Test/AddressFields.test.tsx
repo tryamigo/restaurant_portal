@@ -82,6 +82,6 @@ describe('AddressFields', () => {
     );
 
     const rootElement = container.firstChild;
-    expect(rootElement).toHaveClass(testClassName);
+    expect(rootElement as HTMLElement).toHaveClass(testClassName);
   });
 });
