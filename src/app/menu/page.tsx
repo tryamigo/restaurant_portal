@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import {
   Edit,
   Trash2,
+  Package,
   Search,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -61,6 +62,7 @@ const MenuDetails: React.FC = () => {
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
   const [currentEditItem, setCurrentEditItem] = useState<MenuItem | null>(null);
   const [filteredMenu, setFilteredMenu] = useState<MenuItem[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -120,26 +122,26 @@ const MenuDetails: React.FC = () => {
         const formData = new FormData();
         formData.append('image', imageFile);
         try {
-        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/image/upload`, {
-          method: 'POST',
-          body: formData
-        });
+          const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/image/upload`, {
+            method: 'POST',
+            body: formData
+          });
           if (!uploadResponse.ok) {
             throw new Error('Image upload failed');
           }
 
           const result = await uploadResponse.json();
           imageUploadResult = result.file?.filename;
-      }
-      catch (uploadError) {
-        console.error('Image Upload Error:', uploadError);
+        }
+        catch (uploadError) {
+          console.error('Image Upload Error:', uploadError);
 
+        }
       }
-    }
       // Prepare item data with image links
       const itemData = {
         ...newItem,
-        ...(imageUploadResult && { imageLink: "https://image.navya.so/"+imageUploadResult })
+        ...(imageUploadResult && { imageLink: "https://image.navya.so/" + imageUploadResult })
 
       };
       console.log(imageUploadResult)
@@ -384,17 +386,40 @@ const MenuDetails: React.FC = () => {
                         </td>
                         <td className="px-6 py-4">{item.ratings}</td>
                         <td className="px-6 py-4">{item.discounts}%</td>
-                        <td className="px-6 py-4">
-                        {item.imageLink && (
-                        <Image 
-                          src={item.imageLink} 
-                          alt={item.name} 
-                          width={50} 
-                          height={50} 
-                          className="object-cover rounded"
-                        />
-                        
-                      )}
+                        <td className="px-6 py-4 relative">
+                          {item.imageLink ? (
+                            <>
+                              <Image
+                                src={item.imageLink}
+                                alt={item.name}
+                                width={50}
+                                height={50}
+                                className="object-cover rounded-md cursor-pointer"
+                                onClick={() => setSelectedImage(item.imageLink||'')}
+                              />
+
+                              {/* Modal for full image view */}
+                              {selectedImage && (
+                                <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+                                  <DialogContent className="w-full">
+                                    <div className="flex justify-center items-center">
+                                      <Image
+                                        src={selectedImage}
+                                        alt="Full Image"
+                                        width={400}
+                                        height={400}
+                                        className="max-h-[70vh] object-contain"
+                                      />
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
+                              )}
+                            </>
+                          ) : (
+                            <div className="w-12 h-12 bg-gray-200 flex items-center justify-center rounded-md">
+                              <Package className="w-6 h-6 text-gray-400" />
+                            </div>
+                          )}
                         </td>
                         <td className="px-6 py-4">{item.cuisine}</td>
                         <td className="px-6 py-4">{item.vegOrNonVeg}</td>
@@ -616,14 +641,14 @@ const MenuDetails: React.FC = () => {
 
               {/* Image Upload takes full width */}
               <div className="md:col-span-2">
-              <ImageUpload
-              onImageUpload={(file: any) => {
-                // Ensure file is not null and is a File object
-                if (file) {
-                  setImageFile(file);
-                }
-              }}
-            />
+                <ImageUpload
+                  onImageUpload={(file: any) => {
+                    // Ensure file is not null and is a File object
+                    if (file) {
+                      setImageFile(file);
+                    }
+                  }}
+                />
               </div>
             </div>
             <DialogFooter>
