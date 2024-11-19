@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 export function useSSE() {
   const [events, setEvents] = useState<any[]>([]);
   const { data: session, status } = useSession();
-console.log("events are ",events)
   useEffect(() => {
     // Only establish SSE connection if user is authenticated
     if (status === 'authenticated' && session?.user?.id) {

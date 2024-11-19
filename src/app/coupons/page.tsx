@@ -324,7 +324,8 @@ const CouponsPage = () => {
     );
   }
 
-  return (
+
+return (
     <>
       <Header
         searchTerm={searchTerm}
@@ -335,9 +336,8 @@ const CouponsPage = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="container mx-auto px-4 py-12"
+        className="container mx-auto px-4 py-6 md:py-12 pt-[12rem] "
       >
-
         <div className="bg-white shadow-lg rounded-xl overflow-hidden">
           <CardContent className="mt-1">
             <motion.div
@@ -346,14 +346,14 @@ const CouponsPage = () => {
               transition={{ duration: 0.5 }}
             >
               {filteredCoupon?.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {filteredCoupon?.map((coupon) => (
                     <motion.div
                       key={coupon.id}
                       whileHover={{ scale: 1.05 }}
                       className="bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden"
                     >
-                      <div className="p-6">
+                      <div className="p-4 md:p-6">
                         <div className="flex justify-between items-center mb-4">
                           <Badge
                             variant={coupon.isActive ? "default" : "destructive"}
@@ -365,11 +365,11 @@ const CouponsPage = () => {
                             {coupon.couponCode}
                           </span>
                         </div>
-                        <h3 className="text-xl font-semibold mb-2">{coupon.title}</h3>
-                        <p className="text-gray-600 mb-4">{coupon.description}</p>
+                        <h3 className="text-lg md:text-xl font-semibold mb-2">{coupon.title}</h3>
+                        <p className="text-sm md:text-base text-gray-600 mb-4">{coupon.description}</p>
 
                         {/* Additional Coupon Details */}
-                        <div className="space-y-2 mb-4">
+                        <div className="space-y-2 mb-4 text-sm md:text-base">
                           <div className="flex justify-between">
                             <span className="text-gray-600">Discount Type:</span>
                             <span className="font-semibold">
@@ -402,30 +402,29 @@ const CouponsPage = () => {
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">Validity:</span>
-                            <span className="font-semibold">
+                            <span className="font-semibold text-right">
                               {format(new Date(coupon.startDate), 'dd MMM yyyy')} -
                               {format(new Date(coupon.endDate), 'dd MMM yyyy')}
                             </span>
                           </div>
                         </div>
 
-                        <div className="flex justify-between items-center">
-                          <div className="flex space-x-2">
-                            <Button
-                              size="lg"
-                              variant="destructive"
-                              onClick={() => handleDeleteCoupon(coupon.id)}
-                            >
-                              Delete
-                            </Button>
-                            <CustomButton
-                              onClick={() =>
-                                handleUpdateCouponStatus(coupon.id, !coupon.isActive)
-                              }
-                            >
-                              {coupon.isActive ? "Deactivate" : "Activate"}
-                            </CustomButton>
-                          </div>
+                        <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0 md:space-x-2">
+                          <Button
+                            className="w-full md:w-auto"
+                            variant="destructive"
+                            onClick={() => handleDeleteCoupon(coupon.id)}
+                          >
+                            Delete
+                          </Button>
+                          <CustomButton
+                            className="w-full md:w-auto items-center justify-center"
+                            onClick={() =>
+                              handleUpdateCouponStatus(coupon.id, !coupon.isActive)
+                            }
+                          >
+                            {coupon.isActive ? "Deactivate" : "Activate"}
+                          </CustomButton>
                         </div>
                       </div>
                     </motion.div>
@@ -433,20 +432,19 @@ const CouponsPage = () => {
                 </div>
               ) : (
                 <div className="text-center py-12 bg-gray-50 rounded-xl">
-                  <Tag className="mx-auto h-16 w-16 text-gray-300 mb-4" />
-                  <p className="text-xl text-gray-500">No coupons available</p>
-                  <p className="text-gray-400">Create your first coupon</p>
+                  <Tag className="mx-auto h-12 md:h-16 w-12 md:w-16 text-gray-300 mb-4" />
+                  <p className="text-lg md:text-xl text-gray-500">No coupons available</p>
+                  <p className="text-sm md:text-base text-gray-400">Create your first coupon</p>
                 </div>
               )}
             </motion.div>
           </CardContent>
         </div>
 
-
         {/* Modal for Adding Coupon */}
         <Dialog open={isAddingCoupon} onOpenChange={setIsAddingCoupon}>
-          <DialogContent>
-            <DialogTitle className="text">Add New Coupon</DialogTitle>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
+            <DialogTitle className="text-lg md:text-xl">Add New Coupon</DialogTitle>
             <form onSubmit={handleAddCoupon} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -458,6 +456,7 @@ const CouponsPage = () => {
                       setNewCoupon({ ...newCoupon, title: e.target.value })
                     }
                     required
+                    className="w-full"
                   />
                   {validationErrors.title && (
                     <p className="text-red-500 text-sm">{validationErrors.title}</p>
@@ -475,6 +474,7 @@ const CouponsPage = () => {
                       })
                     }
                     required
+                    className="w-full"
                   />
                   {validationErrors.description && (
                     <p className="text-red-500 text-sm">{validationErrors.description}</p>
@@ -516,6 +516,7 @@ const CouponsPage = () => {
                       })
                     }
                     required
+                    className="w-full"
                   />
                   {validationErrors.discountValue && (
                     <p className="text-red-500 text-sm">
@@ -536,6 +537,7 @@ const CouponsPage = () => {
                       })
                     }
                     required
+                    className="w-full"
                   />
                   {validationErrors.eligibleOrders && (
                     <p className="text-red-500 text-sm">{validationErrors.eligibleOrders}</p>
@@ -554,6 +556,7 @@ const CouponsPage = () => {
                       })
                     }
                     required
+                    className="w-full"
                   />
                   {validationErrors.minOrderValue && (
                     <p className="text-red-500 text-sm">{validationErrors.minOrderValue}</p>
@@ -572,6 +575,7 @@ const CouponsPage = () => {
                       })
                     }
                     required
+                    className="w-full"
                   />
                   {validationErrors.maxDiscount && (
                     <p className="text-red-500 text-sm">{validationErrors.maxDiscount}</p>
@@ -585,6 +589,7 @@ const CouponsPage = () => {
                     onChange={(e) =>
                       setNewCoupon({ ...newCoupon, couponCode: e.target.value })
                     }
+                    className="w-full"
                   />
                   {validationErrors.couponCode && (
                     <p className="text-red-500 text-sm">{validationErrors.couponCode}</p>
@@ -603,6 +608,7 @@ const CouponsPage = () => {
                       })
                     }
                     required
+                    className="w-full"
                   />
                   {validationErrors.usageLimit && (
                     <p className="text-red-500 text-sm">{validationErrors.usageLimit}</p>
@@ -618,6 +624,7 @@ const CouponsPage = () => {
                       setNewCoupon({ ...newCoupon, startDate: e.target.value })
                     }
                     required
+                    className="w-full"
                   />
                   {validationErrors.startDate && (
                     <p className="text-red-500 text-sm">{validationErrors.startDate}</p>
@@ -633,34 +640,43 @@ const CouponsPage = () => {
                       setNewCoupon({ ...newCoupon, endDate: e.target.value })
                     }
                     required
+                    className="w-full"
                   />
                   {validationErrors.endDate && (
                     <p className="text-red-500 text-sm">{validationErrors.endDate}</p>
                   )}
                 </div>
               </div>
-              <div className="flex justify-end">
-                <Button type="button" onClick={() => {
-                  setNewCoupon({
-                    title: "",
-                    description: "",
-                    discountType: "PERCENTAGE",
-                    discountValue: "",
-                    minOrderValue: "",
-                    maxDiscount: "",
-                    couponCode: "",
-                    usageLimit: 0,
-                    eligibleOrders: 0,
-                    startDate: "",
-                    endDate: "",
-                  });
-                  setIsAddingCoupon(false)
-                  setValidationErrors({})
-                }}
-                  className="mr-2">
+              <div className="flex flex-col md:flex-row justify-end space-y-2 md:space-y-0 md:space-x-2">
+                <Button 
+                  type="button" 
+                  onClick={() => {
+                    setNewCoupon({
+                      title: "",
+                      description: "",
+                      discountType: "PERCENTAGE",
+                      discountValue: "",
+                      minOrderValue: "",
+                      maxDiscount: "",
+                      couponCode: "",
+                      usageLimit: 0,
+                      eligibleOrders: 0,
+                      startDate: "",
+                      endDate: "",
+                    });
+                    setIsAddingCoupon(false)
+                    setValidationErrors({})
+                  }}
+                  className="w-full md:w-auto"
+                >
                   Cancel
                 </Button>
-                <CustomButton type="submit" >Add Coupon</CustomButton>
+                <CustomButton 
+                  type="submit" 
+                  className="w-full md:w-auto"
+                >
+                  Add Coupon
+                </CustomButton>
               </div>
             </form>
           </DialogContent>

@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import Header from '@/components/Header';
 
 const RestaurantDetails: React.FC = () => {
     const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
@@ -169,41 +170,21 @@ const RestaurantDetails: React.FC = () => {
     }
 
     return (
+        <>
+        <Header  
+        restaurantActions={{
+          onEditRestaurant: handleEditRestaurant,
+          onDeleteRestaurant: openDeleteDialog
+        }} />
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="container mx-auto px-4 pt-[5rem] md:pt-2 md:px-0"
         >
             <Card className="shadow-lg border-none">
-                <CardHeader className="text ">
-                    <div className="flex justify-between items-center">
-                        <CardTitle className="text-2xl font-bold">Restaurant Details</CardTitle>
-                        <div className="flex space-x-4">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button className="background text-white hover:bg-[#0056b3] transition-colors duration-300 flex items-center"
-                                        size="sm" >
-                                        Options
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => {
-                                        setIsEditing(true);
-                                        setEditedRestaurant(restaurant);
-                                    }}>
-                                        <Edit className="mr-2 h-4 w-4" />
-                                        Edit Restaurant
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        className="text-red-600 focus:text-red-700"
-                                        onClick={() => openDeleteDialog()}
-                                    >
-                                        <Trash2 className="mr-2 h-4 w-4" />
-                                        Delete Restaurant
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
+                <CardHeader className="text">
+                    <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                             <DialogContent>
                                 <DialogHeader>
@@ -215,11 +196,18 @@ const RestaurantDetails: React.FC = () => {
                                     Are you sure you want to delete this restaurant?
                                     This action cannot be undone.
                                 </DialogDescription>
-                                <DialogFooter>
-                                    <Button variant="destructive" onClick={handleDeleteRestaurant}>
+                                <DialogFooter className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+                                    <Button 
+                                        variant="destructive" 
+                                        onClick={handleDeleteRestaurant}
+                                        className="w-full md:w-auto"
+                                    >
                                         Delete
                                     </Button>
-                                    <Button onClick={() => setIsDeleteDialogOpen(false)}>
+                                    <Button 
+                                        onClick={() => setIsDeleteDialogOpen(false)}
+                                        className="w-full md:w-auto"
+                                    >
                                         Cancel
                                     </Button>
                                 </DialogFooter>
@@ -227,8 +215,8 @@ const RestaurantDetails: React.FC = () => {
                         </Dialog>
                     </div>
                 </CardHeader>
-
-                <CardContent className="p-6">
+    
+                <CardContent className="p-4 md:p-6">
                     <AnimatePresence mode="wait">
                         {isEditing ? (
                             <motion.div
@@ -238,74 +226,91 @@ const RestaurantDetails: React.FC = () => {
                                 exit={{ opacity: 0 }}
                                 className="space-y-6"
                             >
-
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
+                                    {/* Input fields with responsive layout */}
+                                    <div className="space-y-2">
                                         <Label htmlFor="name">Name</Label>
                                         <Input
                                             id="name"
                                             value={editedRestaurant?.name || ''}
                                             onChange={(e) => setEditedRestaurant(prev => ({ ...prev!, name: e.target.value }))}
+                                            className="w-full"
                                         />
                                     </div>
-                                    <div>
+                                    <div className="space-y-2">
                                         <Label htmlFor="phoneNumber">Phone Number</Label>
                                         <Input
                                             id="phoneNumber"
                                             value={editedRestaurant?.phoneNumber || ''}
                                             onChange={(e) => setEditedRestaurant(prev => ({ ...prev!, phoneNumber: e.target.value }))}
+                                            className="w-full"
                                         />
                                     </div>
-                                    <div>
+                                    <div className="space-y-2">
                                         <Label htmlFor="openingHours">Opening Hours</Label>
                                         <Input
                                             id="openingHours"
                                             value={editedRestaurant?.openingHours || ''}
                                             onChange={(e) => setEditedRestaurant(prev => ({ ...prev!, openingHours: e.target.value }))}
+                                            className="w-full"
                                         />
                                     </div>
-                                    <div>
+                                    <div className="space-y-2">
                                         <Label htmlFor="gstin">GSTIN</Label>
                                         <Input
                                             id="gstin"
                                             value={editedRestaurant?.gstin || ''}
                                             onChange={(e) => setEditedRestaurant(prev => ({ ...prev!, gstin: e.target.value }))}
+                                            className="w-full"
                                         />
                                     </div>
-                                    <div>
+                                    <div className="space-y-2">
                                         <Label htmlFor="FSSAI">FSSAI</Label>
                                         <Input
                                             id="FSSAI"
                                             value={editedRestaurant?.FSSAI || ''}
                                             onChange={(e) => setEditedRestaurant(prev => ({ ...prev!, FSSAI: e.target.value }))}
+                                            className="w-full"
                                         />
                                     </div>
-                                    <div>
+                                    <div className="space-y-2">
                                         <Label htmlFor="rating">Rating</Label>
                                         <Input
                                             id="rating"
                                             type="number"
                                             value={editedRestaurant?.rating || 0}
                                             onChange={(e) => setEditedRestaurant(prev => ({ ...prev!, rating: parseFloat(e.target.value) }))}
+                                            className="w-full"
                                         />
                                     </div>
-                                    <AddressFields
-                                        address={editedRestaurant?.address || {
-                                            streetAddress: '', city: '', state: '', pincode: '', landmark: '', latitude: '', longitude: ''
-                                        }}
-                                        onChange={(updatedAddress) => {
-                                            setEditedRestaurant(prev => ({ ...prev!, address: updatedAddress }));
-                                        }}
-                                        isEditing={true}
-                                    />
+                                    <div className="md:col-span-2">
+                                        <AddressFields
+                                            address={editedRestaurant?.address || {
+                                                streetAddress: '', city: '', state: '', pincode: '', landmark: '', latitude: '', longitude: ''
+                                            }}
+                                            onChange={(updatedAddress) => {
+                                                setEditedRestaurant(prev => ({ ...prev!, address: updatedAddress }));
+                                            }}
+                                            isEditing={true}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="flex gap-2 mt-4">
-                                    <Button className="background text-white hover:bg-[#0056b3] transition-colors duration-300 flex items-center"
-                                        onClick={handleEditRestaurant}>Save Changes</Button>
-                                    <Button onClick={() => {
-                                        setIsEditing(false);
-                                        setEditedRestaurant(null);
-                                    }}>Cancel</Button>
+                                <div className="flex flex-col md:flex-row gap-2 mt-4">
+                                    <Button 
+                                        className="background text-white hover:bg-[#0056b3] transition-colors duration-300 flex items-center w-full md:w-auto"
+                                        onClick={handleEditRestaurant}
+                                    >
+                                        Save Changes
+                                    </Button>
+                                    <Button 
+                                        onClick={() => {
+                                            setIsEditing(false);
+                                            setEditedRestaurant(null);
+                                        }}
+                                        className="w-full md:w-auto"
+                                    >
+                                        Cancel
+                                    </Button>
                                 </div>
                             </motion.div>
                         ) : (
@@ -337,10 +342,10 @@ const RestaurantDetails: React.FC = () => {
                             </motion.div>
                         )}
                     </AnimatePresence>
-
                 </CardContent>
             </Card>
         </motion.div>
+        </>
     );
 };
 

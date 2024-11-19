@@ -68,13 +68,16 @@ export interface Restaurant {
 }
 
 export interface MenuItem {
-  id: string;
+  id?: string;
+  restaurantId?: string;
   name: string;
   description: string;
   price: number;
-  ratings?: number; 
-  discounts?: number; 
-  imageLink?: string; 
+  ratings?: number;
+  discounts?: number;
+  imageLink?: string;
+  vegOrNonVeg?: string; // New field
+  cuisine?: string; // New field
 }
 export type deliveryStatus = 'available' | 'on delivery' | 'offline';
 

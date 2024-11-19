@@ -29,10 +29,10 @@ import Header from '@/components/Header';
 
 // Status Icons Mapping
 const STATUS_ICONS = {
-    pending: <Clock className="text-yellow-500 w-5 h-5" />,
-    preparing: <Package className="text-blue-500 w-5 h-5" />,
-    'on the way': <TruckIcon className="text-orange-500 w-5 h-5" />,
-    delivered: <CheckCircle className="text-green-500 w-5 h-5" />
+    Pending: <Clock className="text-yellow-500 w-5 h-5" />,
+    Preparing: <Package className="text-blue-500 w-5 h-5" />,
+    'On the way': <TruckIcon className="text-orange-500 w-5 h-5" />,
+    Delivered: <CheckCircle className="text-green-500 w-5 h-5" />
 };
 
 function OrdersPage() {
@@ -114,11 +114,10 @@ function OrdersPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="container mx-auto px-4 py-12"
+                className="container mx-auto px-4 py-12 md:py-12 pt-[11rem]"
             >
                 <div className="bg-white shadow-lg rounded-xl overflow-hidden">
-
-                    <div className="overflow-x-auto">
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-gray-100 border-b">
                                 <tr>
@@ -259,6 +258,81 @@ function OrdersPage() {
                                 </AnimatePresence>
                             </tbody>
                         </table>
+                    </div>
+                       {/* Mobile Card View */}
+                       <div className="md:hidden">
+                        <AnimatePresence>
+                            {loading ? (
+                                Array(5).fill(0).map((_, index) => (
+                                    <div key={index} className="p-4 border-b">
+                                        <Skeleton className="h-32 w-full" />
+                                    </div>
+                                ))
+                            ) : filteredOrders.length === 0 ? (
+                                <div className="text-center py-12 text-gray-500">
+                                    <div className="flex flex-col items-center space-y-4">
+                                        <Search className="w-16 h-16 text-gray-300" />
+                                        <p className="text-xl">No orders found</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                filteredOrders.map((order) => (
+                                    <motion.div
+                                        key={order.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="p-4 bg-white border-b hover:bg-gray-50"
+                                    >
+                                        <div className="flex justify-between items-center mb-2">
+                                            <div>
+                                                <div className="font-medium">{order.id.slice(0, 8)}</div>
+                                                <div className="text-xs text-gray-500">
+                                                    {format(new Date(order.orderTime), 'PPp')}
+                                                </div>
+                                            </div>
+                                            <Badge variant={getStatusColor(order.status)}>
+                                                {STATUS_ICONS[order.status as keyof typeof STATUS_ICONS]}
+                                                {capitalizeFirstLetter(order.status)}
+                                            </Badge>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2 mb-2">
+                                            <div>
+                                                <div className="text-sm font-medium">
+                                                    {order.userAddress?.name || 'N/A'}
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    {order.userAddress?.mobile || 'No contact'}
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-sm"> Total: ₹{Number(order.total).toFixed(2)}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-between items-center">
+                                            <Link href={`/orders/${order.id}`} passHref>
+                                                <Button variant="ghost" size="sm">
+                                                    <EyeIcon className="mr-2 h-4 w-4" />
+                                                    View
+                                                </Button>
+                                            </Link>
+                                            <div className="flex items-center">
+                                                {order.rating && (
+                                                    <div className="flex items-center gap-1">
+                                                        <Star className="h-4 w-4 text-yellow-500" />
+                                                        <span className="text-xs">{order.rating.toFixed(1)}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
             </motion.div>
