@@ -1,5 +1,5 @@
 // src/components/admin/types.ts
-export type OrderStatus = 'Pending' | 'Preparing' | 'On the way' | 'Delivered';
+export type OrderStatus = 'pending' | 'preparing' | 'on the way' | 'delivered';
 
 export interface Address {
 id?: string;

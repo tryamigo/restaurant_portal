@@ -102,10 +102,10 @@ function Header({ searchTerm, setSearchTerm, statusFilter, setStatusFilter, onAd
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="Pending">Pending</SelectItem>
-                  <SelectItem value="Preparing">Preparing</SelectItem>
-                  <SelectItem value="On the way">On the Way</SelectItem>
-                  <SelectItem value="Delivered">Delivered</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="preparing">Preparing</SelectItem>
+                  <SelectItem value="on the way">On the Way</SelectItem>
+                  <SelectItem value="delivered">Delivered</SelectItem>
                 </SelectContent>
               </Select>
             </div>
