@@ -58,7 +58,7 @@ function OTPInput({ value, onChange }: { value: string, onChange: (val: string) 
           ref={(el) => inputRefs.current[index] = el as any}
           type="text"
           maxLength={1}
-          className="w-12 h-12 text-center text-xl font-bold"
+          className="w-10 md:w-12 h-10 md:h-12 text-center text-base md:text-xl font-bold"
           value={value[index] || ''}
           onChange={(e) => handleChange(index, e.target.value)}
           onKeyDown={(e) => handleKeyDown(index, e)}
@@ -180,7 +180,7 @@ function OTPLoginContent() {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
-      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100"
+      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4"
     >
       <Card className="w-full max-w-md shadow-2xl border-none">
         <motion.div
@@ -190,15 +190,14 @@ function OTPLoginContent() {
         >
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <ShieldCheck className="w-16 h-16 text-blue-600" />
+              <ShieldCheck className="w-12 md:w-16 h-12 md:h-16 text-blue-600" />
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-800">Secure OTP Login</CardTitle>
-            <CardDescription className="text-gray-500">
+            <CardTitle className="text-xl md:text-2xl font-bold text-gray-800">Secure OTP Login</CardTitle>
+            <CardDescription className="text-sm md:text-base text-gray-500">
               Verify your mobile number to access your account
             </CardDescription>
           </CardHeader>
         </motion.div>
-
         <CardContent className="space-y-6">
           <motion.div
             initial={{ x: -50, opacity: 0 }}
@@ -210,7 +209,7 @@ function OTPLoginContent() {
                 <MobileIcon className="mr-2 w-4 h-4" /> Mobile Number
               </Label>
               <div className="flex items-center">
-                <Badge variant={"secondary"} className="p-3 text-sm outline-none">
+                <Badge variant={"secondary"} className="p-2 text-sm outline-none">
                   +91
                 </Badge>
                 <Input
@@ -231,7 +230,6 @@ function OTPLoginContent() {
                 ? `${10 - mobile.length} digits remaining`
                 : "Ready to send OTP"}
             </div>
-
           </motion.div>
 
           <AnimatePresence>

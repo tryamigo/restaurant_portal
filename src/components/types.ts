@@ -1,5 +1,5 @@
 // src/components/admin/types.ts
-export type OrderStatus = 'Pending' | 'Preparing' | 'On the way' | 'Delivered';
+export type OrderStatus = 'pending' | 'preparing' | 'on the way' | 'delivered';
 
 export interface Address {
 id?: string;
@@ -68,13 +68,16 @@ export interface Restaurant {
 }
 
 export interface MenuItem {
-  id: string;
+  id?: string;
+  restaurantId?: string;
   name: string;
   description: string;
   price: number;
-  ratings?: number; 
-  discounts?: number; 
-  imageLink?: string; 
+  ratings?: number;
+  discounts?: number;
+  imageLink?: string;
+  vegOrNonVeg?: string; // New field
+  cuisine?: string; // New field
 }
 export type deliveryStatus = 'available' | 'on delivery' | 'offline';
 
