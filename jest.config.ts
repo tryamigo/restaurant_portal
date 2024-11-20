@@ -1,6 +1,7 @@
+
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'jsdom',
+  testEnvironment: "jsdom",
   testPathIgnorePatterns: ['/node_modules/', '/.next/'],
   
   moduleNameMapper: {

@@ -86,16 +86,21 @@ const MenuDetails: React.FC = () => {
   };
 
   const fetchMenu = async () => {
+    console.log("Your user id", session?.user.id);
+    console.log("Your Toke id", session?.user.token);
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `/api/restaurants/?id=${session?.user.id}&menu=true`,
-        {
-          headers: {
-            Authorization: `Bearer ${session?.user.token}`,
-          },
+      // Construct absolute URL
+      const apiUrl = `http://localhost:3001/restaurants/?id=${session?.user.id}&menu=true`;
+  
+      const response = await fetch(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${session?.user.token}`,
         }
-      );
+      });
+
+
+  
       if (!response.ok) {
         throw new Error("Failed to fetch menu");
       }
@@ -107,6 +112,7 @@ const MenuDetails: React.FC = () => {
       setIsLoading(false);
     }
   };
+  
 
   const openDeleteDialog = (itemId?: string) => {
     if (itemId) setMenuItemToDelete(itemId);
@@ -341,7 +347,7 @@ const MenuDetails: React.FC = () => {
                 (
                   filteredMenu?.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">{item.name}</td>
+                      <td className="px-6 py-4" data-testid="itemname" >{item.name}</td>
                       <td className="px-6 py-4">{item.description}</td>
                       <td className="px-6 py-4">
                         ₹{Number(item.price).toFixed(2)}
