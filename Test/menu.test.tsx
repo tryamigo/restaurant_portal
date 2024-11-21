@@ -58,14 +58,14 @@ describe("MenuDetails Component", () => {
   // });
 
 
-  // it("renders menu items after fetching", async () => {
-  //   render(<MenuDetails />);
-  //   await waitFor(() => {
-  //     expect(screen.getByRole('cell', {
-  //       name: /adarsh/i
-  //     })).toBeInTheDocument(); 
-  //   });
-  // });
+  it("renders menu items after fetching", async () => {
+    render(<MenuDetails />);
+    await waitFor(() => {
+      expect(screen.getByRole('cell', {
+        name: /adarsh/i
+      })).toBeInTheDocument(); 
+    });
+  });
 
   // it("adds a new menu item", async () => {
 

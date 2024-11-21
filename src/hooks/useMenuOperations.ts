@@ -19,7 +19,7 @@ export const useMenuManagement = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:3001/restaurants/?id=${session.user.id}&menu=true`,
+        `/api/restaurants/?id=${session.user.id}&menu=true`,
         {
           headers: {
             Authorization: `Bearer ${session.user.token}`,
@@ -45,7 +45,7 @@ export const useMenuManagement = () => {
         const formData = new FormData();
         formData.append('image', imageFile);
         try {
-          const uploadResponse = await fetch(`http://localhost:3001/image/upload`, {
+          const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/image/upload`, {
             method: 'POST',
             body: formData
           });
@@ -70,7 +70,7 @@ export const useMenuManagement = () => {
       const validatedItem = MenuItemSchema.parse(itemData);
       
       const response = await fetch(
-        `http://localhost:3001/restaurants/?id=${session?.user.id}&menu=true`,
+        `/api/restaurants/?id=${session?.user.id}&menu=true`,
         {
           method: "POST",
           headers: {
@@ -79,9 +79,8 @@ export const useMenuManagement = () => {
           },
           body: JSON.stringify(validatedItem),
         }
-        
       );
-      console.log(response);
+
       if (!response.ok) throw new Error("Failed to add menu item");
 
       const addedItem = await response.json();
@@ -101,7 +100,7 @@ export const useMenuManagement = () => {
         const formData = new FormData();
         formData.append('image', imageFile);
         try {
-          const uploadResponse = await fetch(`http://localhost:3001/image/upload`, {
+          const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/image/upload`, {
             method: 'POST',
             body: formData
           });
@@ -126,7 +125,7 @@ export const useMenuManagement = () => {
       const validatedItem = MenuItemSchema.parse(item);
       
       const response = await fetch(
-        `http://localhost:3001/restaurants/?id=${session?.user.id}&menu=true&menuItemId=${item.id}`,
+        `/api/restaurants/?id=${session?.user.id}&menu=true&menuItemId=${item.id}`,
         {
           method: "PUT",
           headers: {
@@ -156,7 +155,7 @@ export const useMenuManagement = () => {
   const deleteMenuItem = async (itemId: string) => {
     try {
       const response = await fetch(
-        `http://localhost:3001/api/restaurants/?id=${session?.user.id}&menu=true&menuItemId=${itemId}`,
+        `/api/restaurants/?id=${session?.user.id}&menu=true&menuItemId=${itemId}`,
         {
           method: "DELETE",
           headers: {
