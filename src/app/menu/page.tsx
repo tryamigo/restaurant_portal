@@ -62,6 +62,7 @@ const MenuDetails: React.FC = () => {
   };
 
   const handleSubmitItem = async () => {
+
     try {
       if (formMode === 'add') {
         await addMenuItem(newItem);
@@ -85,6 +86,7 @@ const MenuDetails: React.FC = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
         className="container mx-auto p-6 max-w-4xl"
+        data-testid="loading-spinner"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[...Array(6)].map((_, index) => (

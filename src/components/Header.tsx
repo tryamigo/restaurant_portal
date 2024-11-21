@@ -129,6 +129,7 @@ function Header({ searchTerm, setSearchTerm, statusFilter, setStatusFilter, onAd
               <CustomButton 
                 onClick={onAddItem} 
                 className="flex items-center justify-center gap-2 w-full md:w-auto"
+                data-testid="add-item-button"
               >
                 <Plus className="h-4 w-4" />
                 Add Item
