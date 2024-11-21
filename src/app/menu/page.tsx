@@ -62,7 +62,6 @@ const MenuDetails: React.FC = () => {
   };
 
   const handleSubmitItem = async () => {
-
     try {
       if (formMode === 'add') {
         await addMenuItem(newItem);
@@ -128,7 +127,7 @@ const MenuDetails: React.FC = () => {
           <table className="w-full">
             <thead className="bg-gray-100 border-b">
               <tr>
-                {["Item", "Description", "Price", "Ratings", "Discounts", "Image", "Cuisines", "Category", "Actions"].map(header => (
+                {["Image","Item", "Description", "Price", "Ratings", "Discounts", "Cuisines", "Category", "Actions"].map(header => (
                   <th key={header} className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     {header}
                   </th>
@@ -152,15 +151,15 @@ const MenuDetails: React.FC = () => {
                     ))
                 ) : filteredMenu.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-12 text-gray-500">
-                      <div className="flex flex-col items-center space-y-4">
-                        <Search className="w-16 h-16 text-gray-300" />
-                        <p className="text-xl">
-                          {searchTerm ? "No menu items found" : "No menu items available"}
-                        </p>
-                      </div>
-                    </td>
-                  </tr>
+  <td colSpan={9} className="text-center py-12 text-gray-500">
+    <div className="flex flex-col items-center justify-center space-y-4 h-full">
+      <Search className="w-16 h-16 text-gray-300" />
+      <p className="text-xl">
+        {searchTerm ? "No menu items found" : "No menu items available"}
+      </p>
+    </div>
+  </td>
+</tr>
                 ) : (
                 filteredMenu.map(item => (
                   <MenuItemRow

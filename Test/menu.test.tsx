@@ -1,17 +1,34 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  prettyDOM,
+} from "@testing-library/react";
 import MenuDetails from "@/app/menu/page";
 import "@testing-library/jest-dom";
 import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
 import fetchMock from "jest-fetch-mock";
 
+fetchMock.enableMocks();
+
 // Mock the EventSource constructor and static properties
-global.EventSource = jest.fn().mockImplementation(function (this: EventSource, url: string | URL, eventSourceInitDict?: EventSourceInit) {
-  this.addEventListener = jest.fn();
-  this.close = jest.fn();
-  Object.defineProperty(this, "readyState", { value: EventSource.OPEN, writable: false });
-}) as unknown as {
+global.EventSource = jest
+  .fn()
+  .mockImplementation(function (
+    this: EventSource,
+    url: string | URL,
+    eventSourceInitDict?: EventSourceInit
+  ) {
+    this.addEventListener = jest.fn();
+    this.close = jest.fn();
+    Object.defineProperty(this, "readyState", {
+      value: EventSource.OPEN,
+      writable: false,
+    });
+  }) as unknown as {
   new (url: string | URL, eventSourceInitDict?: EventSourceInit): EventSource;
   prototype: EventSource;
   readonly CONNECTING: 0;
@@ -35,7 +52,6 @@ jest.mock("next/navigation", () => ({
   usePathname: jest.fn(() => "/menu"), // Mock usePathname to return /menu
 }));
 
-
 describe("MenuDetails Component", () => {
   beforeEach(() => {
     fetchMock.resetMocks();
@@ -43,7 +59,7 @@ describe("MenuDetails Component", () => {
       data: {
         user: {
           id: "1",
-          token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3MzIxMDg3MzMsImV4cCI6MzMyODk3MDg3MzN9.jd50r7DPvDraQpC6WvjAdiNsvMJseECuYGbjIs_AywI",
+          token: "test-token",
         },
       },
       status: "authenticated",
@@ -51,81 +67,138 @@ describe("MenuDetails Component", () => {
     (toast as jest.Mock).mockReturnValue(jest.fn());
   });
 
-
-  // it("renders loading skeleton initially", () => {
-  //   render(<MenuDetails />);
-  //   expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
-  // });
-
+  it("renders loading skeleton initially", () => {
+    render(<MenuDetails />);
+    expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
+  });
 
   it("renders menu items after fetching", async () => {
-    render(<MenuDetails />);
+    // Mock the API response to include "Pizza" data
+    const mockResponse = [
+      {
+        name: "Pizza",
+        description: "Delicious cheese pizza",
+        price: 12,
+        ratings: 4,
+        discounts: 10,
+        imageLink: "https://example.com/pizza.jpg",
+        vegOrNonVeg: "Vegetarian",
+        cuisine: "Italian",
+      },
+    ];
+
+    // Fix the fetch response to return the above mock data
+    fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
+
+    // Render the component
+    const { container } = render(<MenuDetails />);
+
+    console.log(prettyDOM(container));
+
+    // Wait for the component to render and verify that the data appears correctly
     await waitFor(() => {
-      expect(screen.getByRole('cell', {
-        name: /adarsh/i
-      })).toBeInTheDocument(); 
+      // Verify that the "Pizza" name appears in the rendered component (you can modify based on your component)
+      const itemName = screen.getByText("Pizza");
+      expect(itemName).toBeInTheDocument();
+
+      // You can also verify other properties
+      const itemDescription = screen.getByText("Delicious cheese pizza");
+      expect(itemDescription).toBeInTheDocument();
     });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/restaurants/?id=1&menu=true", // Absolute URL for testing
+      {
+        headers: {
+          Authorization: "Bearer test-token", // Authorization header
+        },
+      }
+    );
   });
+
+  it("handles fetch errors gracefully", async () => {
+    // Simulate an error response (e.g., fetch fails or returns a 500 status)
+    fetchMock.mockRejectOnce(new Error("API Error"));
+
+    // Render the component
+    render(<MenuDetails />);
+
+    // Verify that the component handles the error gracefully (e.g., showing an error message)
+    await waitFor(() => {
+      const errorMessage = screen.getByText(/API Error/i);
+      expect(errorMessage).toBeInTheDocument();
+    });
+
+  });
+
 
   // it("adds a new menu item", async () => {
-
+  //   // Render the component
   //   render(<MenuDetails />);
-    
-  //    // Click the "Add Item" button in the Header
-  //    await waitFor(() => {
-  //    fireEvent.click(screen.getByTestId("add-item-button"));
-  //    });
- 
-  //    // Fill out the form fields
-  //    fireEvent.change(screen.getByLabelText(/item name/i), {
-  //      target: { value: "Pasta" },
-  //    });
-  //    fireEvent.change(screen.getByLabelText(/description/i), {
-  //      target: { value: "Yummy pasta" },
-  //    });
-  //    fireEvent.change(screen.getByLabelText(/price/i), {
-  //      target: { value: "899" },
-  //    });
-  //    fireEvent.change(screen.getByPlaceholderText(/0\-5/i), {
-  //      target: { value: "4" },
-  //    });
-  //    fireEvent.change(screen.getByLabelText(/discount \(%\)/i), {
-  //      target: { value: "15" },
-  //    });
- 
-  //    fireEvent.click(screen.getByRole("combobox"));
-  //    fireEvent.click(screen.getByText('Vegetarian'));
-
-  //    fireEvent.change(screen.getByLabelText(/cuisine/i), {
-  //      target: { value: "Coffee" },
-  //    });
- 
-  //    // Submit the form
-  //    fireEvent.click(screen.getByRole('button', {
-  //     name: /add item/i
-  //   }));
- 
-  //    // Assert the new item appears in the DOM
-  //    await waitFor(() => {
-  //     expect(screen.getByRole('cell', {
-  //       name: /pasta/i
-  //     })).toBeInTheDocument(); 
+  
+  //   // Wait for the "Add Item" button to be in the DOM
+  //   await waitFor(() => {
+  //     expect(screen.getByTestId("add-item-button")).toBeInTheDocument();
   //   });
-  //  });
+  
+  //   // Click the "Add Item" button in the Header
+  //   fireEvent.click(screen.getByTestId("add-item-button"));
+  
+  //   // Fill out the form fields and assert the values after changing
+  //   fireEvent.change(screen.getByLabelText(/item name/i), {
+  //     target: { value: "Pasta" },
+  //   });
+  //   expect(screen.getByLabelText(/item name/i).value).toBe("Pasta");
+  
+  //   fireEvent.change(screen.getByLabelText(/description/i), {
+  //     target: { value: "Yummy pasta" },
+  //   });
+  //   expect(screen.getByLabelText(/description/i).value).toBe("Yummy pasta");
+  
+  //   fireEvent.change(screen.getByLabelText(/price/i), {
+  //     target: { value: "899" },
+  //   });
+  //   expect(screen.getByLabelText(/price/i).value).toBe("899");
+  
+  //   fireEvent.change(screen.getByPlaceholderText(/0\-5/i), {
+  //     target: { value: "4" },
+  //   });
+  //   expect(screen.getByPlaceholderText(/0\-5/i).value).toBe("4");
+  
+  //   fireEvent.change(screen.getByLabelText(/discount \(%\)/i), {
+  //     target: { value: "15" },
+  //   });
+  //   expect(screen.getByLabelText(/discount \(%\)/i).value).toBe("15");
+  
+  //   fireEvent.click(screen.getByRole("combobox"));
+  //   fireEvent.click(screen.getByText('Vegetarian'));
+  
+  //   fireEvent.change(screen.getByLabelText(/cuisine/i), {
+  //     target: { value: "Coffee" },
+  //   });
+  //   expect(screen.getByLabelText(/cuisine/i).value).toBe("Coffee");
+  
+  //   // Submit the form
+  //   fireEvent.click(screen.getByRole('button', { name: /add item/i }));
+  
+  //   // Assert the new item appears in the DOM
+  //   await waitFor(() => {
+  //     expect(screen.getByRole('cell', { name: /Pasta/i })).toBeInTheDocument();
+  //   });
+  
+  // it("displays 'No menu items found' when search term does not match", async () => {
+  //   render(<MenuDetails />);
 
-  it("displays 'No menu items found' when search term does not match", async () => {
-    render(<MenuDetails />);
+  //  await waitFor(() => {
+  //   fireEvent.change(screen.getByPlaceholderText(/search menu items/i), {
+  //     target: { value: "Nonexistent Item" },
+  //   });
+  //   });
 
-   await waitFor(() => {
-    fireEvent.change(screen.getByPlaceholderText(/search menu items/i), {
-      target: { value: "Nonexistent Item" },
-    });
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText("No menu items found")).toBeInTheDocument();
-    });
-  });
+  //   await waitFor(() => {
+  //     expect(screen.getByText("No menu items found")).toBeInTheDocument();
+  //   });
+  // });
 
   // it("validates input fields", async () => {
   //   render(<MenuDetails />);

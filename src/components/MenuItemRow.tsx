@@ -25,14 +25,7 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = React.memo(({
 }) => {
   return (
     <tr key={item.id} className="hover:bg-gray-50">
-    <td className="px-6 py-4">{item.name}</td>
-    <td className="px-6 py-4">{item.description}</td>
-    <td className="px-6 py-4">
-      ₹{Number(item.price).toFixed(2)}
-    </td>
-    <td className="px-6 py-4">{item.ratings}</td>
-    <td className="px-6 py-4">{item.discounts}%</td>
-    <td className="px-6 py-4 relative">
+        <td className="px-6 py-4 relative">
       {item.imageLink ? (
         <>
           <Image
@@ -67,24 +60,26 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = React.memo(({
         </div>
       )}
     </td>
+    <td className="px-6 py-4">{item.name}</td>
+    <td className="px-6 py-4">{item.description}</td>
+    <td className="px-6 py-4">
+      ₹{Number(item.price).toFixed(2)}
+    </td>
+    <td className="px-6 py-4">{item.ratings}</td>
+    <td className="px-6 py-4">{item.discounts}%</td>
     <td className="px-6 py-4">{item.cuisine}</td>
     <td className="px-6 py-4">{item.vegOrNonVeg}</td>
-    <td className="px-6 py-4 flex space-x-2">
-      <CustomButton
+    <td className="px-6 py-6 flex space-x-5">
+      <Edit
         onClick={()=>onEdit(item)}
-        className="w-20"
+        cursor={"pointer"}
       >
-        <Edit className="h-4 w-4 mr-2" />
-        Edit
-      </CustomButton>
-      <Button
+      </Edit>
+      <Trash2
         onClick={() => onDelete(item.id as string)}
-        variant="destructive"
-        size="lg"
+        cursor={"pointer"}
       >
-        <Trash2 className="h-4 w-4 mr-2" />
-        Delete
-      </Button>
+      </Trash2>
     </td>
   </tr>
   );
