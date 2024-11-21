@@ -3,7 +3,8 @@ import {
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogFooter 
+  DialogFooter,
+  DialogTitle 
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ImageUpload";
 import { MenuItem } from "@/components/types";
 import { initialObject } from "@/schema/MenuItemSchema";
+import { VisuallyHidden } from '@reach/visually-hidden';
 
 interface AddEditItemDialogProps {
   isOpen: boolean;
@@ -39,7 +41,10 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <VisuallyHidden>
+          <DialogTitle>My Dialog Title</DialogTitle>
+          </VisuallyHidden>
+          <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
             <DialogHeader className="text">
               {formMode === 'add' ? 'Add New Menu Item' : 'Edit Menu Item'}
             </DialogHeader>

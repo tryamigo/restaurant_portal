@@ -13,6 +13,7 @@ import { useSSE } from '@/hooks/useSSE';
 import Header from '@/components/Header';
 import OrderRow from '@/components/OrderRow';
 import { useRouter } from 'next/navigation';
+import { ListOrdered } from 'lucide-react';
 
 // Main OrdersPage component
 function OrdersPage() {
@@ -121,9 +122,12 @@ function OrdersPage() {
                                     ) : filteredOrders.length === 0 ? (
                                         <tr>
                                             <td colSpan={7} className="text-center py-12 text-gray-500">
+                                            <div className="flex flex-col items-center justify-center space-y-4 h-full">
+                                                <ListOrdered className="w-16 h-16 text-gray-300" />
                                                 <div className="flex flex-col items-center space-y-4">
                                                     <p className="text-xl">No orders found</p>
                                                 </div>
+                                            </div>
                                             </td>
                                         </tr>
                                     ) : (

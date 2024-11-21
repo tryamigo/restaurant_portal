@@ -157,8 +157,8 @@ const CouponFormDialog: React.FC<CouponFormDialogProps> = ({
   setNewCoupon,
   validationErrors
 }) => (
-  <Dialog open={isOpen} onOpenChange={onClose}>
-    <DialogContent className="max-h-[90vh] overflow-y-auto">
+  <Dialog open={isOpen} onOpenChange={onClose} >
+    <DialogContent className="max-h-[90vh] overflow-y-auto"  aria-describedby={undefined}>
       <DialogTitle className="text-lg text-center md:text-xl text md:justify-start">
         Create New Coupon
       </DialogTitle>
@@ -174,3 +174,4 @@ const CouponFormDialog: React.FC<CouponFormDialogProps> = ({
 );
 
 export default CouponsPage;
+
