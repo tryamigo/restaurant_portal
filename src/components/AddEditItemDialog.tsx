@@ -2,7 +2,6 @@ import React from 'react';
 import { 
   Dialog, 
   DialogContent, 
-  DialogHeader, 
   DialogFooter,
   DialogTitle 
 } from "@/components/ui/dialog";
@@ -14,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ImageUpload";
 import { MenuItem } from "@/components/types";
 import { initialObject } from "@/schema/MenuItemSchema";
-import { VisuallyHidden } from '@reach/visually-hidden';
 
 interface AddEditItemDialogProps {
   isOpen: boolean;
@@ -41,13 +39,10 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-          <VisuallyHidden>
-          <DialogTitle>My Dialog Title</DialogTitle>
-          </VisuallyHidden>
           <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
-            <DialogHeader className="text">
-              {formMode === 'add' ? 'Add New Menu Item' : 'Edit Menu Item'}
-            </DialogHeader>
+          <DialogTitle className="text-lg text-center md:text-xl text md:justify-start">
+          {formMode === 'add' ? 'Add New Menu Item' : 'Edit Menu Item'}
+          </DialogTitle>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Existing fields */}
               <div>

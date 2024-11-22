@@ -23,10 +23,10 @@ interface OrderRowProps {
 
 const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
     const STATUS_ICONS = {
-        pending: <Clock className="text-yellow-500 w-5 h-5" />,
-        preparing: <Package className="text-blue-500 w-5 h-5" />,
-        'on the way': <TruckIcon className="text-orange-500 w-5 h-5" />,
-        delivered: <CheckCircle className="text-green-500 w-5 h-5" />
+        pending: <Clock className="text-yellow-500 w-5 h-5 mr-2" />,
+        preparing: <Package className="text-blue-500 w-5 h-5 mr-2" />,
+        'on the way': <TruckIcon className="text-orange-500 w-5 h-5 mr-2" />,
+        delivered: <CheckCircle className="text-green-500 w-5 h-5 mr-2" />
     };
 
     const getStatusColor = (status: string): "default" | "secondary" | "destructive" | "outline" => {
@@ -84,11 +84,12 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
             <td className="px-6 py-4">
                 <div className="flex flex-col gap-1">
                     {order.takeFromStore ? (
-                        <Badge variant="secondary">Pickup</Badge>
+                        <Badge variant="secondary">Pick Up</Badge>
                     ) : (
                         <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4" />
-                            <span className="text-xs">Delivery</span>
+                            
+                            <Badge variant="secondary">Delivery <MapPin className="h-4 w-4 ml-2" /></Badge>
+                            {/* <span className="text-xs">DELIVERY</span> */}
                         </div>
                     )}
                     {order.rating && (

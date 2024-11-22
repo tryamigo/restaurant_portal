@@ -23,8 +23,6 @@ export const AddressFields: React.FC<AddressFieldsProps> = ({
     { key: 'city', label: 'City' },
     { key: 'state', label: 'State' },
     { key: 'pincode', label: 'Pincode' },
-    { key:'latitude', label:'latitude'},
-    { key:'longitude',label:'longitude'}
   ];
 
   if (isEditing) {

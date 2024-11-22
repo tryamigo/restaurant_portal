@@ -2,11 +2,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { Order, OrderStatus } from '@/components/types';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
 import { useSession } from 'next-auth/react';
-import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSSE } from '@/hooks/useSSE';
@@ -122,8 +118,8 @@ function OrdersPage() {
                                     ) : filteredOrders.length === 0 ? (
                                         <tr>
                                             <td colSpan={7} className="text-center py-12 text-gray-500">
-                                            <div className="flex flex-col items-center justify-center space-y-4 h-full">
-                                                <ListOrdered className="w-16 h-16 text-gray-300" />
+                                                <div className="flex flex-col items-center justify-center space-y-4 h-full">
+                                                    <ListOrdered className="w-16 h-16 text-gray-300" />
                                                 <div className="flex flex-col items-center space-y-4">
                                                     <p className="text-xl">No orders found</p>
                                                 </div>
@@ -151,8 +147,8 @@ function OrdersPage() {
                             ) : filteredOrders.length === 0 ? (
                                 <div className="text-center py-12 text-gray-500">
                                     <div className="flex flex-col items-center space-y-4">
-                                        <p className="text-xl">No orders found</p>
-                                    </div>
+                                    <p className="text-xl">No orders found</p>
+                                </div>
                                 </div>
                             ) : (
                                 filteredOrders.map((order) => (
