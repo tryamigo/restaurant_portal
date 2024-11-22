@@ -35,18 +35,17 @@ interface HeaderProps {
   onAddItem?: () => void;
   restaurantActions?: {
     onEditRestaurant?: () => void;
-    onDeleteRestaurant?: () => void;
   };
 }
 
-function Header({ searchTerm, setSearchTerm, statusFilter, setStatusFilter, onAddItem,restaurantActions  }: HeaderProps) {
+function Header({ searchTerm, setSearchTerm, statusFilter, setStatusFilter, onAddItem, restaurantActions  }: HeaderProps) {
   const { data: session } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const renderHeaderContent = () => {
-    const commonClasses = "text-xl md:text-2xl font-bold text";
+    const commonClasses = "text-xl md:text-2xl font-bold text w-1/3";
     const containerClasses = "flex flex-col gap-4 md:flex-row md:justify-between md:items-center w-full";
 
     switch (pathname) {
@@ -55,27 +54,13 @@ function Header({ searchTerm, setSearchTerm, statusFilter, setStatusFilter, onAd
           <div className={containerClasses}>
             <h1 className={commonClasses}>Restaurant Details</h1>
             <div className="flex space-x-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className='outline-none text customBorder hover:bg-blue-100 hover:text' variant={"ghost"} 
-                  >
-                    Options
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={restaurantActions?.onEditRestaurant}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit Restaurant
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-red-600 focus:text-red-700"
-                    onClick={restaurantActions?.onDeleteRestaurant}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Restaurant
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <CustomButton 
+                onClick={restaurantActions?.onEditRestaurant} 
+                className="flex items-center justify-center gap-2 w-full md:w-auto"
+              >
+              <Edit className="h-4 w-4" />
+                Edit Restaurant
+              </CustomButton>
             </div>
           </div>
         );

@@ -1,6 +1,5 @@
 // app/error.tsx
 'use client'
-
 import { Button } from "@/components/ui/button"
 import { AlertCircle } from "lucide-react"
 import { useEffect } from "react"

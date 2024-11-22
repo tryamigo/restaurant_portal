@@ -1,6 +1,5 @@
 // app/not-found.tsx
 'use client'
-
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"

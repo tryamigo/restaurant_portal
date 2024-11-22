@@ -1,6 +1,5 @@
 // app/loading.tsx
 'use client'
-
 import { Loader2 } from "lucide-react"
 import { motion } from "framer-motion"
 

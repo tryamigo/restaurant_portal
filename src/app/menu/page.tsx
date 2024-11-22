@@ -1,17 +1,15 @@
-
-'use client'
-import React, { useEffect, useState } from 'react';
-import { useSession } from "next-auth/react";
+"use client";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { MenuItemRow } from "@/components/MenuItemRow";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useMenuManagement } from '@/hooks/useMenuOperations';
-import { MenuItem } from '@/components/types';
-import { initialObject } from '@/schema/MenuItemSchema';
-import Header from '@/components/Header';
-import AddEditItemDialog from '@/components/AddEditItemDialog';
-import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
-import { Search } from 'lucide-react';
+import { useMenuManagement } from "@/hooks/useMenuOperations";
+import { MenuItem } from "@/components/types";
+import { initialObject } from "@/schema/MenuItemSchema";
+import Header from "@/components/Header";
+import AddEditItemDialog from "@/components/AddEditItemDialog";
+import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
+import { Search } from "lucide-react";
 
 const MenuDetails: React.FC = () => {
   const {
@@ -28,12 +26,14 @@ const MenuDetails: React.FC = () => {
   } = useMenuManagement();
 
   const [isAddItemDialogOpen, setIsAddItemDialogOpen] = useState(false);
-  const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+  const [formMode, setFormMode] = useState<"add" | "edit">("add");
   const [currentEditItem, setCurrentEditItem] = useState<MenuItem | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [menuItemToDelete, setMenuItemToDelete] = useState<string | null>(null);
   const [newItem, setNewItem] = useState<Omit<MenuItem, "id">>(initialObject);
-  const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
+  const [validationErrors, setValidationErrors] = useState<{
+    [key: string]: string;
+  }>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handleEditItem = (item: MenuItem) => {
@@ -45,9 +45,9 @@ const MenuDetails: React.FC = () => {
       ratings: Number(item.ratings),
       discounts: Number(item.discounts),
       vegOrNonVeg: item.vegOrNonVeg,
-      cuisine: item.cuisine
+      cuisine: item.cuisine,
     });
-    setFormMode('edit');
+    setFormMode("edit");
     setIsAddItemDialogOpen(true);
   };
 
@@ -64,7 +64,7 @@ const MenuDetails: React.FC = () => {
 
   const handleSubmitItem = async () => {
     try {
-      if (formMode === 'add') {
+      if (formMode === "add") {
         await addMenuItem(newItem);
       } else if (currentEditItem) {
         await updateMenuItem({ ...currentEditItem, ...newItem });
@@ -72,7 +72,7 @@ const MenuDetails: React.FC = () => {
       setNewItem(initialObject);
       setIsAddItemDialogOpen(false);
       setCurrentEditItem(null);
-      setFormMode('add');
+      setFormMode("add");
     } catch (error) {
       console.error("Error submitting item:", error);
       // Handle validation errors if needed
@@ -128,48 +128,63 @@ const MenuDetails: React.FC = () => {
           <table className="w-full">
             <thead className="bg-gray-100 border-b">
               <tr>
-                {["Image","Item", "Description", "Price", "Ratings", "Discounts", "Cuisines", "Category", "Actions"].map(header => (
-                  <th key={header} className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {[
+                  "Image",
+                  "Item",
+                  "Description",
+                  "Price",
+                  "Ratings",
+                  "Discounts",
+                  "Cuisines",
+                  "Category",
+                  "Actions",
+                ].map((header) => (
+                  <th
+                    key={header}
+                    className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     {header}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-            {isLoading ? (
-                  Array(5)
-                    .fill(0)
-                    .map((_, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        {Array(7)
-                          .fill(0)
-                          .map((_, colIndex) => (
-                            <td key={colIndex} className="px-6 py-4">
-                              <Skeleton className="h-8 w-full" />
-                            </td>
-                          ))}
-                      </tr>
-                    ))
-                ) : filteredMenu.length === 0 ? (
-                  <tr>
-  <td colSpan={9} className="text-center py-12 text-gray-500">
-    <div className="flex flex-col items-center justify-center space-y-4 h-full">
-      <Search className="w-16 h-16 text-gray-300" />
-      <p className="text-xl">
-        {searchTerm ? "No menu items found" : "No menu items available"}
-      </p>
-    </div>
-  </td>
-</tr>
-                ) : (
-                filteredMenu.map(item => (
+              {isLoading ? (
+                Array(5)
+                  .fill(0)
+                  .map((_, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      {Array(7)
+                        .fill(0)
+                        .map((_, colIndex) => (
+                          <td key={colIndex} className="px-6 py-4">
+                            <Skeleton className="h-8 w-full" />
+                          </td>
+                        ))}
+                    </tr>
+                  ))
+              ) : filteredMenu.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="text-center py-12 text-gray-500">
+                    <div className="flex flex-col items-center justify-center space-y-4 h-full">
+                      <Search className="w-16 h-16 text-gray-300" />
+                      <p className="text-xl">
+                        {searchTerm
+                          ? "No menu items found"
+                          : "No menu items available"}
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredMenu.map((item) => (
                   <MenuItemRow
                     key={item.id}
                     item={item}
                     setSelectedImage={setSelectedImage}
                     selectedImage={selectedImage}
                     onEdit={handleEditItem}
-                    onDelete={id => {
+                    onDelete={(id) => {
                       setMenuItemToDelete(id);
                       setIsDeleteDialogOpen(true);
                     }}
@@ -196,7 +211,7 @@ const MenuDetails: React.FC = () => {
           isOpen={isDeleteDialogOpen}
           onClose={() => setIsDeleteDialogOpen(false)}
           onConfirmDelete={handleDeleteItem}
- />
+        />
       </motion.div>
     </>
   );
