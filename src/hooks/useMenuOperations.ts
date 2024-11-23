@@ -4,6 +4,7 @@ import { Session } from 'next-auth';
 import { z } from 'zod';
 import { MenuItemSchema } from "@/schema/MenuItemSchema";
 import { useSession } from 'next-auth/react';
+import { toast } from "@/hooks/use-toast";
 
 export const useMenuManagement = () => {
   const [menu, setMenu] = useState<MenuItem[]>([]);
@@ -83,13 +84,25 @@ export const useMenuManagement = () => {
 
       if (!response.ok) throw new Error("Failed to add menu item");
 
+      toast({
+        title: "Success",
+        description: "Item added successfully",
+      });
+
+
       const addedItem = await response.json();
       setMenu(prevMenu => [...prevMenu, addedItem]);
       setImageFile("");
       return addedItem;
     } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add Item",
+        variant: "destructive",
+      });
       console.error("Error adding menu item:", error);
       throw error;
+      
     }
   };
 
@@ -137,6 +150,10 @@ export const useMenuManagement = () => {
       );
 
       if (!response.ok) throw new Error("Failed to update menu item");
+      toast({
+        title: "Success",
+        description: `Item updated successfully`,
+      });
 
       const updatedItem = await response.json();
       setMenu(prevMenu => 
@@ -147,6 +164,11 @@ export const useMenuManagement = () => {
       setImageFile("");
       return updatedItem;
     } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update Item",
+        variant: "destructive",
+      });
       console.error("Error updating menu item:", error);
       throw error;
     }
@@ -165,9 +187,18 @@ export const useMenuManagement = () => {
       );
 
       if (!response.ok) throw new Error("Failed to delete menu item");
+      toast({
+        title: "Success",
+        description: "Item deleted successfully",
+      });
 
       setMenu(prevMenu => prevMenu.filter(item => item.id !== itemId));
     } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete Item",
+        variant: "destructive",
+      });
       console.error("Error deleting menu item:", error);
       throw error;
     }

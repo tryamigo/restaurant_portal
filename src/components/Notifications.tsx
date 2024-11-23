@@ -1,6 +1,5 @@
 // components/Notifications.tsx
 'use client'
-
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSSE } from '../hooks/useSSE';
 import { ShoppingBag, Check, Trash2 } from 'lucide-react';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -37,6 +37,13 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
   handleSubmit,
   setImageFile
 }) => {
+
+  useEffect(() => {
+    if (isOpen) {
+      setValidationErrors({});
+    }
+  }, [isOpen, setValidationErrors]);
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
           <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
