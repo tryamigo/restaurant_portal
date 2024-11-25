@@ -1,0 +1,71 @@
+### 1. **Fetching Restaurant Details**
+
+- **Test Case**: Display restaurant details after a successful fetch.  
+    - **Precondition**: User is logged in and navigates to the restaurant details page.  
+    - **Steps**:  
+        1. Go to the restaurant details page (`https://restaurant.navya.so/restaurants`).  
+        2. Wait for the restaurant details to load.  
+        3. Verify that the following details are displayed:  
+            - Restaurant Name  
+            - Phone Number  
+            - Opening Hours  
+            - GSTIN  
+            - FSSAI  
+            - Rating  
+            - Street Address  
+            - City  
+            - Pincode  
+            - Landmark  
+            - State  
+
+    - **Expected Result**:  
+        - All restaurant details (e.g., Name, Address, Rating, etc.) are correctly displayed.  
+
+---
+
+### 2. **Handling API Failure for Restaurant Details**
+
+- **Test Case**: Display an error message when fetching restaurant details fails.  
+    - **Precondition**: User is logged in and navigates to the restaurant details page.  
+    - **Steps**:  
+        1. Mock an API failure for fetching restaurant details (`/api/restaurants`).  
+        2. Go to the restaurant details page (`https://restaurant.navya.so/restaurants`).  
+        3. Wait for the page to load.  
+        4. Check if an error message is displayed.  
+
+    - **Expected Result**:  
+        - An error message such as *"Failed to load restaurant details. Please try again later."* is displayed.  
+
+---
+
+### 3. **Editing Restaurant Information**
+
+- **Test Case**: Update restaurant information and save changes.  
+    - **Precondition**: User is logged in and has access to the restaurant details page in edit mode.  
+    - **Steps**:  
+        1. Click on the "Options" button.  
+        2. Select "Edit Restaurant" from the menu.  
+        3. Edit the restaurant name, GSTIN, FSSAI, Rating, and street address, etc.  
+        4. Save the changes by clicking the "Save Changes" button.  
+        5. Verify that the updated information is displayed on the page.  
+
+    - **Expected Result**:  
+        - The updated restaurant details should be visible on the page after saving.  
+        - A success message appears, stating: **"Restaurant details updated successfully."**  
+
+---
+
+### 4. **Deleting Restaurant**
+
+- **Test Case**: Open the delete dialog and delete the restaurant.  
+    - **Precondition**: User is logged in and navigates to the restaurant details page.  
+    - **Steps**:  
+        1. Go to the restaurant details page (`https://restaurant.navya.so/restaurants`).  
+        2. Click on the "Delete Restaurant" button from the options menu.  
+        3. Ensure the delete dialog appears.  
+        4. Click on the "Delete" button in the dialog to confirm deletion.  
+        5. Verify that a success message appears stating: *"Restaurant deleted successfully."*  
+        6. Verify that the restaurant is deleted and a message like *"No restaurant details found"* is displayed.  
+
+    - **Expected Result**:  
+        - The restaurant is deleted, and the user sees a message like *"No restaurant details found"* indicating the restaurant has been removed.  

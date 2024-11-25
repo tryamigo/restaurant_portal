@@ -1,0 +1,82 @@
+# Test Cases for OrdersPage Component
+
+### 1. Test Case: Renders loading skeletons when fetching orders
+- **Steps:**
+  1. Render the `OrdersPage` component.
+  2. Wait for skeleton elements to appear.
+  3. Verify skeletons are visible during the fetch process.
+  
+- **Precondition:** The `OrdersPage` component initiates a fetch for orders when rendered.
+- **Expected Result:** Skeleton loading elements should be displayed while fetching orders.
+
+---
+
+### 2. Test Case: Renders orders after successful fetch
+- **Steps:**
+  1. Render the `OrdersPage` component.
+  2. Wait for the orders to be fetched and rendered.
+  3. Check for the presence of the order ID and other order details.
+
+- **Precondition:** The component fetches mock order data successfully.
+- **Expected Result:** The order data should be displayed, including the order ID.
+
+---
+
+### 3. Test Case: Filters orders by search term
+- **Steps:**
+  1. Render the `OrdersPage` component.
+  2. Wait for orders to be rendered.
+  3. Enter a search term in the search input (e.g., `order-1234`).
+  4. Verify the displayed orders match the search term.
+
+- **Precondition:** Orders are available, and a search input is present.
+- **Expected Result:** Orders matching the search term should be displayed, and others should be hidden.
+
+---
+
+### 4. Test Case: Filters orders by status
+- **Steps:**
+  1. Render the `OrdersPage` component.
+  2. Wait for orders to be rendered.
+  3. Open the status filter dropdown.
+  4. Select the 'Delivered' status.
+  5. Verify only orders with the 'Delivered' status are shown.
+
+- **Precondition:** Orders have different statuses, and a filter dropdown is present.
+- **Expected Result:** Only orders with the selected status (e.g., 'Delivered') should be displayed.
+
+---
+
+### 5. Test Case: Displays "No orders found" when no orders match filter
+- **Steps:**
+  1. Render the `OrdersPage` component.
+  2. Wait for orders to be rendered.
+  3. Open the status filter dropdown.
+  4. Select the 'Pending' status.
+  5. Verify the message "No orders found" is displayed.
+
+- **Precondition:** Orders are available, and a filter dropdown is present.
+- **Expected Result:** "No orders found" should be displayed when no orders match the filter.
+
+---
+
+### 6. Test Case: Handles fetch error gracefully
+- **Steps:**
+  1. Mock `fetch` to throw an error.
+  2. Render the `OrdersPage` component.
+  3. Verify error handling occurs without crashing.
+
+- **Precondition:** The `fetch` function is mocked to simulate a failure.
+- **Expected Result:** The error should be logged to the console without affecting the page rendering.
+
+---
+
+### 7. Test Case: Navigates to order details when view button is clicked
+- **Steps:**
+  1. Render the `OrdersPage` component.
+  2. Wait for orders to be rendered.
+  3. Locate and click the 'view' button for an order.
+  4. Verify navigation to the order details page.
+
+- **Precondition:** Orders are available, and the 'view' button is present for each order.
+- **Expected Result:** Clicking the 'view' button should navigate to the order details page, where the 'update status' button is visible.

@@ -1,0 +1,76 @@
+## 1. **Test for Successful Request with a Valid Token**
+   **Description:**  
+   Ensure that the `handleRequest` function successfully makes a request when provided with a valid authorization token.
+
+   **Test Steps:**
+   - Mock a valid token and create a mock request.
+   - Mock the Axios call to return a successful response with status `200`.
+   - Call the `handleRequest` function and check that the Axios request was made with the correct headers and URL.
+   - Assert that the response status is `200` and the response body matches the mocked data.
+
+   **Expected Result:**  
+   - Axios should be called with the correct parameters.
+   - The response should have status `200` and the correct response data (`{ message: 'Success' }`).
+
+---
+
+## 2. **Test for Unauthorized Error with Invalid Token**
+   **Description:**  
+   Ensure that the `handleRequest` function returns a `401` error when an invalid token is provided.
+
+   **Test Steps:**
+   - Mock an invalid token and create a mock request.
+   - Mock the Axios call to return a `401` error with an error message indicating invalid credentials.
+   - Call the `handleRequest` function and check that the response status is `401`.
+   - Assert that the response body contains the correct error message: `'Unauthorized: Invalid or expired token'`.
+
+   **Expected Result:**  
+   - The response status should be `401`.
+   - The response body should contain the error message: `'Unauthorized: Invalid or expired token'`.
+
+---
+
+## 3. **Test for Unauthorized Error When No Token is Provided**
+   **Description:**  
+   Ensure that the `handleRequest` function returns a `401` error when no token is provided.
+
+   **Test Steps:**
+   - Create a mock request without an authorization token.
+   - Call the `handleRequest` function and check that the response status is `401`.
+   - Assert that the response body contains the correct error message: `'Unauthorized: No token provided'`.
+
+   **Expected Result:**  
+   - The response status should be `401`.
+   - The response body should contain the error message: `'Unauthorized: No token provided'`.
+
+---
+
+## 4. **Test for Generic Error from Axios**
+   **Description:**  
+   Ensure that the `handleRequest` function correctly handles generic errors (e.g., server errors) returned by Axios.
+
+   **Test Steps:**
+   - Mock a valid token and create a mock request.
+   - Mock the Axios call to return a `500` error with a message indicating a server error.
+   - Call the `handleRequest` function and check that the response status is `500`.
+   - Assert that the response body contains the error message: `'Internal Server Error'`.
+
+   **Expected Result:**  
+   - The response status should be `500`.
+   - The response body should contain the error message: `'Internal Server Error'`.
+
+---
+
+## 5. **Test for Axios Error Without Response (Network Error)**
+   **Description:**  
+   Ensure that the `handleRequest` function correctly handles network errors (i.e., Axios errors without a response).
+
+   **Test Steps:**
+   - Mock a valid token and create a mock request.
+   - Mock the Axios call to reject with a network error (e.g., `Error: Network Error`).
+   - Call the `handleRequest` function and check that the response status is `500`.
+   - Assert that the response body contains the error message: `'An error occurred while processing your request'`.
+
+   **Expected Result:**  
+   - The response status should be `500`.
+   - The response body should contain the error message: `'An error occurred while processing your request'`.

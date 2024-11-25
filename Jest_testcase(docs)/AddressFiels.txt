@@ -1,0 +1,52 @@
+### 1. **Rendering Address Fields in Editing Mode**
+
+- **Test Case**: Verify that the `AddressFields` component renders correctly in editing mode.  
+    - **Precondition**: The component receives a valid `Address` object and is set to editing mode.  
+    - **Steps**:  
+        1. Render the `AddressFields` component with the provided mock `Address` object and `isEditing` set to `true`.  
+        2. Check that all fields (`streetAddress`, `landmark`, `city`, `state`, and `pincode`) are displayed.  
+        3. Verify that each field is rendered as an input element.  
+        4. Confirm that the input elements are correctly populated with the corresponding values from the `mockAddress`.  
+
+    - **Expected Result**:  
+        - All address fields are displayed as input elements with the correct values.  
+
+---
+
+### 2. **Triggering onChange Callback**
+
+- **Test Case**: Verify that the `onChange` callback is triggered when an input field is edited.  
+    - **Precondition**: The component is in editing mode and has an `onChange` callback.  
+    - **Steps**:  
+        1. Render the `AddressFields` component with the provided mock `Address` object and a mocked `onChange` function.  
+        2. Simulate changing the `streetAddress` field by modifying its value.  
+        3. Verify that the `onChange` callback is triggered with the updated address data.  
+
+    - **Expected Result**:  
+        - The `onChange` callback is called with the updated address object after the field value is changed.  
+
+---
+
+### 3. **Debugging Rendered Component**
+
+- **Test Case**: Print the component's rendered output for debugging purposes.  
+    - **Precondition**: The component is rendered in non-editing mode.  
+    - **Steps**:  
+        1. Render the `AddressFields` component with the provided mock `Address` object and `isEditing` set to `false`.  
+        2. Print the `innerHTML` of the rendered component for inspection.  
+
+    - **Expected Result**:  
+        - The rendered HTML structure is printed for debugging, showing the component details.  
+
+---
+
+### 4. **Applying Custom ClassName**
+
+- **Test Case**: Verify that the custom `className` prop is applied to the component's root element.  
+    - **Precondition**: The component receives a valid `className` prop.  
+    - **Steps**:  
+        1. Render the `AddressFields` component with a custom `className` prop.  
+        2. Verify that the root element of the component contains the specified class.  
+
+    - **Expected Result**:  
+        - The component's root element includes the custom class name provided via the `className` prop.  

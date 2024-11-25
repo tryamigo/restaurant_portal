@@ -242,7 +242,7 @@ function OTPLoginContent() {
                 className="space-y-2"
               >
                 <Label>Enter 6-digit OTP</Label>
-                <OTPInput value={otp} onChange={setOtp} />
+                <OTPInput value={otp} onChange={setOtp} data-testid="otpinput" />
                 <div className="flex items-center justify-center">
                   <Button
                     variant="link"

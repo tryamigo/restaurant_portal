@@ -1,0 +1,133 @@
+# Test Cases for CouponsPage Component
+
+## 1. **Test for Rendering Loading Spinner**
+   **Description:**  
+   Ensure that the loading spinner is rendered when the component is initially loaded.
+   
+   **Test Steps:**
+   - Render the `CouponsPage` component.
+   - Check if the loading spinner element (identified by `data-testid="loading-spinner"`) is present in the document.
+   
+   **Expected Result:**  
+   The loading spinner should be in the document.
+
+## 2. **Test for Fetching and Displaying Coupons**
+   **Description:**  
+   Ensure that the coupons are correctly fetched from the API and displayed on the page.
+   
+   **Test Steps:**
+   - Mock the API response with a list of coupons.
+   - Mock `useRouter` and `usePathname` hooks for navigation.
+   - Render the `CouponsPage` component.
+   - Wait for the coupons to be displayed after fetching data.
+   - Verify that both active and inactive coupons are rendered.
+   
+   **Expected Result:**  
+   - Coupons with titles `Discount 10%` and `Discount 20%` should be displayed.
+   - The description of each coupon should be shown correctly (`10% off` and `20% off`).
+
+## 3. **Test for Adding a New Coupon**
+   **Description:**  
+   Ensure that the form to add a new coupon works correctly and submits the coupon data.
+
+   **Test Steps:**
+   - Mock the initial response to simulate an empty list of coupons.
+   - Mock the API response for coupon creation with a successful `201` status.
+   - Render the `CouponsPage` component.
+   - Simulate clicking the "Add Coupon" button.
+   - Fill out the form with appropriate coupon data.
+   - Submit the form.
+   - Verify that the API call to create a new coupon is triggered.
+   
+   **Expected Result:**  
+   The form fields should be populated with values, and the coupon creation API should be called with the correct parameters (`Authorization: 'Bearer test-token'`).
+
+## 4. **Test for Searching Coupons by Code**
+   **Description:**  
+   Ensure that the search functionality for coupons by code works correctly.
+
+   **Test Steps:**
+   - Mock the initial fetch to return an empty list of coupons.
+   - Mock the search API response with a coupon that matches the search query (`SEARCH10`).
+   - Render the `CouponsPage` component.
+   - Simulate entering the coupon code `SEARCH10` in the search input.
+   - Verify that the coupon with code `SEARCH10` is displayed.
+   
+   **Expected Result:**  
+   - The search input should be present.
+   - After entering `SEARCH10`, the corresponding coupon should be displayed.
+
+## 5. **Test for Showing the "Add Coupon" Form**
+   **Description:**  
+   Verify that the "Add Coupon" form is displayed correctly when the user clicks the "Add Coupon" button.
+
+   **Test Steps:**
+   - Render the `CouponsPage` component.
+   - Simulate a click on the "Add Coupon" button.
+   - Verify that the coupon creation form is displayed.
+   
+   **Expected Result:**  
+   - The coupon creation form should be displayed after clicking the button.
+
+## 6. **Test for Coupon Creation Error Handling**
+   **Description:**  
+   Ensure the application handles error scenarios correctly when the coupon creation API fails.
+
+   **Test Steps:**
+   - Mock the fetch API to return an error (e.g., a `500` status).
+   - Render the `CouponsPage` component.
+   - Attempt to submit the coupon form.
+   - Verify that an error message is displayed or logged.
+   
+   **Expected Result:**  
+   - The error handling should be triggered (e.g., a toast notification or an error message).
+
+## 7. **Test for Rendering Coupons with Correct Data**
+   **Description:**  
+   Ensure that the coupons are displayed with correct data, such as coupon title, code, description, and active status.
+   
+   **Test Steps:**
+   - Mock the fetch API response to include multiple coupons with various attributes.
+   - Render the `CouponsPage` component.
+   - Wait for the page to update and check that the correct coupon details (title, code, description, active status) are rendered.
+   
+   **Expected Result:**  
+   - Coupons should display correctly with the expected attributes (e.g., title, code, description).
+
+## 8. **Test for Validating Coupon Form Inputs**
+   **Description:**  
+   Ensure the form fields for creating a coupon are validated before submission.
+
+   **Test Steps:**
+   - Simulate filling out the form with invalid data (e.g., missing required fields).
+   - Attempt to submit the form.
+   - Verify that the form validation is triggered and the form is not submitted.
+   
+   **Expected Result:**  
+   - The form should not be submitted when required fields are missing or incorrect.
+   - Validation messages should appear.
+
+## 9. **Test for Correct Display of Empty Coupons List**
+   **Description:**  
+   Ensure that an empty coupons list is handled correctly and an appropriate message is displayed when no coupons are available.
+   
+   **Test Steps:**
+   - Mock the fetch API to return an empty list of coupons.
+   - Render the `CouponsPage` component.
+   - Verify that the message "No coupons available" (or a similar message) is displayed.
+   
+   **Expected Result:**  
+   - A message indicating no coupons are available should be displayed when the list is empty.
+
+## 10. **Test for Mocking EventSource for SSE (Server-Sent Events)**
+   **Description:**  
+   Ensure that the `EventSource` is mocked correctly for testing purposes, simulating real-time updates.
+   
+   **Test Steps:**
+   - Mock the `EventSource` constructor and set the appropriate state (`OPEN`, `CLOSED`).
+   - Render the `CouponsPage` component.
+   - Verify that the `EventSource` constructor is called correctly and that event listeners are added.
+   
+   **Expected Result:**  
+   - The `EventSource` constructor should be mocked, and event listeners should be added for real-time coupon updates.
+

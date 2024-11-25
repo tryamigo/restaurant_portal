@@ -5,9 +5,9 @@ import '@testing-library/jest-dom';
 import CouponsPage from '@/app/coupons/page';
 import { useSession } from 'next-auth/react';
 import { toast } from '@/hooks/use-toast';
-import { useRouter, usePathname } from 'next/navigation';
 import fetchMock from 'jest-fetch-mock';
-
+import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 
 // Mock the EventSource constructor and static properties

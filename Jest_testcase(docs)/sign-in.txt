@@ -1,0 +1,257 @@
+# OTPLoginContent Component Test Cases
+
+## Test Case 1: Renders the initial login form
+### Precondition:
+- None
+### Steps:
+1. Render the `OTPLoginContent` component.
+2. Verify that the mobile input field is present.
+3. Verify that the "Send OTP" button is present.
+### Expected Result:
+- The mobile input field and the "Send OTP" button are displayed correctly.
+
+---
+
+## Test Case 2: Renders OTP login form on large screens
+### Precondition:
+- User is on a desktop screen (width >= 1200px).
+### Steps:
+1. Resize the window to simulate a large screen.
+2. Render the `OTPLoginContent` component.
+3. Verify that the layout is correct for large screens.
+### Expected Result:
+- The OTP login form is displayed correctly on large screens.
+
+---
+
+## Test Case 3: Renders OTP login form on small screens
+### Precondition:
+- User is on a mobile screen (width = 375px).
+### Steps:
+1. Resize the window to simulate a small screen.
+2. Render the `OTPLoginContent` component.
+3. Verify that the layout is correct for small screens.
+### Expected Result:
+- The OTP login form is displayed correctly on small screens.
+
+---
+
+## Test Case 4: Shows error message for invalid mobile number
+### Precondition:
+- User enters an invalid mobile number.
+### Steps:
+1. Render the `OTPLoginContent` component.
+2. Enter an invalid mobile number in the input field.
+3. Click the "Send OTP" button.
+4. Verify that the error message "Please enter a valid 10-digit mobile number" is shown.
+### Expected Result:
+- The error message "Please enter a valid 10-digit mobile number" appears.
+
+---
+
+## Test Case 5: Sends OTP successfully for valid mobile number
+### Precondition:
+- User enters a valid mobile number.
+### Steps:
+1. Render the `OTPLoginContent` component.
+2. Enter a valid mobile number in the input field.
+3. Click the "Send OTP" button.
+4. Wait for the OTP input prompt to appear.
+### Expected Result:
+- The OTP input field appears with the message "Enter 6-digit OTP".
+
+---
+
+## Test Case 6: Handles network error during OTP request
+### Precondition:
+- User enters a valid mobile number.
+### Steps:
+1. Render the `OTPLoginContent` component.
+2. Enter a valid mobile number in the input field.
+3. Click the "Send OTP" button.
+4. Simulate a network error.
+5. Verify that an error message "An error occurred. Please try again." is displayed.
+### Expected Result:
+- The error message "An error occurred. Please try again." appears.
+
+---
+
+## Test Case 7: Multiple OTP Requests for the Same Number
+### Precondition:
+- User has already requested OTP once.
+### Steps:
+1. Render the `OTPLoginContent` component.
+2. Enter a valid mobile number in the input field.
+3. Click the "Send OTP" button.
+4. Wait for the OTP request to be processed.
+5. Click the "Send OTP" button again.
+6. Verify that the latest OTP request is processed.
+### Expected Result:
+- Only the latest OTP request is valid.
+
+---
+
+## Test Case 8: Invalid Mobile Number Format
+### Precondition:
+- User enters an invalid mobile number format.
+### Steps:
+1. Render the `OTPLoginContent` component.
+2. Enter an invalid mobile number in the input field (e.g., less than 10 digits).
+3. Click the "Send OTP" button.
+4. Verify that the error message "Please enter a valid 10-digit mobile number" is shown.
+### Expected Result:
+- The error message "Please enter a valid 10-digit mobile number" appears.
+
+---
+
+## Test Case 9: Unregistered Mobile Number
+### Precondition:
+- User enters a mobile number that is not registered.
+### Steps:
+1. Render the `OTPLoginContent` component.
+2. Enter a valid mobile number in the input field.
+3. Click the "Send OTP" button.
+4. Verify that the error message "Mobile number not registered" is shown.
+### Expected Result:
+- The error message "Mobile number not registered" appears.
+
+---
+
+## Test Case 10: Successful OTP Login
+### Precondition:
+- User enters a valid mobile number and OTP.
+### Steps:
+1. Render the `OTPLoginContent` component.
+2. Enter a valid mobile number in the input field.
+3. Click the "Send OTP" button.
+4. Enter a valid OTP.
+5. Click the "Login" button.
+6. Verify that the `signIn` function is called with the correct mobile number and OTP.
+### Expected Result:
+- The `signIn` function is called with the correct credentials.
+
+---
+
+## Test Case 11: Displays an error for invalid OTP
+### Precondition:
+- User enters a valid mobile number and OTP.
+### Steps:
+1. Render the `OTPLoginContent` component.
+2. Enter a valid mobile number in the input field.
+3. Click the "Send OTP" button.
+4. Enter an invalid OTP.
+5. Click the "Login" button.
+6. Verify that the error message "Invalid OTP" is displayed.
+### Expected Result:
+- The error message "Invalid OTP" is displayed.
+
+---
+
+## Test Case 12: Successful OTP Authentication and Access Token Retrieval
+### Precondition:
+- User enters a valid mobile number and OTP.
+### Steps:
+1. Render the `OTPLoginContent` component.
+2. Enter a valid mobile number in the input field.
+3. Click the "Send OTP" button.
+4. Enter the valid OTP.
+5. Click the "Login" button.
+6. Verify that the access token is retrieved successfully.
+### Expected Result:
+- The access token is retrieved and authentication is successful.
+
+---
+
+# Test Case 13: Multiple Attempts with Wrong OTP
+**Precondition:** User has entered a valid mobile number and requested OTP.
+
+### Steps:
+1. Mock the `signIn` function to simulate failed OTP attempts.
+2. Enter a valid mobile number and click the "Send OTP" button.
+3. After OTP request, input an invalid OTP and click the "Login" button.
+4. Verify the error message "Invalid OTP" after the first failed attempt.
+5. Repeat the above steps for two more invalid OTP entries.
+6. After 3 invalid attempts, verify the message "Maximum attempts reached. Please request a new OTP."
+
+### Expected Result:
+- After 3 invalid attempts, the user is locked out and prompted to request a new OTP.
+
+---
+
+# Test Case 14: Simultaneous OTP Requests from Multiple Devices
+**Precondition:** User has entered a valid mobile number and requested OTP.
+
+### Steps:
+1. Mock multiple OTP requests, allowing only the latest to be valid.
+2. Enter a mobile number and click "Send OTP".
+3. Make a second OTP request from another device.
+4. Verify that only the latest OTP request is valid.
+
+### Expected Result:
+- Only the latest OTP request is valid, and the user sees the prompt "Enter 6-digit OTP."
+
+---
+
+# Test Case: Use of Same OTP After Successful Login
+**Precondition:** User has successfully logged in using OTP.
+
+### Steps:
+1. Mock a successful OTP login.
+2. Enter a valid mobile number and OTP.
+3. Submit the OTP and verify successful login.
+4. After successful login, attempt to reuse the same OTP.
+5. Submit the previously used OTP.
+
+### Expected Result:
+- User is shown an error message: "OTP already used. Please request a new OTP."
+
+---
+
+# Test Case 15: Duplicate OTP Entry
+**Precondition:** User has requested an OTP.
+
+### Steps:
+1. Enter a valid mobile number and request OTP.
+2. Input a valid OTP and submit it.
+3. Re-enter the same OTP and attempt to submit it again.
+
+### Expected Result:
+- The second OTP submission is ignored, and the OTP is only submitted once.
+
+---
+
+# Test Case 16: OTP Request with Simultaneous Account Login
+**Precondition:** User is authenticated.
+
+### Steps:
+1. Mock an authenticated session.
+2. Enter a valid mobile number and request OTP.
+3. Verify that only one OTP request is made and that it is valid.
+
+### Expected Result:
+- OTP is requested successfully, and the user is logged in with the correct credentials.
+
+---
+
+# Test Case 17: OTP Request with Number Associated to Multiple Accounts
+**Precondition:** Mobile number is associated with multiple accounts.
+
+### Steps:
+1. Enter a mobile number associated with multiple accounts and request OTP.
+2. Verify that the user is prompted to select an account.
+
+### Expected Result:
+- User is prompted to select or specify an account.
+
+---
+
+# Test Case: OTP Entry During Network Failure
+**Precondition:** OTP has been requested.
+
+### Steps:
+1. Mock a network failure during OTP submission.
+2. Enter a valid OTP and attempt to submit it.
+3. Verify the network failure error message.
+
+### Expected Result:
+- User is shown a "Network error. Please check your connection" message.

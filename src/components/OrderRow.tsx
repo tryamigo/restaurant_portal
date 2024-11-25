@@ -42,7 +42,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
     const renderDesktopRow = () => (
         <tr className="hover:bg-gray-50">
             <td className="px-6 py-4">
-                <div className="font-medium">{order.id.slice(0, 8)}</div>
+                <div className="font-medium" data-testid="orderId">{order.id.slice(0, 8)}</div>
                 <div className="text-xs text-gray-500">{format(new Date(order.orderTime), 'PPp')}</div>
             </td>
             <td className="px-6 py-4">

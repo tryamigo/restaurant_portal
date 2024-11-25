@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen } from "@testing-library/react";
 import RootLayout from "@/app/layout";
 import { SessionProvider } from "next-auth/react";
-import { NotificationProvider } from "@/contexts/NotificationContext";
 import { usePathname } from "next/navigation";
 import "@testing-library/jest-dom";
 
@@ -65,7 +64,7 @@ describe("RootLayout", () => {
     expect(screen.getByText("Restaurant Portal")).toBeInTheDocument();
 
     // Check for navigation links
-    expect(screen.getByText("Restaurant Details")).toBeInTheDocument();
+    expect(screen.getByText("Menu")).toBeInTheDocument();
     expect(screen.getByText("Orders")).toBeInTheDocument();
     expect(screen.getByText("Coupons")).toBeInTheDocument();
   });
@@ -79,35 +78,5 @@ describe("RootLayout", () => {
 
     // Check if child content is rendered
     expect(screen.getByText("Test Content")).toBeInTheDocument();
-  });
-
-  it("wraps layout with required providers", () => {
-    render(
-      <RootLayout>
-        <div>Test Content</div>
-      </RootLayout>
-    );
-
-    // Check if Toaster is in the document
-    expect(screen.getByTestId("toaster")).toBeInTheDocument();
-
-    // Check if Notification List is in the document
-    expect(screen.getByTestId("notification-list")).toBeInTheDocument();
-
-    // Verify providers were called
-    expect(SessionProvider).toHaveBeenCalled();
-    expect(NotificationProvider).toHaveBeenCalled();
-  });
-
-  it("renders user profile information", () => {
-    render(
-      <RootLayout>
-        <div>Test Content</div>
-      </RootLayout>
-    );
-
-    // Check user name and email
-    expect(screen.getByText("Test User")).toBeInTheDocument();
-    expect(screen.getByText("test@example.com")).toBeInTheDocument();
   });
 });

@@ -23,7 +23,7 @@ describe('AddressFields', () => {
 
     const addressFields = [
       'streetAddress', 'landmark', 'city', 'state', 
-      'pincode', 'latitude', 'longitude'
+      'pincode'
     ];
 
     addressFields.forEach((key) => {

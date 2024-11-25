@@ -1,0 +1,33 @@
+# Test Cases for `RootLayout` Component
+
+## Test Case 1: Renders the layout with title and navigation links
+
+### Steps:
+1. Render the `RootLayout` component with children as `<div>Test Content</div>`.
+2. Check if the title "Restaurant Portal" is displayed.
+3. Check for the presence of navigation links: "Menu", "Orders", and "Coupons".
+
+### Precondition:
+- The component `RootLayout` is implemented correctly with the title and navigation links.
+- `jest.mock` is used to mock necessary components and hooks.
+
+### Expected Result:
+- The title "Restaurant Portal" should be present in the document.
+- Navigation links for "Menu", "Orders", and "Coupons" should be visible in the layout.
+
+---
+
+## Test Case 2: Renders the children inside the main content area
+
+### Steps:
+1. Render the `RootLayout` component with children as `<div>Test Content</div>`.
+2. Check if the child content "Test Content" is rendered inside the layout.
+
+### Precondition:
+- The component `RootLayout` is implemented to render children content inside a designated area.
+- The mock for `usePathname` and `SessionProvider` is set up correctly.
+
+### Expected Result:
+- The child content "Test Content" should be displayed inside the layout.
+
+--- 

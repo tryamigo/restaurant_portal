@@ -7,10 +7,13 @@ import '@testing-library/jest-dom';
 
 // Mock the necessary hooks and modules
 jest.mock('next-auth/react');
+
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
   useParams: jest.fn(() => ({ id: '1' })),
+  usePathname: jest.fn(() => '/menu'), // Mock the pathname
 }));
+
 
 // Mock any external components or libraries that might cause rendering issues
 jest.mock('@/components/ui/skeleton', () => ({
@@ -23,6 +26,28 @@ jest.mock('framer-motion', () => ({
   },
   AnimatePresence: ({ children }: any) => children
 }));
+
+
+global.EventSource = jest
+  .fn()
+  .mockImplementation(function (
+    this: EventSource,
+    url: string | URL,
+    eventSourceInitDict?: EventSourceInit
+  ) {
+    this.addEventListener = jest.fn();
+    this.close = jest.fn();
+    Object.defineProperty(this, "readyState", {
+      value: EventSource.OPEN,
+      writable: false,
+    });
+  }) as unknown as {
+  new (url: string | URL, eventSourceInitDict?: EventSourceInit): EventSource;
+  prototype: EventSource;
+  readonly CONNECTING: 0;
+  readonly OPEN: 1;
+  readonly CLOSED: 2;
+};
 
 describe('RestaurantDetails Component', () => {
   let mockRouter: { push: jest.Mock };
@@ -57,15 +82,12 @@ describe('RestaurantDetails Component', () => {
     openingHours: '10:00 - 22:00',
     gstin: 'GSTIN123',
     FSSAI: 'FSSAI456',
-    rating: 4.5,
     address: { 
       streetAddress: '123 Street', 
       city: 'City', 
       state: 'State', 
       pincode: '12345',
       landmark: 'Near Park',
-      latitude: '12.345',
-      longitude: '78.910'
     },
     menu: [
       { 

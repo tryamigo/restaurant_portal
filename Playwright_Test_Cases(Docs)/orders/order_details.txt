@@ -1,0 +1,55 @@
+### **1. Verify UI Elements of Order Details and Functionality on Clicking the "View" Button**
+
+#### **Test Case**  
+Ensure all necessary fields, content, and buttons on the order details page are visible and properly interactable.
+
+---
+
+### **Preconditions**  
+1. The user is authenticated and logged into the application.  
+2. The user is on the "Orders" page with access to the "View" button for specific orders.
+
+---
+
+### **Test Steps**  
+1. **Navigate to Order Details**:  
+   - Click on the "View" button for a specific order.  
+   - Confirm that the user is redirected to the "Order Details" page.  
+
+2. **Verify Page Header and Navigation Buttons**:  
+   - Confirm that the page header displays "Order Details".  
+   - Check the visibility of the following buttons:  
+     - **"Update Status"**.  
+     - **"Back to Orders"**.  
+
+3. **Verify Order Details Fields**:  
+   - Confirm that the following order details fields are visible and display relevant content:  
+     - Order status (e.g., "Pending", "On The Way", etc.).  
+     - Product details, including:  
+       - Product names.  
+       - Quantities.  
+       - Amount for each product.  
+       - Order total.  
+
+4. **Verify Status Update Section**:  
+   - Check that the following elements for updating the order status are visible and interactable:  
+     - **Dropdown** for selecting a new status.  
+     - **"Cancel"** button to discard changes.  
+     - **"Save Changes"** button to confirm status updates.  
+
+---
+
+### **Expected Results**  
+1. **Page Header and Buttons**:  
+   - Should display **"Order Id” (Order #0cf5234f-a352-11ef-baba-96f21672413c)**.  
+   - Buttons **"Update Status"** and **"Back to Orders"** should be visible and functional.  
+
+2. **Order Details**:  
+   - All order-related fields, such as status, product names, quantities, amounts, and order total, should be visible and display accurate data.  
+
+3. **Status Update Section**:  
+   - The dropdown for changing the order status should allow the user to select different statuses.  
+   - The **"Cancel"** and **"Save Changes"** buttons should be styled consistently and functional.  
+
+4. **User Experience**:  
+   - The UI should be visually consistent and responsive.  

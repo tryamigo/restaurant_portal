@@ -1,0 +1,129 @@
+# Test Cases for MenuDetails Component
+
+## 1. Test Case: Renders Loading Skeleton Initially
+
+**Precondition**:  
+- The `MenuDetails` component is rendered.
+
+**Steps**:  
+1. Render the `MenuDetails` component.
+2. Verify that the loading spinner is present initially.
+
+**Expected Result**:  
+- The loading spinner is displayed during the initial render.
+
+---
+
+## 2. Test Case: Renders Menu Items After Fetching
+
+**Precondition**:  
+- A successful API response is mocked with a menu item.
+
+**Steps**:  
+1. Mock the API response with a menu item like "Pizza".
+2. Render the `MenuDetails` component.
+3. Wait for the component to finish rendering.
+4. Verify that the item "Pizza" and its description appear in the document.
+
+**Expected Result**:  
+- The "Pizza" item and its description ("Delicious cheese pizza") are displayed after fetching data.
+
+---
+
+## 3. Test Case: Handles Fetch Errors Gracefully
+
+**Precondition**:  
+- Simulate a fetch failure (e.g., API error).
+
+**Steps**:  
+1. Mock the fetch to reject with an error.
+2. Render the `MenuDetails` component.
+3. Wait for the component to catch the error.
+4. Verify that an error message ("API Error") appears.
+
+**Expected Result**:  
+- An error message ("API Error") is displayed when the fetch fails.
+
+---
+
+## 4. Test Case: Adds a New Menu Item
+
+**Precondition**:  
+- Menu item is to be added via a form.
+
+**Steps**:  
+1. Mock an empty initial menu.
+2. Render the `MenuDetails` component.
+3. Click on the "Add Item" button.
+4. Fill in the form with details for a new item (e.g., "Pasta").
+5. Click on the "Add Item" button to submit the form.
+6. Verify that the new item is displayed in the menu.
+
+**Expected Result**:  
+- The new menu item ("Pasta") is added and displayed in the list.
+
+---
+
+## 5. Test Case: Displays 'No Menu Items Found' When Search Term Does Not Match
+
+**Precondition**:  
+- Mock a menu with one item, and the search term will not match.
+
+**Steps**:  
+1. Mock the menu with one item.
+2. Render the `MenuDetails` component.
+3. Type a search term ("Nonexistent Item") into the search input.
+4. Verify that the message "No menu items found" appears.
+
+**Expected Result**:  
+- The message "No menu items found" is displayed when no items match the search term.
+
+---
+
+## 6. Test Case: Validates Input Fields
+
+**Precondition**:  
+- Form fields for adding a menu item.
+
+**Steps**:  
+1. Render the `MenuDetails` component.
+2. Click on the "Add Item" button to open the form.
+3. Submit the form with invalid data (e.g., short name, short description, invalid price).
+4. Verify the validation error messages for each field.
+
+**Expected Result**:  
+- Validation error messages are displayed for name, description, and price fields.
+
+---
+
+## 7. Test Case: Edits a Menu Item
+
+**Precondition**:  
+- A menu item (e.g., "Pizza") is displayed in the menu.
+
+**Steps**:  
+1. Render the `MenuDetails` component with mock data for "Pizza".
+2. Click on the "Edit" button for the "Pizza" item.
+3. Change the item name (e.g., to "Updated Pizza").
+4. Click on the "Update Item" button to save the changes.
+5. Verify that the updated name ("Updated Pizza") is displayed in the menu.
+
+**Expected Result**:  
+- The menu item name is updated successfully to "Updated Pizza".
+
+---
+
+## 8. Test Case: Deletes a Menu Item
+
+**Precondition**:  
+- A menu item (e.g., "Pizza") is displayed in the menu.
+
+**Steps**:  
+1. Render the `MenuDetails` component with mock data for "Pizza".
+2. Click on the "Delete" button for the "Pizza" item.
+3. Confirm deletion by clicking the "Delete" button in the confirmation dialog.
+4. Verify that the "Pizza" item is removed from the menu.
+
+**Expected Result**:  
+- The "Pizza" item is successfully deleted from the menu.
+

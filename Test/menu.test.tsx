@@ -7,6 +7,10 @@ import {
   prettyDOM,
 } from "@testing-library/react";
 import MenuDetails from "@/app/menu/page";
+import "@testing-library/jest-dom";
+import { useSession } from "next-auth/react";
+import { toast } from "@/hooks/use-toast";
+import fetchMock from "jest-fetch-mock";
 
 interface MenuItem {
   name: string;
@@ -18,10 +22,6 @@ interface MenuItem {
   vegOrNonVeg: string;
   cuisine: string;
 }
-import "@testing-library/jest-dom";
-import { useSession } from "next-auth/react";
-import { toast } from "@/hooks/use-toast";
-import fetchMock from "jest-fetch-mock";
 
 fetchMock.enableMocks();
 
@@ -318,7 +318,7 @@ describe("MenuDetails Component", () => {
     );
 
     // Click the Edit button (use a more reliable selector like `data-testid`)
-    fireEvent.click(screen.getByTestId("edit-item")); // Ensure to add `data-testid="edit-button-<id>"` to the button
+    fireEvent.click(screen.getByTestId("edit-item")); 
 
     // Update the "Name" field
     fireEvent.change(screen.getByRole('textbox', {

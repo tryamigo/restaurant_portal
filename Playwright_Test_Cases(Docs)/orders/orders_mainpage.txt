@@ -1,0 +1,124 @@
+### 1. **Fetching Orders**
+
+- **Test Case**: Fetch and display orders when the user is authenticated.
+    - **Precondition**: User is logged in and navigated to the orders page.
+    - **Steps**:
+        1. Load the page.
+        2. Observe the fetch request to the `/api/orders` endpoint.
+    - **Expected Result**:
+        - A loading state is shown while the orders are being fetched.
+        - All static content is visible correctly.
+        - Orders are displayed in a table format once the fetch is complete.
+        - If the fetch fails, an error message is displayed (e.g., *"Failed to fetch orders"*).
+
+---
+
+### 2. **Searching Orders**
+
+- **Test Case**: Search for orders by order ID or customer name.
+    - **Precondition**: Orders are loaded on the page.
+    - **Steps**:
+        1. Enter a valid order ID in the search bar.
+        2. Observe the filtered results.
+        3. Enter a valid customer name in the search bar.
+        4. Observe the filtered results.
+        5. Enter an invalid term in the search bar.
+    - **Expected Result**:
+        - Orders matching the search term are displayed.
+        - If no orders match, a message is displayed (e.g., *"No orders found"*).
+
+---
+
+### 3. **Filtering by Status**
+
+- **Test Case**: Filter orders based on their status.
+    - **Precondition**: Orders with different statuses are loaded on the page.
+    - **Steps**:
+        1. Select a status from the filter dropdown (e.g., *Pending*).
+        2. Observe the filtered results.
+        3. Change the filter to *All Status*.
+    - **Expected Result**:
+        - Only orders with the selected status are displayed.
+        - Selecting *All Status* shows all orders.
+
+---
+
+### 4. **View Order Details**
+
+- **Test Case**: View detailed information about an order.
+    - **Precondition**: Orders are listed on the page.
+    - **Steps**:
+        1. Click the "View" button for a specific order.
+        2. Observe navigation to the order details page.
+    - **Expected Result**:
+        - User is navigated to `/orders/{orderId}`.
+        - Detailed information about the order is displayed.
+
+---
+
+### 5. **Handling Empty Orders**
+
+- **Test Case**: Display a message when there are no orders.
+    - **Precondition**: The `/api/orders` endpoint returns an empty array.
+    - **Steps**:
+        1. Load the page.
+    - **Expected Result**:
+        - A message is displayed (e.g., *"No orders found"*).
+
+---
+
+### 6. **Handling API Errors**
+
+- **Test Case**: Display an error message when the API fails.
+    - **Precondition**: The `/api/orders` endpoint returns a 500 error.
+    - **Steps**:
+        1. Load the page.
+    - **Expected Result**:
+        - An error message is displayed (e.g., *"Failed to fetch orders"*).
+
+---
+
+### 7. **Pagination or Large Data Handling**
+
+- **Test Case**: Verify the handling of a large number of orders.
+    - **Precondition**: The `/api/orders` endpoint returns a large dataset.
+    - **Steps**:
+        1. Load the page with 100+ orders.
+        2. Scroll through the list of orders.
+    - **Expected Result**:
+        - The page remains responsive.
+        - Orders are displayed correctly without UI glitches.
+
+---
+
+### 8. **SVG Logo for Status**
+
+- **Test Case**: Verify the SVG logo based on the order status.
+    - **Precondition**: Orders with different statuses are displayed.
+    - **Steps**:
+        1. Observe the SVG logo for each order.
+    - **Expected Result**:
+        - The SVG logo matches the predefined status (e.g., *Pending*: default, *On the Way*: correct logo).
+
+---
+
+### 9. **Accessibility Tests**
+
+- **Test Case**: Verify the page’s accessibility.
+    - **Precondition**: The page is loaded with orders.
+    - **Steps**:
+        1. Use a screen reader to navigate the page.
+        2. Test keyboard navigation across inputs, buttons, and dropdowns.
+    - **Expected Result**:
+        - All elements are accessible via keyboard and provide meaningful labels for screen readers.
+
+---
+
+### 10. **UI Responsiveness**
+
+- **Test Case**: Verify the layout on different screen sizes.
+    - **Precondition**: The orders page is loaded.
+    - **Steps**:
+        1. Test the page on desktop, tablet, and mobile views.
+    - **Expected Result**:
+        - The layout adapts appropriately, with all content visible and functional on smaller screens.
