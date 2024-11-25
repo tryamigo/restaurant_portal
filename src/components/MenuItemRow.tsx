@@ -73,11 +73,13 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = React.memo(({
       <Edit
         onClick={()=>onEdit(item)}
         cursor={"pointer"}
+        data-testid="edit-item"
       >
       </Edit>
       <Trash2
         onClick={() => onDelete(item.id as string)}
         cursor={"pointer"}
+        data-testid="delete-item"
       >
       </Trash2>
     </td>

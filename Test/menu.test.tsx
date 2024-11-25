@@ -7,6 +7,17 @@ import {
   prettyDOM,
 } from "@testing-library/react";
 import MenuDetails from "@/app/menu/page";
+
+interface MenuItem {
+  name: string;
+  description: string;
+  price: number;
+  ratings: number;
+  discounts: number;
+  imageLink?: string;
+  vegOrNonVeg: string;
+  cuisine: string;
+}
 import "@testing-library/jest-dom";
 import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
@@ -132,112 +143,240 @@ describe("MenuDetails Component", () => {
   });
 
 
-  // it("adds a new menu item", async () => {
-  //   // Render the component
-  //   render(<MenuDetails />);
+  it("adds a new menu item", async () => {
+    const mockResponse: MenuItem[] = [];
+    fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
   
-  //   // Wait for the "Add Item" button to be in the DOM
-  //   await waitFor(() => {
-  //     expect(screen.getByTestId("add-item-button")).toBeInTheDocument();
-  //   });
+    render(<MenuDetails />);
   
-  //   // Click the "Add Item" button in the Header
-  //   fireEvent.click(screen.getByTestId("add-item-button"));
+    await waitFor(() => {
+      expect(screen.getByTestId("add-item-button")).toBeInTheDocument();
+    });
   
-  //   // Fill out the form fields and assert the values after changing
-  //   fireEvent.change(screen.getByLabelText(/item name/i), {
-  //     target: { value: "Pasta" },
-  //   });
-  //   expect(screen.getByLabelText(/item name/i).value).toBe("Pasta");
+    fireEvent.click(screen.getByTestId("add-item-button"));
   
-  //   fireEvent.change(screen.getByLabelText(/description/i), {
-  //     target: { value: "Yummy pasta" },
-  //   });
-  //   expect(screen.getByLabelText(/description/i).value).toBe("Yummy pasta");
+    fireEvent.change(screen.getByLabelText(/item name/i), {
+      target: { value: "Pasta" },
+    });
+    fireEvent.change(screen.getByLabelText(/description/i), {
+      target: { value: "Yummy pasta" },
+    });
+    fireEvent.change(screen.getByLabelText(/price/i), {
+      target: { value: "899" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/0-5/i), {
+      target: { value: "4" },
+    });
+    fireEvent.change(screen.getByLabelText(/discount \(%\)/i), {
+      target: { value: "15" },
+    });
+    const vegOrNonVeg = screen.getByRole("combobox");
+    fireEvent.click(vegOrNonVeg);
+    fireEvent.click(screen.getByText("Vegetarian"));
+    fireEvent.change(screen.getByLabelText(/cuisine/i), {
+      target: { value: "Coffee" },
+    });
   
-  //   fireEvent.change(screen.getByLabelText(/price/i), {
-  //     target: { value: "899" },
-  //   });
-  //   expect(screen.getByLabelText(/price/i).value).toBe("899");
+    fetchMock.mockResponseOnce(
+      JSON.stringify([
+        {
+          name: "Pasta",
+          description: "Yummy pasta",
+          price: 899,
+          ratings: 4,
+          discounts: 15,
+          vegOrNonVeg: "Vegetarian",
+          cuisine: "Coffee",
+        },
+      ]),
+      { status: 200 }
+    );
   
-  //   fireEvent.change(screen.getByPlaceholderText(/0\-5/i), {
-  //     target: { value: "4" },
-  //   });
-  //   expect(screen.getByPlaceholderText(/0\-5/i).value).toBe("4");
+    fireEvent.click(screen.getByRole("button", { name: /add item/i }));
   
-  //   fireEvent.change(screen.getByLabelText(/discount \(%\)/i), {
-  //     target: { value: "15" },
-  //   });
-  //   expect(screen.getByLabelText(/discount \(%\)/i).value).toBe("15");
+    await waitFor(() => {
+      screen.debug(); // Debug the DOM if needed
+      expect(screen.getByRole('cell', {
+        name: /₹899\.00/i
+      })).toBeInTheDocument();
+    });
+  });
   
-  //   fireEvent.click(screen.getByRole("combobox"));
-  //   fireEvent.click(screen.getByText('Vegetarian'));
+
   
-  //   fireEvent.change(screen.getByLabelText(/cuisine/i), {
-  //     target: { value: "Coffee" },
-  //   });
-  //   expect(screen.getByLabelText(/cuisine/i).value).toBe("Coffee");
-  
-  //   // Submit the form
-  //   fireEvent.click(screen.getByRole('button', { name: /add item/i }));
-  
-  //   // Assert the new item appears in the DOM
-  //   await waitFor(() => {
-  //     expect(screen.getByRole('cell', { name: /Pasta/i })).toBeInTheDocument();
-  //   });
-  
-  // it("displays 'No menu items found' when search term does not match", async () => {
-  //   render(<MenuDetails />);
+  it("displays 'No menu items found' when search term does not match", async () => {
+    // Mock the fetch response for menu items
+        const mockResponse = [
+      {
+        name: "Pasta",
+        description: "Delicious cheese pizza",
+        price: 12,
+        ratings: 4,
+        discounts: 10,
+        imageLink: "https://example.com/pizza.jpg",
+        vegOrNonVeg: "Vegetarian",
+        cuisine: "Italian",
+      },
+    ];
 
-  //  await waitFor(() => {
-  //   fireEvent.change(screen.getByPlaceholderText(/search menu items/i), {
-  //     target: { value: "Nonexistent Item" },
-  //   });
-  //   });
+    // Fix the fetch response to return the above mock data
+    fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
+    render(<MenuDetails />);
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText("No menu items found")).toBeInTheDocument();
-  //   });
-  // });
+    // Wait for the search input to appear
+    await waitFor(() => {
+      expect(
+        screen.getByPlaceholderText(/search menu items/i)
+      ).toBeInTheDocument();
+    });
 
-  // it("validates input fields", async () => {
-  //   render(<MenuDetails />);
+    // Search for a nonexistent item
+    fireEvent.change(screen.getByPlaceholderText(/search menu items/i), {
+      target: { value: "Nonexistent Item" },
+    });
 
-  //   fireEvent.click(screen.getByText("Add Item"));
-  //   fireEvent.click(screen.getByText("Save"));
+    // Assert "No menu items found" appears in the DOM
+    await waitFor(() => {
+      expect(screen.getByText(/no menu items found/i)).toBeInTheDocument();
+    });
+  });
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText("Name must be at least 2 characters long")).toBeInTheDocument();
-  //     expect(screen.getByText("Description must be at least 5 characters long")).toBeInTheDocument();
-  //     expect(screen.getByText("Price must be a positive number")).toBeInTheDocument();
-  //   });
-  // });
+  it("validates input fields", async () => {
+    
+      // Mock the fetch response for menu items
+    const mockResponse = [
+      {
+        name: "Pasta",
+        description: "Delicious cheese pizza",
+        price: 12,
+        ratings: 4,
+        discounts: 10,
+        imageLink: "https://example.com/pizza.jpg",
+        vegOrNonVeg: "Vegetarian",
+        cuisine: "Italian",
+      },
+    ];
 
-  // it("edits a menu item", async () => {
-  //   renderComponent();
+    // Fix the fetch response to return the above mock data
+    fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
+    render(<MenuDetails />);
 
-  //   await waitFor(() => expect(screen.getByText("Pizza")).toBeInTheDocument());
-  //   fireEvent.click(screen.getByText("Edit"));
+    await waitFor(() => {
+      expect(screen.getByTestId("add-item-button")).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole('button', {
+      name: /add item/i
+    }));
 
-  //   fireEvent.change(screen.getByLabelText("Name"), {
-  //     target: { value: "Updated Pizza" },
-  //   });
-  //   fireEvent.click(screen.getByText("Save"));
+    await waitFor(() => {
+      expect(screen.getByText("Name must be at least 2 characters long")).toBeInTheDocument();
+      expect(screen.getByText("Description must be at least 5 characters long")).toBeInTheDocument();
+      expect(screen.getByText("Price must be a positive number")).toBeInTheDocument();
+    });
+  });
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText("Updated Pizza")).toBeInTheDocument();
-  //   });
-  // });
+  it("edits a menu item", async () => {
+    
+    // Mock initial menu items
+    const mockResponse = [
+      {
+        id: 1,
+        name: "Pizza",
+        description: "Delicious cheese pizza",
+        price: 12,
+        ratings: 4,
+        discounts: 10,
+        vegOrNonVeg: "Vegetarian",
+        cuisine: "Italian",
+      },
+    ];
 
-  // it("deletes a menu item", async () => {
-  //   renderComponent();
+    // Mock GET response for menu items
+    fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
 
-  //   await waitFor(() => expect(screen.getByText("Pizza")).toBeInTheDocument());
-  //   fireEvent.click(screen.getByText("Delete"));
-  //   fireEvent.click(screen.getByText("Confirm"));
+    // Render the MenuDetails component
+    render(<MenuDetails />);
 
-  //   await waitFor(() => {
-  //     expect(screen.queryByText("Pizza")).not.toBeInTheDocument();
-  //   });
-  // });
+    // Wait for the item "Pizza" to be displayed
+    await waitFor(() => {
+      expect(screen.getByText("Pizza")).toBeInTheDocument();
+    });
+
+    // Mock PUT response for editing the menu item
+    fetchMock.mockResponseOnce(
+      JSON.stringify({
+        id: 1,
+        name: "Updated Pizza",
+        description: "Delicious cheese pizza",
+        price: 12,
+        ratings: 4,
+        discounts: 10,
+        vegOrNonVeg: "Vegetarian",
+        cuisine: "Italian",
+      }),
+      { status: 200 }
+    );
+
+    // Click the Edit button (use a more reliable selector like `data-testid`)
+    fireEvent.click(screen.getByTestId("edit-item")); // Ensure to add `data-testid="edit-button-<id>"` to the button
+
+    // Update the "Name" field
+    fireEvent.change(screen.getByRole('textbox', {
+      name: /item name/i
+    }), {
+      target: { value: "Updated Pizza" },
+    });
+
+    // Click the Save button
+    fireEvent.click(screen.getByRole('button', {
+      name: /update item/i
+    }));
+
+    // Wait for the updated item to be displayed
+    await waitFor(() => {
+      expect(screen.getByText("Updated Pizza")).toBeInTheDocument();
+    });
+  });
+
+
+  it("deletes a menu item", async () => {
+    // Mock initial menu items
+    const mockMenuItems = [
+      {
+        id: 1,
+        name: "Pizza",
+        description: "Delicious cheese pizza",
+        price: 12,
+        ratings: 4,
+        discounts: 10,
+        vegOrNonVeg: "Vegetarian",
+        cuisine: "Italian",
+      },
+    ];
+
+    // Mock GET response to fetch menu items
+    fetchMock.mockResponseOnce(JSON.stringify(mockMenuItems), { status: 200 });
+
+    // Render the MenuDetails component
+    render(<MenuDetails />);
+
+    // Wait for the "Pizza" menu item to be displayed
+    await waitFor(() => {
+      expect(screen.getByText("Pizza")).toBeInTheDocument();
+    });
+
+    // Click the "Delete" button for the specific item (use reliable `data-testid`)
+    fireEvent.click(screen.getByTestId("delete-item")); // Ensure delete buttons have `data-testid="delete-button-<id>"`
+
+    // Confirm deletion in the confirmation dialog
+    fireEvent.click(screen.getByRole('button', {
+      name: /delete/i
+    })); // Assuming "Confirm" button has text "Confirm"
+
+    // Wait for the item to be removed from the DOM
+    await waitFor(() => {
+      expect(screen.queryByText("Pizza")).not.toBeInTheDocument();
+    });
+  });
+
 });
