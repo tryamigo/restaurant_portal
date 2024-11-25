@@ -2,8 +2,6 @@ import React from 'react';
 import Image from 'next/image';
 import { MenuItem } from "@/components/types";
 import { Edit, Trash2, Package } from "lucide-react";
-import { CustomButton } from "@/components/CustomButton";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from './ui/dialog';
 
 interface MenuItemRowProps {
@@ -71,6 +69,7 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = React.memo(({
     <td className="px-6 py-4">{item.vegOrNonVeg}</td>
     <td className="px-6 py-6 flex space-x-5">
       <Edit
+      className='mt-[1px]'
         onClick={()=>onEdit(item)}
         cursor={"pointer"}
         data-testid="edit-item"

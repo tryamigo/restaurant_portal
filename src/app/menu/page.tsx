@@ -47,8 +47,8 @@ const MenuDetails: React.FC = () => {
       vegOrNonVeg: item.vegOrNonVeg,
       cuisine: item.cuisine,
     });
-    setFormMode("edit");
-    setIsAddItemDialogOpen(true);
+    setFormMode("edit"); // Switch to edit mode
+    setIsAddItemDialogOpen(true); // Open the dialog
   };
 
   const handleDeleteItem = async () => {
@@ -79,23 +79,6 @@ const MenuDetails: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="container mx-auto p-6 max-w-4xl"
-        data-testid="loading-spinner"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {[...Array(6)].map((_, index) => (
-            <Skeleton key={index} className="h-24 w-full" />
-          ))}
-        </div>
-      </motion.div>
-    );
-  }
 
   if (error) {
     return (
@@ -113,7 +96,12 @@ const MenuDetails: React.FC = () => {
   return (
     <>
       <Header
-        onAddItem={() => setIsAddItemDialogOpen(true)}
+        onAddItem={() => {
+          setIsAddItemDialogOpen(true);
+          setCurrentEditItem(null);
+          setNewItem(initialObject);
+          setFormMode("add");
+        }}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
       />
@@ -154,7 +142,7 @@ const MenuDetails: React.FC = () => {
                   .fill(0)
                   .map((_, index) => (
                     <tr key={index} className="hover:bg-gray-50">
-                      {Array(7)
+                      {Array(9)
                         .fill(0)
                         .map((_, colIndex) => (
                           <td key={colIndex} className="px-6 py-4">
