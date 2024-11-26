@@ -57,7 +57,7 @@ const OrderDetails: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div className='mb-4 md:mb-0'>
             <h1 className="text-2xl md:text-3xl font-bold">Order #{order.id}</h1>
-            <p className="text-sm md:text-base text-gray-600 mt-1">
+            <p className="text-sm md:text-base text-gray-600 mt-1 dark:text-gray-300">
               Placed on {format(new Date(order.orderTime), 'MMMM dd, yyyy at hh:mm a')}
             </p>
           </div>

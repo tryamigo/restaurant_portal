@@ -23,9 +23,9 @@ export const CouponList: React.FC<CouponListProps> = ({
         <motion.div
           key={coupon.id}
           whileHover={{ scale: 1.05 }}
-          className="bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden"
+          className="bg-white dark:bg-gray-800 border border-gray-200 rounded-xl shadow-md overflow-hidden"
         >
-          <div className="p-4 md:p-6">
+          <div className="p-4 md:p-6 dark:text-white">
             <div className="flex justify-between items-center mb-4">
               <Badge
                 variant={coupon.isActive ? "default" : "destructive"}
@@ -33,19 +33,19 @@ export const CouponList: React.FC<CouponListProps> = ({
               >
                 {coupon.isActive ? "Active" : "Inactive"}
               </Badge>
-              <span className="text-sm text-gray- 500">{coupon.couponCode}</span>
+              <span className="text-sm text-gray-500 dark:text-white">{coupon.couponCode}</span>
             </div>
             <h3 className="text-lg md:text-xl font-semibold mb-2">{coupon.title}</h3>
-            <p className="text-sm md:text-base text-gray-600 mb-4">{coupon.description}</p>
+            <p className="text-sm md:text-base text-gray-600 mb-4 dark:text-gray-300">{coupon.description}</p>
             <div className="space-y-2 mb-4 text-sm md:text-base">
               <div className="flex justify-between">
-                <span className="text-gray-600">Discount Type:</span>
+                <span className="text-gray-600 dark:text-gray-300">Discount Type:</span>
                 <span className="font-semibold">
                   {coupon.discountType === "FIXED_AMOUNT" ? "Fixed Amount" : "Percentage"}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Discount Value:</span>
+                <span className="text-gray-600 dark:text-gray-300">Discount Value:</span>
                 <span className="font-semibold">
                   {coupon.discountType === "FIXED_AMOUNT"
                     ? `₹${parseFloat(coupon.discountValue).toFixed(2)}`
@@ -53,23 +53,23 @@ export const CouponList: React.FC<CouponListProps> = ({
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Minimum Order Value:</span>
+                <span className="text-gray-600 dark:text-gray-300">Minimum Order Value:</span>
                 <span className="font-semibold">₹{parseFloat(coupon.minOrderValue ?? '0').toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Maximum Discount:</span>
+                <span className="text-gray-600 dark:text-gray-300">Maximum Discount:</span>
                 <span className="font-semibold">₹{parseFloat(coupon.maxDiscount ?? '0').toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Usage Limit:</span>
+                <span className="text-gray-600 dark:text-gray-300">Usage Limit:</span>
                 <span className="font-semibold">{coupon.usageLimit}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Eligible Orders:</span>
+                <span className="text-gray-600 dark:text-gray-300">Eligible Orders:</span>
                 <span className="font-semibold">{coupon.eligibleOrders ?? 'N/A'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Validity:</span>
+                <span className="text-gray-600 dark:text-gray-300">Validity:</span>
                 <span className="font-semibold text-right">
                   {format(new Date(coupon.startDate), 'dd MMM yyyy')} -
                   {format(new Date(coupon.endDate), 'dd MMM yyyy')}

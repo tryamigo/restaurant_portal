@@ -86,8 +86,8 @@ const CouponsPage: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4 py-6 md:py-12 pt-[12rem]"
       >
-        <div className="bg-white shadow-lg rounded-xl overflow-hidden">
-          <CardContent className="mt-1">
+        <div className="bg-white shadow-lg rounded-xl overflow-hidden dark:bg-gray-900 dark:shadow-none">
+          <CardContent className="mt-4">
             {filteredCoupons.length > 0 ? (
               <CouponList
                 coupons={filteredCoupons}
@@ -121,6 +121,7 @@ const CouponsPage: React.FC = () => {
 // Loading Spinner Component
 const LoadingSpinner: React.FC = () => (
   <div className="flex justify-center items-center h-screen">
+    <Header />
     <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
   </div>
 );
@@ -131,7 +132,7 @@ interface EmptyCouponStateProps {
 }
 
 const EmptyCouponState: React.FC<EmptyCouponStateProps> = ({ onAddCoupon }) => (
-  <div className="text-center py-12 bg-gray-50 rounded-xl">
+  <div className="text-center py-12 bg-gray-50 rounded-xl dark:bg-slate-800">
     <Tag className="mx-auto h-12 md:h-16 w-12 md:w-16 text-gray-300 mb-4" />
     <p className="text-lg md:text-xl text-gray-500">No coupons available</p>
   </div>

@@ -47,7 +47,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
   return (
     <div className="space-y-4 w-full">
-      <Label className="block text-sm font-medium text-gray-700">Menu Item Image</Label>
+      <Label className="block text-sm font-medium text-gray-700 dark:text-white">Menu Item Image</Label>
       <div className="flex flex-col space-y-2">
         <input
           type="file"
@@ -64,10 +64,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           >
             <div className="flex flex-col items-center justify-center space-y-2">
               <ImagePlus className="h-10 w-10 text-gray-400 group-hover:text-indigo-500 transition-colors" />
-              <p className="text-sm text-gray-500 group-hover:text-indigo-600">
+              <p className="text-sm text-gray-500 group-hover:text-indigo-600 dark:text-gray-300">
                 Click to upload an image
               </p>
-              <p className="text-xs text-gray-400">PNG, JPG, WEBP up to 5MB</p>
+              <p className="text-xs text-gray-400 dark:text-gray-400">PNG, JPG, WEBP up to 5MB</p>
             </div>
           </div>
         ) : (

@@ -35,7 +35,7 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
         </thead>
         <tbody className="divide-y divide-gray-200 border-b">
           {items.map((item) => (
-            <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+            <tr key={item.id} className="hover:bg-gray-50 transition-colors hover:dark:bg-gray-800">
               <td className="px-6 py-4 whitespace-nowrap flex items-center space-x-4">
                 {item.imageLink && (
                   <Image
@@ -47,8 +47,8 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
                   />
                 )}
                 <div>
-                  <div className="font-medium text-gray-800">{item.name}</div>
-                  <div className="text-sm text-gray-500">{item.description}</div>
+                  <div className="font-medium text-gray-800 dark:text-gray-300">{item.name}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{item.description}</div>
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">{item.quantity}</td>
