@@ -22,7 +22,6 @@ interface AddEditItemDialogProps {
   setNewItem: (item: Omit<MenuItem, "id">) => void;
   validationErrors: { [key: string]: string };
   handleSubmit: () => void;
-  setValidationErrors: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
   setImageFile: React.Dispatch<React.SetStateAction<string>>;
 }
 
@@ -33,16 +32,10 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
   newItem,
   setNewItem,
   validationErrors,
-  setValidationErrors,
   handleSubmit,
   setImageFile
 }) => {
 
-  useEffect(() => {
-    if (isOpen) {
-      setValidationErrors({});
-    }
-  }, [isOpen, setValidationErrors]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -53,7 +46,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Existing fields */}
               <div>
-                <Label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-700">
+                <Label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
                   Item Name
                 </Label>
                 <Input
@@ -61,14 +54,14 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                   placeholder="Enter item name"
                   value={newItem.name || ''}
                   onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                  className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                  className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-slate-700"
                 />
                 {validationErrors.name && (
                   <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
                 )}
               </div>
               <div>
-                <Label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-700">
+                <Label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
                   Description
                 </Label>
                 <Input
@@ -76,14 +69,14 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                   placeholder="Item description"
                   value={newItem.description || ''}
                   onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                  className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                  className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-slate-700"
                 />
                 {validationErrors.description && (
                   <p className="text-red-500 text-sm mt-1">{validationErrors.description}</p>
                 )}
               </div>
               <div>
-                <Label htmlFor="price" className="block mb-2 text-sm font-medium text-gray-700">
+                <Label htmlFor="price" className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
                   Price
                 </Label>
                 <Input
@@ -92,14 +85,14 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                   placeholder="0.00"
                   value={newItem.price || ''}
                   onChange={(e) => setNewItem({ ...newItem, price: Number(parseFloat(e.target.value).toFixed(2)) })}
-                  className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                  className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-slate-700"
                 />
                 {validationErrors.price && (
                   <p className="text-red-500 text-sm mt-1">{validationErrors.price}</p>
                 )}
               </div>
               <div>
-                <Label htmlFor="ratings" className="block mb-2 text-sm font-medium text-gray-700">
+                <Label htmlFor="ratings" className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
                   Ratings
                 </Label>
                 <Input
@@ -113,14 +106,14 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                     ...newItem,
                     ratings: Number(parseFloat(e.target.value).toFixed(2)),
                   })}
-                  className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                  className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-slate-700"
                 />
                 {validationErrors.ratings && (
                   <p className="text-red-500 text-sm mt-1">{validationErrors.ratings}</p>
                 )}
               </div>
               <div>
-                <Label htmlFor="discounts" className="block mb-2 text-sm font-medium text-gray-700">
+                <Label htmlFor="discounts" className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
                   Discount (%)
                 </Label>
                 <Input
@@ -134,7 +127,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                     ...newItem,
                     discounts: Number(parseFloat(e.target.value).toFixed(2)),
                   })}
-                  className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                  className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-slate-700"
                 />
                 {validationErrors.discounts && (
                   <p className="text-red-500 text-sm mt-1">{validationErrors.discounts}</p>
@@ -159,6 +152,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                 <Label htmlFor="cuisine">Cuisine</Label>
                 <Input
                   id="cuisine"
+                  className='dark:bg-slate-700'
                   placeholder="Enter cuisine type"
                   value={newItem.cuisine || ''}
                   onChange={(e) => setNewItem({ ...newItem, cuisine: e.target.value })}
@@ -184,7 +178,6 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
               <Button
                 onClick={() => {
                   setNewItem(initialObject);
-                  setValidationErrors({})
                   onClose();
                 }}
               >

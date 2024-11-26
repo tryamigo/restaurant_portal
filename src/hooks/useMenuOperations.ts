@@ -1,18 +1,20 @@
 import { useState, useCallback, useEffect } from 'react';
 import { MenuItem } from "@/components/types";
-import { Session } from 'next-auth';
-import { z } from 'zod';
-import { MenuItemSchema } from "@/schema/MenuItemSchema";
 import { useSession } from 'next-auth/react';
 import { toast } from "@/hooks/use-toast";
+import { z } from 'zod';
+import { MenuItemSchema } from "@/schema/MenuItemSchema";
 
 export const useMenuManagement = () => {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const {data:session} = useSession()
+  const { data: session } = useSession();
   const [imageFile, setImageFile] = useState<string>('');
+  const [validationErrors, setValidationErrors] = useState<{
+    [key: string]: string;
+  }>({});
 
   const fetchMenu = useCallback(async () => {
     if (!session) return;
@@ -27,9 +29,9 @@ export const useMenuManagement = () => {
           },
         }
       );
-      
+
       if (!response.ok) throw new Error("Failed to fetch menu");
-      
+
       const data = await response.json();
       setMenu(data);
     } catch (error) {
@@ -39,8 +41,19 @@ export const useMenuManagement = () => {
     }
   }, [session]);
 
+  const handleValidationErrors = (zodError: z.ZodError) => {
+    const errors: { [key: string]: string } = {};
+    zodError.errors.forEach(err => {
+      if (err.path.length > 0) {
+        errors[err.path[0]] = err.message;
+      }
+    });
+    setValidationErrors(errors);
+  };
+
   const addMenuItem = async (item: Omit<MenuItem, "id">) => {
     try {
+      setValidationErrors({}); // Clear previous errors
       let imageUploadResult = '';
       if (imageFile) {
         const formData = new FormData();
@@ -56,20 +69,18 @@ export const useMenuManagement = () => {
 
           const result = await uploadResponse.json();
           imageUploadResult = result.file?.filename;
-        }
-        catch (uploadError) {
+        } catch (uploadError) {
           console.error('Image Upload Error:', uploadError);
-
         }
       }
-      // Prepare item data with image links
+
       const itemData = {
         ...item,
         ...(imageUploadResult && { imageLink: "https://image.navya.so/" + imageUploadResult })
-
       };
-      const validatedItem = MenuItemSchema.parse(itemData);
-      
+
+      const validatedItem = MenuItemSchema.parse(itemData); // Validate using Zod
+
       const response = await fetch(
         `/api/restaurants/?id=${session?.user.id}&menu=true`,
         {
@@ -89,25 +100,28 @@ export const useMenuManagement = () => {
         description: "Item added successfully",
       });
 
-
       const addedItem = await response.json();
       setMenu(prevMenu => [...prevMenu, addedItem]);
       setImageFile("");
       return addedItem;
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to add Item",
-        variant: "destructive",
-      });
-      console.error("Error adding menu item:", error);
+      if (error instanceof z.ZodError) {
+        handleValidationErrors(error);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to add Item",
+          variant: "destructive",
+        });
+        console.error("Error adding menu item:", error);
+      }
       throw error;
-      
     }
   };
 
   const updateMenuItem = async (item: MenuItem) => {
     try {
+      setValidationErrors({}); // Clear previous errors
       let imageUploadResult = '';
       if (imageFile) {
         const formData = new FormData();
@@ -123,20 +137,18 @@ export const useMenuManagement = () => {
 
           const result = await uploadResponse.json();
           imageUploadResult = result.file?.filename;
-        }
-        catch (uploadError) {
+        } catch (uploadError) {
           console.error('Image Upload Error:', uploadError);
-
         }
       }
-      // Prepare item data with image links
+
       const itemData = {
         ...item,
         ...(imageUploadResult && { imageLink: "https://image.navya.so/" + imageUploadResult })
-
       };
-      const validatedItem = MenuItemSchema.parse(item);
-      
+
+      const validatedItem = MenuItemSchema.parse(itemData); // Validate using Zod
+
       const response = await fetch(
         `/api/restaurants/?id=${session?.user.id}&menu=true&menuItemId=${item.id}`,
         {
@@ -145,34 +157,40 @@ export const useMenuManagement = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session?.user.token}`,
           },
-          body: JSON.stringify(itemData),
+          body: JSON.stringify(validatedItem),
         }
       );
 
       if (!response.ok) throw new Error("Failed to update menu item");
+
       toast({
         title: "Success",
-        description: `Item updated successfully`,
+        description: "Item updated successfully",
       });
 
       const updatedItem = await response.json();
-      setMenu(prevMenu => 
-        prevMenu.map(menuItem => 
+      setMenu(prevMenu =>
+        prevMenu.map(menuItem =>
           menuItem.id === item.id ? updatedItem : menuItem
         )
       );
       setImageFile("");
       return updatedItem;
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update Item",
-        variant: "destructive",
-      });
-      console.error("Error updating menu item:", error);
+      if (error instanceof z.ZodError) {
+        handleValidationErrors(error);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update Item",
+          variant: "destructive",
+        });
+        console.error("Error updating menu item:", error);
+      }
       throw error;
     }
   };
+
 
   const deleteMenuItem = async (itemId: string) => {
     try {
@@ -218,6 +236,7 @@ export const useMenuManagement = () => {
   return {
     menu,
     filteredMenu: filteredMenu(),
+    validationErrors,
     isLoading,
     error,
     searchTerm,
@@ -227,6 +246,6 @@ export const useMenuManagement = () => {
     updateMenuItem,
     deleteMenuItem,
     imageFile,
-    setImageFile
+    setImageFile,
   };
 };

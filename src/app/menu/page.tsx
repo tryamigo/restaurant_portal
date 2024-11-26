@@ -13,6 +13,7 @@ import { Search } from "lucide-react";
 
 const MenuDetails: React.FC = () => {
   const {
+    validationErrors,
     filteredMenu,
     isLoading,
     error,
@@ -31,9 +32,6 @@ const MenuDetails: React.FC = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [menuItemToDelete, setMenuItemToDelete] = useState<string | null>(null);
   const [newItem, setNewItem] = useState<Omit<MenuItem, "id">>(initialObject);
-  const [validationErrors, setValidationErrors] = useState<{
-    [key: string]: string;
-  }>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handleEditItem = (item: MenuItem) => {
@@ -112,7 +110,8 @@ const MenuDetails: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4 py-6 md:py-12 pt-[12rem]"
       >
-        <div className="bg-white shadow-lg rounded-xl overflow-hidden overflow-x-auto">
+        <div className="bg-white shadow-lg rounded-xl overflow-hidden overflow-x-auto dark:bg-gray-900 dark:shadow-none">
+
           <table className="w-full">
             <thead className="bg-gray-100 border-b">
               <tr>
@@ -141,7 +140,7 @@ const MenuDetails: React.FC = () => {
                 Array(5)
                   .fill(0)
                   .map((_, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
+                    <tr key={index} className="hover:bg-gray-50 ">
                       {Array(9)
                         .fill(0)
                         .map((_, colIndex) => (
@@ -153,7 +152,7 @@ const MenuDetails: React.FC = () => {
                   ))
               ) : filteredMenu.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-12 text-gray-500">
+                  <td colSpan={9} className="text-center py-12 text-gray-500 dark:bg-slate-800">
                     <div className="flex flex-col items-center justify-center space-y-4 h-full">
                       <Search className="w-16 h-16 text-gray-300" />
                       <p className="text-xl">
@@ -191,7 +190,6 @@ const MenuDetails: React.FC = () => {
           setNewItem={setNewItem}
           validationErrors={validationErrors}
           handleSubmit={handleSubmitItem}
-          setValidationErrors={setValidationErrors}
           setImageFile={setImageFile}
         />
 

@@ -30,13 +30,13 @@ export const OrderStatusDisplay: React.FC<OrderStatusDisplayProps> = ({ status }
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 md:p-6 mb-6">
+    <div className="bg-white shadow-md rounded-lg p-4 md:p-6 mb-6 dark:bg-gray-800 dark:shadow-none">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
         <div className="flex items-center space-x-4 mb-4 md:mb-0">
           {StatusIcon[status as keyof typeof StatusIcon]}
           <div>
             <h2 className="text-lg md:text-xl font-semibold capitalize">{status}</h2>
-            <p className="text-xs md:text-sm text-gray-500">Current order status</p>
+            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Current order status</p>
           </div>
         </div>
         <div className='flex items-center'>

@@ -22,7 +22,7 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = React.memo(({
   selectedImage
 }) => {
   return (
-    <tr key={item.id} className="hover:bg-gray-50">
+    <tr key={item.id} className="hover:bg-gray-50 hover:dark:bg-gray-800">
         <td className="px-6 py-4 relative">
       {item.imageLink ? (
         <>

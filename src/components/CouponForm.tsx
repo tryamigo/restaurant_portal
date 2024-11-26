@@ -98,7 +98,7 @@ export const CouponForm: React.FC<CouponFormProps> = ({
                 value={value || ""}
                 onChange={(e) => setNewCoupon({ ...newCoupon, [key]: e.target.value })}
                 required
-                className="w-full"
+                className="w-full dark:bg-slate-700 dark:text-white"
                 step={getInputType() === 'number' ? '0.01' : undefined}
               />
               {validationErrors[key] && (

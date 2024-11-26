@@ -182,7 +182,7 @@ function OTPLoginContent() {
       transition={{ duration: 0.3 }}
       className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4"
     >
-      <Card className="w-full max-w-md shadow-2xl border-none">
+      <Card className="w-full max-w-md shadow-2xl border-none dark:bg-gray-900">
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -192,8 +192,8 @@ function OTPLoginContent() {
             <div className="flex justify-center mb-4">
               <ShieldCheck className="w-12 md:w-16 h-12 md:h-16 text-blue-600" />
             </div>
-            <CardTitle className="text-xl md:text-2xl font-bold text-gray-800">Secure OTP Login</CardTitle>
-            <CardDescription className="text-sm md:text-base text-gray-500">
+            <CardTitle className="text-xl md:text-2xl font-bold text-gray-800  dark:text-gray-200">Secure OTP Login</CardTitle>
+            <CardDescription className="text-sm md:text-base text-gray-500 dark:text-gray-400">
               Verify your mobile number to access your account
             </CardDescription>
           </CardHeader>
@@ -221,11 +221,11 @@ function OTPLoginContent() {
                     const value = e.target.value.replace(/\D/g, "");
                     if (value.length <= 10) setMobile(value);
                   }}
-                  className="flex-1 border-0 focus:ring-0 focus:outline-none px-3"
+                  className=" ml-1 flex-1 focus:ring-0 focus:outline-none px-3 dark:border-gray-300"
                 />
               </div>
             </div>
-            <div className="mt-1 text-sm text-gray-500">
+            <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {mobile.length < 10
                 ? `${10 - mobile.length} digits remaining`
                 : "Ready to send OTP"}
@@ -248,13 +248,13 @@ function OTPLoginContent() {
                     variant="link"
                     onClick={handleResendOTP}
                     disabled={resendCooldown > 0}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-blue-600 hover:text-blue-800 dark:text-gray-200 hover:dark:text-gray-400 "
                   >
                     {resendCooldown > 0 ? (
                       <>Resend OTP in {resendCooldown}s</>
                     ) : (
                       <>
-                        <RefreshCw className="mr-2 h-4 w-4" />
+                        <RefreshCw className="h-4 w-4" />
                         Resend OTP
                       </>
                     )}
@@ -284,7 +284,7 @@ function OTPLoginContent() {
             <Button
               onClick={() => requestOtp(false)}
               disabled={loading}
-              className="w-full bg-gray-800 hover:bg-blue-700 transition duration-200"
+              className="w-full bg-gray-800 hover:bg-blue-700 transition duration-200 dark:bg-gray-50 dark:hover:bg-gray-300"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {loading ? "Sending..." : "Send OTP"}
@@ -293,7 +293,7 @@ function OTPLoginContent() {
             <Button
               onClick={loginWithOtp}
               disabled={loading}
-              className="w-full bg-gray-800 hover:bg-blue-700 transition duration-200"
+              className="w-full bg-gray-800 hover:bg-blue-700 transition duration-200 dark:bg-gray-50 dark:hover:bg-gray-300"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {loading ? "Logging in..." : "Login"}
