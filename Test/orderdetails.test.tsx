@@ -1,173 +1,174 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { useSession } from 'next-auth/react';
-import { useParams, useRouter } from 'next/navigation';
-import OrderDetails from '@/app/orders/[id]/page';
+// Add this at the top of your test file
+import { TextEncoder, TextDecoder } from 'util';
 
-// Mock dependencies
-jest.mock('next-auth/react', () => ({
+// Type-cast to avoid type issues with TextDecoder
+global.TextEncoder = TextEncoder as any;
+global.TextDecoder = TextDecoder as any;
+import React from "react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import OrderDetails from "@/app/orders/[id]/page";
+import "@testing-library/jest-dom";
+import { useSession } from "next-auth/react";
+import { toast } from "@/hooks/use-toast";
+import fetchMock from "jest-fetch-mock";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+fetchMock.enableMocks();
+
+// Mock necessary hooks and dependencies
+jest.mock("next-auth/react", () => ({
   useSession: jest.fn(),
 }));
 
-jest.mock('next/navigation', () => ({
-  useParams: jest.fn(),
-  useRouter: jest.fn(),
+jest.mock("@/hooks/use-toast", () => ({
+  toast: jest.fn(),
 }));
 
-jest.mock('next/link', () => ({
-  __esModule: true,
-  default: ({ children, href }: { children: React.ReactNode, href: string }) => (
-    <a href={href}>{children}</a>
-  ),
-}));
-
-// Mock components
-jest.mock('@/components/ui/badge', () => ({
-  Badge: ({ children, variant }: { children: React.ReactNode, variant?: string }) => (
-    <div data-variant={variant}>{children}</div>
-  ),
-}));
-
-jest.mock('@/components/ui/skeleton', () => ({
-  Skeleton: () => <div data-testid="skeleton">Loading</div>,
-}));
-
-// Mock dropdown and dialog components
-jest.mock('@/components/ui/dropdown-menu', () => ({
-  DropdownMenu: ({ children }: any) => <div>{children}</div>,
-  DropdownMenuTrigger: ({ children }: any) => <button>{children}</button>,
-  DropdownMenuContent: ({ children }: any) => <div>{children}</div>,
-  DropdownMenuItem: ({ children, onClick }: any) => (
-    <div onClick={onClick}>{children}</div>
-  ),
-}));
-
-jest.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ children }: any) => <div>{children}</div>,
-  DialogContent: ({ children }: any) => <div>{children}</div>,
-  DialogHeader: ({ children }: any) => <div>{children}</div>,
-  DialogTitle: ({ children }: any) => <div>{children}</div>,
-  DialogDescription: ({ children }: any) => <div>{children}</div>,
-  DialogFooter: ({ children }: any) => <div>{children}</div>,
-}));
-
-describe('OrderDetails', () => {
-  const mockOrder = {
-    id: 'order123',
-    orderTime: '2023-06-15T10:30:00Z',
-    status: 'pending',
-    total: 50.00,
-    deliveryCharge: 5.00,
-    discount: 2.00,
-    takeFromStore: false,
-    rating: 4.5,
-    feedback: 'Great service!',
-    userAddress: {
-      name: 'John Doe',
-      mobile: '1234567890',
-      address: '123 Test St',
-      latitude: 40.7128,
-      longitude: -74.0060,
-    },
-    restaurantAddress: {
-      name: 'Test Restaurant',
-      address: '456 Restaurant St',
-      mobile: '0987654321',
-      latitude: 40.7129,
-      longitude: -74.0061,
-    },
-    orderItems: [
-      {
-        id: 'item1',
-        name: 'Pizza',
-        quantity: 2,
-        description: 'Cheese Pizza',
-        price: 10.00,
-        imageLink: 'https://example.com/pizza.jpg',
-      },
-    ],
-  };
-
+describe("OrderDetails Component", () => {
   beforeEach(() => {
-    // Reset mocks
-    jest.clearAllMocks();
-
-    // Setup default mocks
-    (useParams as jest.Mock).mockReturnValue({ id: 'order123' });
-    (useRouter as jest.Mock).mockReturnValue({
-      push: jest.fn(),
-    });
+    fetchMock.resetMocks();
     (useSession as jest.Mock).mockReturnValue({
-      data: { user: { token: 'test-token' } },
-      status: 'authenticated',
+      data: {
+        user: {
+          id: "1",
+          token: "test-token",
+        },
+      },
+      status: "authenticated",
     });
-
-    // Mock fetch
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockOrder),
-    });
+    (toast as jest.Mock).mockReturnValue(jest.fn());
   });
 
-  it('renders loading skeletons initially', async () => {
-    render(<OrderDetails />);
+  test("renders loading state when order data is not available", async () => {
+    render(
+      <BrowserRouter>
+        <Routes>
+          <Route path="/orders/:id" element={<OrderDetails />} />
+        </Routes>
+      </BrowserRouter>
+    );
 
-    // Check for skeleton loading state
-    const skeletons = await screen.findAllByTestId('skeleton');
-    expect(skeletons.length).toBeGreaterThan(0);
+    // Check if skeleton loaders are present
+    expect(screen.getAllByText(/loading/i)).toHaveLength(4);
   });
 
-  it('renders order details after successful fetch', async () => {
-    render(<OrderDetails />);
+  test("renders order details when order data is available", async () => {
+    // Mock the data returned from `useOrderDetails`
+    const mockOrder = {
+      id: "123",
+      orderTime: new Date().toISOString(),
+      status: "pending",
+      orderItems: [{ id: "item1", name: "Item 1", price: 10, quantity: 2 }],
+    };
 
-    // Wait for order details to be rendered
-    await waitFor(() => {
-      expect(screen.getByText('order123')).toBeInTheDocument();
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
-    });
+    jest.spyOn(require('@/hooks/useOrderDetails'), 'useOrderDetails').mockImplementation(() => ({
+      order: mockOrder,
+      editedOrder: mockOrder,
+      isEditDialogOpen: false,
+      setEditedOrder: jest.fn(),
+      setIsEditDialogOpen: jest.fn(),
+      updateOrderStatus: jest.fn(),
+      calculateOrderTotals: jest.fn(() => ({
+        subtotal: 20,
+        discount: 0,
+        total: 20,
+      })),
+    }));
+
+    render(
+      <BrowserRouter>
+        <Routes>
+          <Route path="/orders/:id" element={<OrderDetails />} />
+        </Routes>
+      </BrowserRouter>
+    );
+
+    // Check if order ID and order time are rendered
+    expect(screen.getByText(/Order #123/i)).toBeInTheDocument();
+    expect(screen.getByText(/Placed on/i)).toBeInTheDocument();
   });
 
+  test("opens and interacts with the edit status dialog", async () => {
+    render(
+      <BrowserRouter>
+        <Routes>
+          <Route path="/orders/:id" element={<OrderDetails />} />
+        </Routes>
+      </BrowserRouter>
+    );
 
-  it('opens delete confirmation dialog', async () => {
-    render(<OrderDetails />);
+    // Check that the 'Update Status' button is present
+    const updateButton = screen.getByText(/Update Status/i);
+    expect(updateButton).toBeInTheDocument();
 
-    // Wait for order details to be rendered
-    await waitFor(() => {
-      expect(screen.getByText('order123')).toBeInTheDocument();
-    });
+    // Simulate a click to open the dialog
+    fireEvent.click(updateButton);
 
-    // Find and click Options button
-    const optionsButton = screen.getByText('Options');
-    fireEvent.click(optionsButton);
-
-    // Find and click Delete Order item
-    const deleteItems = screen.getAllByText(/Delete/i);
-    fireEvent.click(deleteItems[0]);
-
-    // Check if delete confirmation dialog is visible
-    await waitFor(() => {
-      expect(screen.getByText('Delete')).toBeInTheDocument();
-    });
+    // Verify dialog is open and contains the status select dropdown
+    expect(screen.getByText(/Edit Order Status/i)).toBeInTheDocument();
+    expect(screen.getByText(/Order Status/i)).toBeInTheDocument();
   });
 
+  test("changes the order status when a status is selected", async () => {
+    render(
+      <BrowserRouter>
+        <Routes>
+          <Route path="/orders/:id" element={<OrderDetails />} />
+        </Routes>
+      </BrowserRouter>
+    );
 
+    fireEvent.click(screen.getByText(/Update Status/i));
+    
+    const select = screen.getByPlaceholderText(/Select status/i);
+    fireEvent.change(select, { target: { value: 'preparing' } });
 
-  it('handles fetch error gracefully', async () => {
-    // Mock fetch to throw an error
-    global.fetch = jest.fn().mockRejectedValue(new Error('Fetch failed'));
+    // Check that the selected value is 'preparing'
+    expect(screen.getByDisplayValue('preparing')).toBeInTheDocument();
+  });
 
-    // Spy on console.error to prevent error logging in test output
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  test("triggers updateOrderStatus function when Save Changes button is clicked", async () => {
+    const mockUpdateOrderStatus = jest.fn();
 
-    render(<OrderDetails />);
+    jest.spyOn(require('@/hooks/useOrderDetails'), 'useOrderDetails').mockImplementation(() => ({
+      order: { id: "123" },
+      editedOrder: { status: "pending" },
+      isEditDialogOpen: false,
+      setEditedOrder: jest.fn(),
+      setIsEditDialogOpen: jest.fn(),
+      updateOrderStatus: mockUpdateOrderStatus,
+      calculateOrderTotals: jest.fn(() => ({ subtotal: 20, discount: 0, total: 20 })),
+    }));
 
-    // Wait for potential error handling
-    await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith('Error fetching order details:', expect.any(Error));
-    });
+    render(
+      <BrowserRouter>
+        <Routes>
+          <Route path="/orders/:id" element={<OrderDetails />} />
+        </Routes>
+      </BrowserRouter>
+    );
 
-    // Restore console.error
-    consoleSpy.mockRestore();
+    fireEvent.click(screen.getByText(/Update Status/i));
+    fireEvent.click(screen.getByText(/Save Changes/i));
+
+    // Verify the function was called
+    expect(mockUpdateOrderStatus).toHaveBeenCalled();
+  });
+
+  test("navigates back to orders when 'Back to Orders' button is clicked", async () => {
+    render(
+      <BrowserRouter>
+        <Routes>
+          <Route path="/orders/:id" element={<OrderDetails />} />
+        </Routes>
+      </BrowserRouter>
+    );
+
+    const backButton = screen.getByText(/Back to Orders/i);
+    expect(backButton).toBeInTheDocument();
+
+    // Verify that clicking the back button navigates to /orders
+    fireEvent.click(backButton);
+    expect(window.location.pathname).toBe("/orders");
   });
 });

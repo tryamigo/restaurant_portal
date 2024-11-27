@@ -9,7 +9,7 @@ import { Home, ShoppingBag, Tag, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import  {ThemeProvider}  from "@/contexts/ThemeContext";
 
 const navItems = [
   { href: "/orders", label: "Orders", icon: ShoppingBag },

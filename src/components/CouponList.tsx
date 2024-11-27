@@ -81,6 +81,7 @@ export const CouponList: React.FC<CouponListProps> = ({
                 className="w-full md:w-auto"
                 variant="destructive"
                 onClick={() => onDelete(coupon.id)}
+                data-testid="delete-coupon"
               >
                 Delete
               </Button>

@@ -101,7 +101,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
                 </div>
             </td>
             <td className="px-6 py-4">
-                <Button variant="ghost" size="sm" onClick={() => onView(order.id)}>
+                <Button variant="ghost" size="sm" onClick={() => onView(order.id)} data-testid = "view">
                     <EyeIcon className="mr-2 h-4 w-4" />
                     View
                 </Button>

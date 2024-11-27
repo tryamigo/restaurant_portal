@@ -1,22 +1,37 @@
-// __tests__/CouponsPage.test.tsx
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import CouponsPage from '@/app/coupons/page';
-import { useSession } from 'next-auth/react';
-import { toast } from '@/hooks/use-toast';
-import fetchMock from 'jest-fetch-mock';
-import { useRouter } from 'next/navigation';
-import { usePathname } from 'next/navigation';
+import React from "react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  prettyDOM,
+} from "@testing-library/react";
+import Coupons from "@/app/coupons/page";
+import "@testing-library/jest-dom";
+import { useSession } from "next-auth/react";
+import { toast } from "@/hooks/use-toast";
+import fetchMock from "jest-fetch-mock";
+import  {ThemeProvider}  from "../src/contexts/ThemeContext";
+import { useRouter, usePathname } from "next/navigation";
 
+
+fetchMock.enableMocks();
 
 // Mock the EventSource constructor and static properties
-global.EventSource = jest.fn().mockImplementation(function (this: EventSource, url: string | URL, eventSourceInitDict?: EventSourceInit) {
-  // Mimic the behavior of EventSource instance
-  this.addEventListener = jest.fn();
-  this.close = jest.fn();
-  Object.defineProperty(this, 'readyState', { value: EventSource.OPEN, writable: false });  // Default to OPEN state
-}) as unknown as {
+global.EventSource = jest
+  .fn()
+  .mockImplementation(function (
+    this: EventSource,
+    url: string | URL,
+    eventSourceInitDict?: EventSourceInit
+  ) {
+    this.addEventListener = jest.fn();
+    this.close = jest.fn();
+    Object.defineProperty(this, "readyState", {
+      value: EventSource.OPEN,
+      writable: false,
+    });
+  }) as unknown as {
   new (url: string | URL, eventSourceInitDict?: EventSourceInit): EventSource;
   prototype: EventSource;
   readonly CONNECTING: 0;
@@ -24,71 +39,48 @@ global.EventSource = jest.fn().mockImplementation(function (this: EventSource, u
   readonly CLOSED: 2;
 };
 
-// Define the static properties on the mock
-(global.EventSource as any).CONNECTING = 0;
-(global.EventSource as any).OPEN = 1;
-(global.EventSource as any).CLOSED = 2;
-
-// Mock dependencies
-jest.mock('next-auth/react', () => ({
+jest.mock("next-auth/react", () => ({
   useSession: jest.fn(),
 }));
 
-jest.mock('@/hooks/use-toast', () => ({
+jest.mock("@/hooks/use-toast", () => ({
   toast: jest.fn(),
 }));
 
-// Mock Next.js router
-jest.mock('next/navigation', () => {
-  const originalModule = jest.requireActual('next/navigation');
-  return {
-    ...originalModule,
-    useRouter: jest.fn(),
-    usePathname: jest.fn(),
-  };
-});
-
-
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  },
-
+jest.mock("next/navigation", () => ({
+  useRouter: jest.fn(() => ({
+    pathname: "/coupons", // Return correct pathname
+    push: jest.fn(),
+  })),
+  usePathname: jest.fn(() => "/coupons"), // Mock usePathname to return /menu
 }));
 
 
-beforeAll(() => {
-  fetchMock.enableMocks();
-});
+const renderWithThemeProvider = (component: React.ReactNode) => {
+  return render(<ThemeProvider>{component}</ThemeProvider>);
+};
 
-afterEach(() => {
-  fetchMock.resetMocks();
-});
-
-describe('CouponsPage', () => {
+describe("Coupons Page Component", () => {
   beforeEach(() => {
     fetchMock.resetMocks();
     (useSession as jest.Mock).mockReturnValue({
-      data: { 
-        user: { 
-          token: 'test-token', 
-          id: 'user-id' 
-        } 
+      data: {
+        user: {
+          id: "1",
+          token: "test-token",
+        },
       },
-      status: 'authenticated',
+      status: "authenticated",
     });
     (toast as jest.Mock).mockReturnValue(jest.fn());
   });
 
-  test('renders loading spinner initially', async () => {
-    render(<CouponsPage />);
-    
-    // Look for the loading element with a more specific selector
-    const loadingElement = screen.getByTestId('loading-spinner');
-    expect(loadingElement).toBeInTheDocument();
+  it("renders loading skeleton initially", () => {
+    renderWithThemeProvider(<Coupons  />);
+    expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
   });
 
- 
+
   test('fetches and displays coupons', async () => {
     // Mock the API response
     fetchMock.mockResponseOnce(
@@ -126,7 +118,7 @@ describe('CouponsPage', () => {
     // Mock usePathname to return a mocked pathname
     (usePathname as jest.Mock).mockReturnValue('/coupons');
   
-    render(<CouponsPage />);
+    renderWithThemeProvider(<Coupons/>);
   
     // Wait for the coupons to be displayed after fetching data
     await waitFor(() => {
@@ -163,7 +155,7 @@ describe('CouponsPage', () => {
     );
   
     // Render the CouponsPage with mocked session context if necessary
-    const { container } = render(<CouponsPage />);
+    const { container } = renderWithThemeProvider(<Coupons/>);
   
     // Wait for initial render and simulate clicking the "Add Coupon" button
     await waitFor(() => {
@@ -250,38 +242,110 @@ describe('CouponsPage', () => {
   
 
   test('searches for a coupon by code and displays result', async () => {
-    // Mock initial fetch
-    fetchMock.mockResponseOnce(JSON.stringify({ coupons: [] }));
-  
+
     // Mock search response
     fetchMock.mockResponseOnce(
-      JSON.stringify({ 
-        coupon: { 
-          id: '1', 
-          title: 'Found Coupon', 
-          couponCode: 'SEARCH10', 
-          description: '10% off', 
-          isActive: true 
-        } 
-      })
+      JSON.stringify({
+        id: "1",
+        title: "New Coupon",
+        description: "10% off",
+        discountType: "PERCENTAGE",
+        discountValue: "10",
+        minOrderValue: "10",
+        maxDiscount: "10",
+        couponCode: "SEARCH10",
+        usageLimit: 10,
+        eligibleOrders: 10,
+        startDate: "2024-01-01",
+        endDate: "2024-12-31",
+      }),
+      { status: 201 }
     );
-  
-    const { container } = render(<CouponsPage />);
+
+      renderWithThemeProvider(<Coupons/>);
   
     // Verify initial render
     await waitFor(() => {
-      const searchInput = container.querySelector('input[id="search"]');
+      const searchInput = screen.getByTestId('searchcoupon')
       expect(searchInput).toBeInTheDocument();
-      if(searchInput){
       fireEvent.change(searchInput, { target: { value: 'SEARCH10' } }); // Simulate input
-      }
     });
   
     // Verify updated render
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes('SEARCH10'))).toBeInTheDocument();
+      expect(screen.getByText(/SEARCH10/i)).toBeInTheDocument();
     });
   });
-  
-  
+
+  test('deletes a coupon', async () => {
+    // Mock initial fetch for coupons (if needed)
+    fetchMock.mockResponseOnce(
+      JSON.stringify({
+        id: "1",
+        title: "New Coupon",
+        description: "10% off",
+        discountType: "PERCENTAGE",
+        discountValue: "10",
+        minOrderValue: "10",
+        maxDiscount: "10",
+        couponCode: "NEW10",
+        usageLimit: 10,
+        eligibleOrders: 10,
+        startDate: "2024-01-01",
+        endDate: "2024-12-31",
+      }),
+      { status: 201 }
+    );
+
+    // Mock the response for delete operation
+    fetchMock.mockResponseOnce(
+      JSON.stringify({ message: 'Coupon deleted successfully' })
+    );
+
+    renderWithThemeProvider(<Coupons />);
+
+    // Wait for the initial render and find the delete button
+    await waitFor(() => {
+      const deleteButton = screen.getByTestId("delete-coupon");
+      expect(deleteButton).toBeInTheDocument();
+
+      // Simulate clicking the delete button
+      fireEvent.click(deleteButton);
+    });
+
+    // Wait for the fetch call and verify that it's called with the correct parameters
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/restaurants/coupons/1',
+        {
+          method: 'DELETE',
+          headers: expect.objectContaining({
+            Authorization: 'Bearer test-token', // Replace with actual token logic if needed
+          }),
+        }
+      );
+    });
+
+    // Optionally, check for confirmation or UI update after deletion
+    await waitFor(() => {
+      expect(screen.getByText(/coupon deleted successfully/i)).toBeInTheDocument();
+    });
+  });
+
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

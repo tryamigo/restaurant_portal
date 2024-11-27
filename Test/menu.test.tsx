@@ -11,6 +11,7 @@ import "@testing-library/jest-dom";
 import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
 import fetchMock from "jest-fetch-mock";
+import  {ThemeProvider}  from "../src/contexts/ThemeContext";
 
 interface MenuItem {
   name: string;
@@ -63,6 +64,11 @@ jest.mock("next/navigation", () => ({
   usePathname: jest.fn(() => "/menu"), // Mock usePathname to return /menu
 }));
 
+
+const renderWithThemeProvider = (component: React.ReactNode) => {
+  return render(<ThemeProvider>{component}</ThemeProvider>);
+};
+
 describe("MenuDetails Component", () => {
   beforeEach(() => {
     fetchMock.resetMocks();
@@ -79,7 +85,7 @@ describe("MenuDetails Component", () => {
   });
 
   it("renders loading skeleton initially", () => {
-    render(<MenuDetails />);
+    renderWithThemeProvider(<MenuDetails />);
     expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
   });
 
@@ -102,7 +108,7 @@ describe("MenuDetails Component", () => {
     fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
 
     // Render the component
-    const { container } = render(<MenuDetails />);
+    const { container } = renderWithThemeProvider(<MenuDetails />);
 
     console.log(prettyDOM(container));
 
@@ -132,7 +138,7 @@ describe("MenuDetails Component", () => {
     fetchMock.mockRejectOnce(new Error("API Error"));
 
     // Render the component
-    render(<MenuDetails />);
+    renderWithThemeProvider(<MenuDetails />);
 
     // Verify that the component handles the error gracefully (e.g., showing an error message)
     await waitFor(() => {
@@ -147,7 +153,7 @@ describe("MenuDetails Component", () => {
     const mockResponse: MenuItem[] = [];
     fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
   
-    render(<MenuDetails />);
+    renderWithThemeProvider(<MenuDetails />);
   
     await waitFor(() => {
       expect(screen.getByTestId("add-item-button")).toBeInTheDocument();
@@ -221,7 +227,7 @@ describe("MenuDetails Component", () => {
 
     // Fix the fetch response to return the above mock data
     fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
-    render(<MenuDetails />);
+    renderWithThemeProvider(<MenuDetails />);
 
     // Wait for the search input to appear
     await waitFor(() => {
@@ -259,7 +265,7 @@ describe("MenuDetails Component", () => {
 
     // Fix the fetch response to return the above mock data
     fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
-    render(<MenuDetails />);
+    renderWithThemeProvider(<MenuDetails />);
 
     await waitFor(() => {
       expect(screen.getByTestId("add-item-button")).toBeInTheDocument();
@@ -295,7 +301,7 @@ describe("MenuDetails Component", () => {
     fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
 
     // Render the MenuDetails component
-    render(<MenuDetails />);
+    renderWithThemeProvider(<MenuDetails />);
 
     // Wait for the item "Pizza" to be displayed
     await waitFor(() => {
@@ -358,7 +364,7 @@ describe("MenuDetails Component", () => {
     fetchMock.mockResponseOnce(JSON.stringify(mockMenuItems), { status: 200 });
 
     // Render the MenuDetails component
-    render(<MenuDetails />);
+    renderWithThemeProvider(<MenuDetails />);
 
     // Wait for the "Pizza" menu item to be displayed
     await waitFor(() => {

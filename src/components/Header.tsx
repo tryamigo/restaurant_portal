@@ -172,12 +172,13 @@ function Header({
                 {theme === "light" ? <Moon /> : <Sun />}
               </Button>
               <div className="relative flex-grow dark:bg-gray-700 rounded-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"/>
                 <Input
                   placeholder="Search coupons"
                   className="pl-10 w-full"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm?.(e.target.value)}
+                  data-testid = "searchcoupon" 
                 />
               </div>
               <CustomButton

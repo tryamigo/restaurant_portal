@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import Loader from "../components/Loader";
+import Loader from "@/components/Loader";
 
 type Theme = "light" | "dark";
 
@@ -15,13 +15,15 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true); // State to manage the loading state
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem("theme") as Theme | null;
-    const initialTheme = storedTheme || "light";
-    setTheme(initialTheme);
-    document.documentElement.classList.add(initialTheme);
+    if (typeof window !== "undefined") {
+      const storedTheme = localStorage.getItem("theme") as Theme | null;
+      const initialTheme = storedTheme || "light";
+      setTheme(initialTheme);
+      document.documentElement.classList.add(initialTheme);
 
-    // After setting the theme, stop the loading state
-    setLoading(false);
+      // After setting the theme, stop the loading state
+      setLoading(false);
+    }
   }, []);
 
   const toggleTheme = () => {
