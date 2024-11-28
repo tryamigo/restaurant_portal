@@ -43,7 +43,7 @@ const OrderDetails: React.FC = () => {
   );
 
   const { subtotal, discount, total } = calculateOrderTotals(order.orderItems);
-
+  
   return (
     <>
       <Header />
@@ -58,7 +58,7 @@ const OrderDetails: React.FC = () => {
           <div className='mb-4 md:mb-0'>
             <h1 className="text-2xl md:text-3xl font-bold">Order #{order.id}</h1>
             <p className="text-sm md:text-base text-gray-600 mt-1 dark:text-gray-300">
-              Placed on {format(new Date(order.orderTime), 'MMMM dd, yyyy at hh:mm a')}
+            Placed on  {format(new Date(order.orderTime), "PPp")}
             </p>
           </div>
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto">

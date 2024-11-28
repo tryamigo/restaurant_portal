@@ -1,8 +1,8 @@
 "use client";
 
 import { Toaster } from "@/components/ui/toaster";
-import "@/app/globals.css";
 import React from "react";
+import "./globals.css";
 import { SessionProvider, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { Home, ShoppingBag, Tag, Moon, Sun } from "lucide-react";
@@ -108,7 +108,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body className="min-h-screen">
         <SessionProvider>
           <ThemeProvider>

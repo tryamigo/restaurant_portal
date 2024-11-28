@@ -1,4 +1,3 @@
-// app/orders/page.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import { Order, OrderStatus } from "@/components/types";
@@ -10,6 +9,7 @@ import Header from "@/components/Header";
 import OrderRow from "@/components/OrderRow";
 import { useRouter } from "next/navigation";
 import { ListOrdered } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Main OrdersPage component
 function OrdersPage() {
@@ -21,6 +21,11 @@ function OrdersPage() {
   const { data: session, status } = useSession();
   const { events } = useSSE();
   const router = useRouter();
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15; // Number of items per page
+
   useEffect(() => {
     if (status === "authenticated") {
       fetchOrders();
@@ -31,6 +36,7 @@ function OrdersPage() {
     filterOrders();
   }, [orders, searchTerm, statusFilter]);
 
+  // Fetch orders
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -48,6 +54,7 @@ function OrdersPage() {
       setLoading(false);
     }
   };
+
   const filterOrders = () => {
     let filtered = orders;
 
@@ -66,7 +73,16 @@ function OrdersPage() {
     }
 
     setFilteredOrders(filtered);
+    setCurrentPage(1);
   };
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+
+  // Handle pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -122,7 +138,7 @@ function OrdersPage() {
                             ))}
                         </tr>
                       ))
-                  ) : filteredOrders.length === 0 ? (
+                  ) : currentItems.length === 0 ? (
                     <tr>
                       <td
                         colSpan={7}
@@ -137,7 +153,7 @@ function OrdersPage() {
                       </td>
                     </tr>
                   ) : (
-                    filteredOrders.map((order) => (
+                    currentItems.map((order) => (
                       <OrderRow
                         key={order.id}
                         order={order}
@@ -160,14 +176,14 @@ function OrdersPage() {
                       <Skeleton className="h-32 w-full" />
                     </div>
                   ))
-              ) : filteredOrders.length === 0 ? (
+              ) : currentItems.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
                   <div className="flex flex-col items-center space-y-4">
                     <p className="text-xl">No orders found</p>
                   </div>
                 </div>
               ) : (
-                filteredOrders.map((order) => (
+                currentItems.map((order) => (
                   <OrderRow
                     key={order.id}
                     order={order}
@@ -178,6 +194,31 @@ function OrdersPage() {
               )}
             </AnimatePresence>
           </div>
+
+          {/* Pagination Controls */}
+          {filteredOrders.length > itemsPerPage && (
+            <div className="flex justify-center mt-4 mb-3">
+              <Button
+                className="px-4 py-2 mx-2 bg-gray-500 rounded hover:dark:bg-gray-700"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span className="px-4 py-2 dark:text-gray-300">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                className="px-4 py-2 mx-2 bg-gray-500 rounded hover:dark:bg-gray-700"
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, currentPage + 1))
+                }
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </div>
       </motion.div>
     </>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Tag } from "lucide-react";
@@ -15,15 +15,18 @@ import { CouponForm } from "@/components/CouponForm";
 
 // Hooks and Utilities
 import { initialObject } from "@/schema/CouponSchema";
-import { useCouponOperations } from '@/hooks/useCouponOpearation';
+import { useCouponOperations } from "@/hooks/useCouponOpearation";
+import { Button } from "@/components/ui/button";
+import { CustomButton } from "@/components/CustomButton";
 
 const CouponsPage: React.FC = () => {
   // Authentication and Session
   const { data: session, status } = useSession();
-  
+
   // State Management
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isAddingCoupon, setIsAddingCoupon] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   // Custom Hook for Coupon Operations
   const {
@@ -39,7 +42,7 @@ const CouponsPage: React.FC = () => {
     handleUpdateCouponStatus,
     setNewCoupon,
     setValidationErrors,
-    filterCoupons
+    filterCoupons,
   } = useCouponOperations();
 
   // Fetch Coupons on Authentication
@@ -54,21 +57,38 @@ const CouponsPage: React.FC = () => {
     filterCoupons(searchTerm);
   }, [searchTerm, coupons]);
 
+  // Pagination Effect
+  useEffect(() => {
+    setCurrentPage(1); // Reset to the first page whenever the search term changes
+  }, [searchTerm]);
+
   // Coupon Submission Handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const isValid = await validateCoupon();
-    
+
     if (isValid) {
       await handleAddCoupon(session?.user?.id);
       setIsAddingCoupon(false);
     }
   };
 
+  const itemsPerPage = 15;
+  // Pagination Logic: Calculate start and end indices based on the current page
+  const indexOfLastCoupon = currentPage * itemsPerPage;
+  const indexOfFirstCoupon = indexOfLastCoupon - itemsPerPage;
+  const currentCoupons = filteredCoupons.slice(
+    indexOfFirstCoupon,
+    indexOfLastCoupon
+  );
+
   // Loading State
   if (isLoading) {
     return <LoadingSpinner />;
   }
+
+  // Pagination Controls
+  const totalPages = Math.ceil(filteredCoupons.length / itemsPerPage);
 
   return (
     <>
@@ -78,9 +98,9 @@ const CouponsPage: React.FC = () => {
         setSearchTerm={setSearchTerm}
         onAddItem={() => setIsAddingCoupon(true)}
       />
-      
+
       {/* Main Content Container */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -88,9 +108,9 @@ const CouponsPage: React.FC = () => {
       >
         <div className="bg-white shadow-lg rounded-xl overflow-hidden dark:bg-gray-900 dark:shadow-none">
           <CardContent className="mt-4">
-            {filteredCoupons.length > 0 ? (
+            {currentCoupons.length > 0 ? (
               <CouponList
-                coupons={filteredCoupons}
+                coupons={currentCoupons}
                 onDelete={handleDeleteCoupon}
                 onStatusUpdate={handleUpdateCouponStatus}
               />
@@ -98,6 +118,32 @@ const CouponsPage: React.FC = () => {
               <EmptyCouponState onAddCoupon={() => setIsAddingCoupon(true)} />
             )}
           </CardContent>
+
+          {/* Pagination Controls */}
+
+          {filteredCoupons.length > itemsPerPage && (
+            <div className="flex justify-center mt-4 mb-3">
+              <Button
+                className="px-4 py-2 mx-2 bg-gray-500 rounded hover:dark:bg-gray-700"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span className="px-4 py-2 dark:text-gray-300">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                className="px-4 py-2 mx-2 bg-gray-500 rounded hover:dark:bg-gray-700"
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, currentPage + 1))
+                }
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Coupon Creation Dialog */}
@@ -154,10 +200,13 @@ const CouponFormDialog: React.FC<CouponFormDialogProps> = ({
   onSubmit,
   newCoupon,
   setNewCoupon,
-  validationErrors
+  validationErrors,
 }) => (
-  <Dialog open={isOpen} onOpenChange={onClose} >
-    <DialogContent className="max-h-[90vh] overflow-y-auto"  aria-describedby={undefined}>
+  <Dialog open={isOpen} onOpenChange={onClose}>
+    <DialogContent
+      className="max-h-[90vh] overflow-y-auto"
+      aria-describedby={undefined}
+    >
       <DialogTitle className="text-lg text-center md:text-xl text md:justify-start">
         Create New Coupon
       </DialogTitle>
@@ -173,4 +222,3 @@ const CouponFormDialog: React.FC<CouponFormDialogProps> = ({
 );
 
 export default CouponsPage;
-

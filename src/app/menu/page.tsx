@@ -10,6 +10,7 @@ import Header from "@/components/Header";
 import AddEditItemDialog from "@/components/AddEditItemDialog";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const MenuDetails: React.FC = () => {
   const {
@@ -33,6 +34,20 @@ const MenuDetails: React.FC = () => {
   const [menuItemToDelete, setMenuItemToDelete] = useState<string | null>(null);
   const [newItem, setNewItem] = useState<Omit<MenuItem, "id">>(initialObject);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15; // You can adjust the number of items per page
+
+  const totalPages = Math.ceil(filteredMenu.length / itemsPerPage);
+
+  // Handle pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredMenu.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Handle page change
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const handleEditItem = (item: MenuItem) => {
     setCurrentEditItem(item);
@@ -73,10 +88,8 @@ const MenuDetails: React.FC = () => {
       setFormMode("add");
     } catch (error) {
       console.error("Error submitting item:", error);
-      // Handle validation errors if needed
     }
   };
-
 
   if (error) {
     return (
@@ -91,6 +104,11 @@ const MenuDetails: React.FC = () => {
     );
   }
 
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1); // Reset to first page when search term changes
+  };
+
   return (
     <>
       <Header
@@ -101,7 +119,7 @@ const MenuDetails: React.FC = () => {
           setFormMode("add");
         }}
         searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
+        setSearchTerm={handleSearchChange}
       />
 
       <motion.div
@@ -111,7 +129,6 @@ const MenuDetails: React.FC = () => {
         className="container mx-auto px-4 py-6 md:py-12 pt-[12rem]"
       >
         <div className="bg-white shadow-lg rounded-xl overflow-hidden overflow-x-auto dark:bg-gray-900 dark:shadow-none">
-
           <table className="w-full">
             <thead className="bg-gray-100 border-b">
               <tr>
@@ -140,7 +157,7 @@ const MenuDetails: React.FC = () => {
                 Array(5)
                   .fill(0)
                   .map((_, index) => (
-                    <tr key={index} className="hover:bg-gray-50 ">
+                    <tr key={index} className="hover:bg-gray-50">
                       {Array(9)
                         .fill(0)
                         .map((_, colIndex) => (
@@ -150,7 +167,7 @@ const MenuDetails: React.FC = () => {
                         ))}
                     </tr>
                   ))
-              ) : filteredMenu.length === 0 ? (
+              ) : currentItems.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="text-center py-12 text-gray-500 dark:bg-slate-800">
                     <div className="flex flex-col items-center justify-center space-y-4 h-full">
@@ -164,7 +181,7 @@ const MenuDetails: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                filteredMenu.map((item) => (
+                currentItems.map((item) => (
                   <MenuItemRow
                     key={item.id}
                     item={item}
@@ -180,6 +197,30 @@ const MenuDetails: React.FC = () => {
               )}
             </tbody>
           </table>
+          {/* Pagination Controls */}
+          {filteredMenu.length > itemsPerPage && (
+            <div className="flex justify-center mt-4 mb-3">
+              <Button
+                className="px-4 py-2 mx-2 bg-gray-500 rounded hover:dark:bg-gray-700"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span className="px-4 py-2 dark:text-gray-300">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                className="px-4 py-2 mx-2 bg-gray-500 rounded hover:dark:bg-gray-700"
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, currentPage + 1))
+                }
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </div>
 
         <AddEditItemDialog
