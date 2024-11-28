@@ -83,7 +83,7 @@ function Header({
           <div className={containerClasses}>
             <h1 className={commonClasses}>Restaurant Details</h1>
             <div className="flex space-x-4">
-            <Button onClick={toggleTheme} aria-label="Toggle Theme">
+              <Button onClick={toggleTheme} aria-label="Toggle Theme">
                 {theme === "light" ? <Moon /> : <Sun />}
               </Button>
               <CustomButton
@@ -194,6 +194,9 @@ function Header({
         return (
           <div className={containerClasses}>
             <h1 className={commonClasses}>Dashboard</h1>
+            <Button onClick={toggleTheme} aria-label="Toggle Theme">
+              {theme === "light" ? <Moon /> : <Sun />}
+            </Button>
           </div>
         );
     }

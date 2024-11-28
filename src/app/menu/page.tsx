@@ -201,17 +201,17 @@ const MenuDetails: React.FC = () => {
           {filteredMenu.length > itemsPerPage && (
             <div className="flex justify-center mt-4 mb-3">
               <Button
-                className="px-4 py-2 mx-2 bg-gray-500 rounded"
+                className="px-4 py-2 mx-2 bg-gray-500 rounded hover:dark:bg-gray-700"
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
               >
                 Previous
               </Button>
-              <span className="px-4 py-2">
+              <span className="px-4 py-2 dark:text-gray-300">
                 Page {currentPage} of {totalPages}
               </span>
               <Button
-                className="px-4 py-2 mx-2 bg-gray-500 rounded"
+                className="px-4 py-2 mx-2 bg-gray-500 rounded hover:dark:bg-gray-700"
                 onClick={() =>
                   setCurrentPage(Math.min(totalPages, currentPage + 1))
                 }

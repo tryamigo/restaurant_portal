@@ -68,7 +68,7 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
                 {/* Product details column */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
-                    {item.name.length > 20 ? (
+                    {item?.name?.length > 20 ? (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
@@ -89,7 +89,7 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
                   </div>
 
                   <div>
-                    {item.description.length > 20 ? (
+                    {item?.description?.length > 20 ? (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
