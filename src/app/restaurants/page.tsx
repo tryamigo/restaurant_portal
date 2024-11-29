@@ -295,12 +295,12 @@ const RestaurantDetails: React.FC = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  <Card>
+                  <Card className="dark:bg-gray-800">
                     <CardHeader>
                       <CardTitle className="text-2xl font-bold">
                         {restaurant.name}
                       </CardTitle>
-                      <Badge variant="outline" className="text-sm">
+                      <Badge variant="outline" className="text-sm dark:text-gray-300 dark:border-white">
                         GSTIN: {restaurant.gstin}
                       </Badge>
                     </CardHeader>
