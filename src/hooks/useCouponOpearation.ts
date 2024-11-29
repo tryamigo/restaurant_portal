@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
 import { toast } from "@/hooks/use-toast";
 import { Coupon } from "@/components/types";
 import { CouponSchema, initialObject } from "@/schema/CouponSchema";
@@ -17,6 +17,51 @@ export const useCouponOperations = () => {
   }>({});
   const {data:session}=useSession()
 
+
+  const validateInput = (name: string, value: string) => {
+    try {
+      // Parse value based on field type
+      let parsedValue: any = value;
+      if (["discountValue", "minOrderValue", "maxDiscount", "usageLimit", "eligibleOrders"].includes(name)) {
+        parsedValue = parseFloat(value);
+        if (isNaN(parsedValue)) {
+          throw new Error(`Invalid number for ${name}: ${value}`);
+        }
+      } else if (["startDate", "endDate"].includes(name)) {
+        parsedValue = new Date(value);
+        if (isNaN(parsedValue.getTime())) {
+          throw new Error(`Invalid date for ${name}: ${value}`);
+        }
+      }
+  
+      // Pick specific field for validation
+      const fieldSchema = z.object({ [name]: (CouponSchema._def.schema as z.ZodObject<any>).shape[name] });
+      fieldSchema.parse({ [name]: parsedValue });
+  
+      // If validation passes, update the errors
+      setValidationErrors((prev: any) => {
+        const updated = { ...prev, [name]: "" };
+        return updated;
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Handle validation errors
+        const errMessages = error.errors.map((err) => err.message).join(", ");
+        console.error(`Validation error for ${name}: ${errMessages}`);
+        setValidationErrors((prev: any) => {
+          const updated = { ...prev, [name]: errMessages };
+          console.log("Validation failed. Updated errors:", updated);
+          return updated;
+        });
+      } else {
+        // Catch any other unexpected errors
+        console.error("Unexpected validation error:", error);
+      }
+    }
+  };
+  
+  
+  
   const fetchCoupons = async () => {
     try {
       const response = await fetch("/api/restaurants/coupons", {
@@ -31,7 +76,7 @@ export const useCouponOperations = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch coupons",
+        description: "Failed to fetch Coupons",
         variant: "destructive",
       });
     } finally {
@@ -48,7 +93,7 @@ export const useCouponOperations = () => {
         }
         return parsedDate;
       };
-
+  
       const couponData = {
         ...newCoupon,
         discountValue: parseFloat(newCoupon.discountValue),
@@ -59,9 +104,9 @@ export const useCouponOperations = () => {
         startDate: parseDate(newCoupon.startDate),
         endDate: parseDate(newCoupon.endDate),
       };
-
+  
       await CouponSchema.parseAsync(couponData);
-      setValidationErrors({});
+      setValidationErrors({}); // Clear validation errors if valid
       return true;
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -71,13 +116,12 @@ export const useCouponOperations = () => {
         }, {});
         setValidationErrors(errors);
       } else if (error instanceof Error) {
-        setValidationErrors({
-          general: error.message
-        });
+        setValidationErrors({ general: error.message });
       }
       return false;
     }
   };
+  
 
   const handleAddCoupon = async (restaurantId?: string) => {
     try {
@@ -185,6 +229,7 @@ export const useCouponOperations = () => {
     handleAddCoupon,
     handleDeleteCoupon,
     handleUpdateCouponStatus,
-    filterCoupons
+    filterCoupons,
+    validateInput
   };
 };

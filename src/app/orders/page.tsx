@@ -10,6 +10,7 @@ import OrderRow from "@/components/OrderRow";
 import { useRouter } from "next/navigation";
 import { ListOrdered } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 // Main OrdersPage component
 function OrdersPage() {
@@ -49,7 +50,11 @@ function OrdersPage() {
       const data = await response.json();
       setOrders(data);
     } catch (error) {
-      console.error("Error fetching orders:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch Orders",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

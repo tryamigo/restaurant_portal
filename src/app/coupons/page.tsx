@@ -17,10 +17,8 @@ import { CouponForm } from "@/components/CouponForm";
 import { initialObject } from "@/schema/CouponSchema";
 import { useCouponOperations } from "@/hooks/useCouponOpearation";
 import { Button } from "@/components/ui/button";
-import { CustomButton } from "@/components/CustomButton";
 
 const CouponsPage: React.FC = () => {
-  // Authentication and Session
   const { data: session, status } = useSession();
 
   // State Management
@@ -43,6 +41,7 @@ const CouponsPage: React.FC = () => {
     setNewCoupon,
     setValidationErrors,
     filterCoupons,
+    validateInput,
   } = useCouponOperations();
 
   // Fetch Coupons on Authentication
@@ -158,6 +157,7 @@ const CouponsPage: React.FC = () => {
           newCoupon={newCoupon}
           setNewCoupon={setNewCoupon}
           validationErrors={validationErrors}
+          validateInput={validateInput}
         />
       </motion.div>
     </>
@@ -192,6 +192,7 @@ interface CouponFormDialogProps {
   newCoupon: any;
   setNewCoupon: React.Dispatch<React.SetStateAction<any>>;
   validationErrors: { [key: string]: string };
+  validateInput: (name: string, value: string) => void;
 }
 
 const CouponFormDialog: React.FC<CouponFormDialogProps> = ({
@@ -201,6 +202,7 @@ const CouponFormDialog: React.FC<CouponFormDialogProps> = ({
   newCoupon,
   setNewCoupon,
   validationErrors,
+  validateInput,
 }) => (
   <Dialog open={isOpen} onOpenChange={onClose}>
     <DialogContent
@@ -216,6 +218,7 @@ const CouponFormDialog: React.FC<CouponFormDialogProps> = ({
         setNewCoupon={setNewCoupon}
         validationErrors={validationErrors}
         onCancel={onClose}
+        validateInput={validateInput}
       />
     </DialogContent>
   </Dialog>

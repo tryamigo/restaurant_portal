@@ -1,8 +1,8 @@
-'use client';
-import React, {useState} from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {Restaurant } from '@/components/types';
-import { AddressFields } from '@/components/AddressFields';
+"use client";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Restaurant } from "@/components/types";
+import { AddressFields } from "@/components/AddressFields";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { CustomButton } from "@/components/CustomButton";
 import { Button } from "@/components/ui/button";
@@ -10,9 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import Header from "@/components/Header";
-import { MapPin, Phone, Clock, FileText } from "lucide-react";
+import { MapPin, Phone, Clock, FileText, Utensils } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import useRestaurant from "@/hooks/useRestaurant";
+import { z } from "zod";
+import { RestaurantSchema } from "@/schema/RestaurantSchema";
 
 const RestaurantDetails: React.FC = () => {
   const { restaurant, isLoading, error, updateRestaurant } = useRestaurant();
@@ -20,14 +22,46 @@ const RestaurantDetails: React.FC = () => {
   const [editedRestaurant, setEditedRestaurant] = useState<Restaurant | null>(
     null
   );
+  const [validationErrors, setValidationErrors] = useState<any>({});
 
-  const handleEditRestaurant = async () => {
-    if (isEditing && editedRestaurant) {
-      await updateRestaurant(editedRestaurant);
+  useEffect(() => {
+    if (isEditing && restaurant) {
+      setEditedRestaurant({ ...restaurant });
+    }
+  }, [isEditing, restaurant]);
+
+  const validateInput = (name: string, value: string) => {
+    try {
+      console.log(`Validating ${name} with value: ${value}`);
+      RestaurantSchema.pick({ [name]: true } as any).parse({ [name]: value });
+      setValidationErrors((prev: any) => ({ ...prev, [name]: "" }));
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errMessage = error.errors[0]?.message || "Invalid input";
+        console.error(`Validation error for ${name}: ${errMessage}`);
+
+        setValidationErrors((prev: any) => ({ ...prev, [name]: errMessage }));
+      }
+    }
+  };
+
+  const handleEditRestaurant = () => {
+    try {
+      RestaurantSchema.parse(editedRestaurant);
+      setValidationErrors({}); // Clear all errors
+      if (editedRestaurant) {
+        updateRestaurant(editedRestaurant);
+      }
       setIsEditing(false);
-    } else {
-      setEditedRestaurant(restaurant);
-      setIsEditing(true);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: { [key: string]: string } = {};
+        error.errors.forEach((err) => {
+          const path = err.path.join(".");
+          errors[path] = err.message;
+        });
+        setValidationErrors(errors); // Set validation errors
+      }
     }
   };
 
@@ -74,11 +108,14 @@ const RestaurantDetails: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto p-4"
       >
-        <Card>
-          <CardContent>
-            <p>No restaurant details found.</p>
-          </CardContent>
-        </Card>
+        <AnimatePresence>
+          <div className="flex flex-col items-center justify-center space-y-4 h-full">
+            <Utensils className="w-16 h-16 text-gray-300" />
+            <div className="flex flex-col items-center space-y-4 text-gray-500">
+              <p className="text-xl">Restaurant details not found</p>
+            </div>
+          </div>
+        </AnimatePresence>
       </motion.div>
     );
   }
@@ -87,7 +124,7 @@ const RestaurantDetails: React.FC = () => {
     <>
       <Header
         restaurantActions={{
-          onEditRestaurant: handleEditRestaurant,
+          onEditRestaurant: () => setIsEditing(true),
         }}
       />
       <motion.div
@@ -108,77 +145,109 @@ const RestaurantDetails: React.FC = () => {
                   className="space-y-8"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Input fields with responsive layout */}
                     <div className="space-y-2">
                       <Label htmlFor="name">Name</Label>
                       <Input
                         id="name"
                         value={editedRestaurant?.name || ""}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newName = e.target.value;
                           setEditedRestaurant((prev) => ({
                             ...prev!,
-                            name: e.target.value,
-                          }))
-                        }
+                            name: newName,
+                          }));
+                          validateInput("name", newName); // Validate input on change
+                        }}
                       />
+                      {validationErrors.name && (
+                        <p className="text-sm text-red-500">
+                          {validationErrors.name}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phoneNumber">Phone Number</Label>
                       <Input
                         id="phoneNumber"
                         value={editedRestaurant?.phoneNumber || ""}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newPhoneNumber = e.target.value;
                           setEditedRestaurant((prev) => ({
                             ...prev!,
-                            phoneNumber: e.target.value,
-                          }))
-                        }
+                            phoneNumber: newPhoneNumber,
+                          }));
+                          validateInput("phoneNumber", newPhoneNumber); // Validate input on change
+                        }}
                         readOnly={true}
                         className="w-full bg-gray-200 text-gray-500 border border-gray-300 cursor-not-allowed"
                       />
+                      {validationErrors.phoneNumber && (
+                        <p className="text-sm text-red-500">
+                          {validationErrors.phoneNumber}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="openingHours">Opening Hours</Label>
                       <Input
                         id="openingHours"
                         value={editedRestaurant?.openingHours || ""}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newOpeningHours = e.target.value;
                           setEditedRestaurant((prev) => ({
                             ...prev!,
-                            openingHours: e.target.value,
-                          }))
-                        }
-                        className="w-full"
+                            openingHours: newOpeningHours,
+                          }));
+                          validateInput("openingHours", newOpeningHours); // Validate input on change
+                        }}
                       />
+                      {validationErrors.openingHours && (
+                        <p className="text-sm text-red-500">
+                          {validationErrors.openingHours}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="gstin">GSTIN</Label>
                       <Input
                         id="gstin"
                         value={editedRestaurant?.gstin || ""}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newGstin = e.target.value;
                           setEditedRestaurant((prev) => ({
                             ...prev!,
-                            gstin: e.target.value,
-                          }))
-                        }
-                        className="w-full"
+                            gstin: newGstin,
+                          }));
+                          validateInput("gstin", newGstin); // Validate input on change
+                        }}
                       />
+                      {validationErrors.gstin && (
+                        <p className="text-sm text-red-500">
+                          {validationErrors.gstin}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
-                    <Label htmlFor="fssai">FSSAI</Label>
-                    <Input
-                      id="fssai"
-                      value={editedRestaurant?.FSSAI || ""}
-                      onChange={(e) =>
-                        setEditedRestaurant((prev) => ({
-                          ...prev!,
-                          FSSAI: e.target.value,
-                        }))
-                      }
-                      className="w-full"
-                    />
+                      <Label htmlFor="fssai">FSSAI</Label>
+                      <Input
+                        id="fssai"
+                        value={editedRestaurant?.FSSAI || ""}
+                        onChange={(e) => {
+                          const newFssai = e.target.value;
+                          setEditedRestaurant((prev) => ({
+                            ...prev!,
+                            FSSAI: newFssai,
+                          }));
+                          validateInput("FSSAI", newFssai); // Validate input on change
+                        }}
+                      />
+                      {validationErrors.FSSAI && (
+                        <p className="text-sm text-red-500">
+                          {validationErrors.FSSAI}
+                        </p>
+                      )}
                     </div>
+
                     <div className="md:col-span-2">
                       <AddressFields
                         address={
