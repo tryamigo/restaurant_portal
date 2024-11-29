@@ -1,20 +1,52 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from "react";
 import { MenuItem } from "@/components/types";
-import { useSession } from 'next-auth/react';
+import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
-import { z } from 'zod';
+import { z } from "zod";
 import { MenuItemSchema } from "@/schema/MenuItemSchema";
 
 export const useMenuManagement = () => {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const { data: session } = useSession();
-  const [imageFile, setImageFile] = useState<string>('');
+  const [imageFile, setImageFile] = useState<string>("");
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
+
+  const validateInput = (name: string, value: string) => {
+    try {
+      let parsedValue: any = value.trim(); // Trim any surrounding whitespace
+      const schemaType =
+        MenuItemSchema.shape[name as keyof typeof MenuItemSchema.shape];
+
+      if (schemaType instanceof z.ZodNumber) {
+        if (parsedValue === "") {
+          throw new Error("This field is required.");
+        }
+
+        if (isNaN(Number(parsedValue))) {
+          throw new Error(`Expected a number, but received '${value}'`);
+        }
+        parsedValue = Number(parsedValue);
+      }
+      schemaType.parse(parsedValue);
+
+      // Clear any previous validation errors
+      setValidationErrors((prev) => ({ ...prev, [name]: "" }));
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errMessage = error.errors?.[0]?.message || "Invalid input";
+        setValidationErrors((prev) => ({ ...prev, [name]: errMessage }));
+      } else {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
+        setValidationErrors((prev) => ({ ...prev, [name]: errorMessage }));
+      }
+    }
+  };
 
   const fetchMenu = useCallback(async () => {
     if (!session) return;
@@ -35,7 +67,11 @@ export const useMenuManagement = () => {
       const data = await response.json();
       setMenu(data);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An unknown error occurred');
+      toast({
+        title: "Error",
+        description: "Failed to fetch Menu Items",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -43,7 +79,7 @@ export const useMenuManagement = () => {
 
   const handleValidationErrors = (zodError: z.ZodError) => {
     const errors: { [key: string]: string } = {};
-    zodError.errors.forEach(err => {
+    zodError.errors.forEach((err) => {
       if (err.path.length > 0) {
         errors[err.path[0]] = err.message;
       }
@@ -54,29 +90,34 @@ export const useMenuManagement = () => {
   const addMenuItem = async (item: Omit<MenuItem, "id">) => {
     try {
       setValidationErrors({}); // Clear previous errors
-      let imageUploadResult = '';
+      let imageUploadResult = "";
       if (imageFile) {
         const formData = new FormData();
-        formData.append('image', imageFile);
+        formData.append("image", imageFile);
         try {
-          const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/image/upload`, {
-            method: 'POST',
-            body: formData
-          });
+          const uploadResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/image/upload`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
           if (!uploadResponse.ok) {
-            throw new Error('Image upload failed');
+            throw new Error("Image upload failed");
           }
 
           const result = await uploadResponse.json();
           imageUploadResult = result.file?.filename;
         } catch (uploadError) {
-          console.error('Image Upload Error:', uploadError);
+          console.error("Image Upload Error:", uploadError);
         }
       }
 
       const itemData = {
         ...item,
-        ...(imageUploadResult && { imageLink: "https://image.navya.so/" + imageUploadResult })
+        ...(imageUploadResult && {
+          imageLink: "https://image.navya.so/" + imageUploadResult,
+        }),
       };
 
       const validatedItem = MenuItemSchema.parse(itemData); // Validate using Zod
@@ -101,7 +142,7 @@ export const useMenuManagement = () => {
       });
 
       const addedItem = await response.json();
-      setMenu(prevMenu => [...prevMenu, addedItem]);
+      setMenu((prevMenu) => [...prevMenu, addedItem]);
       setImageFile("");
       return addedItem;
     } catch (error) {
@@ -122,29 +163,34 @@ export const useMenuManagement = () => {
   const updateMenuItem = async (item: MenuItem) => {
     try {
       setValidationErrors({}); // Clear previous errors
-      let imageUploadResult = '';
+      let imageUploadResult = "";
       if (imageFile) {
         const formData = new FormData();
-        formData.append('image', imageFile);
+        formData.append("image", imageFile);
         try {
-          const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/image/upload`, {
-            method: 'POST',
-            body: formData
-          });
+          const uploadResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/image/upload`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
           if (!uploadResponse.ok) {
-            throw new Error('Image upload failed');
+            throw new Error("Image upload failed");
           }
 
           const result = await uploadResponse.json();
           imageUploadResult = result.file?.filename;
         } catch (uploadError) {
-          console.error('Image Upload Error:', uploadError);
+          console.error("Image Upload Error:", uploadError);
         }
       }
 
       const itemData = {
         ...item,
-        ...(imageUploadResult && { imageLink: "https://image.navya.so/" + imageUploadResult })
+        imageLink: imageUploadResult
+          ? `https://image.navya.so/${imageUploadResult}`
+          : item.imageLink || "",
       };
 
       const validatedItem = MenuItemSchema.parse(itemData); // Validate using Zod
@@ -169,8 +215,8 @@ export const useMenuManagement = () => {
       });
 
       const updatedItem = await response.json();
-      setMenu(prevMenu =>
-        prevMenu.map(menuItem =>
+      setMenu((prevMenu) =>
+        prevMenu.map((menuItem) =>
           menuItem.id === item.id ? updatedItem : menuItem
         )
       );
@@ -191,7 +237,6 @@ export const useMenuManagement = () => {
     }
   };
 
-
   const deleteMenuItem = async (itemId: string) => {
     try {
       const response = await fetch(
@@ -210,7 +255,7 @@ export const useMenuManagement = () => {
         description: "Item deleted successfully",
       });
 
-      setMenu(prevMenu => prevMenu.filter(item => item.id !== itemId));
+      setMenu((prevMenu) => prevMenu.filter((item) => item.id !== itemId));
     } catch (error) {
       toast({
         title: "Error",
@@ -223,9 +268,10 @@ export const useMenuManagement = () => {
   };
 
   const filteredMenu = useCallback(() => {
-    return menu.filter(item => 
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase())
+    return menu.filter(
+      (item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [menu, searchTerm]);
 
@@ -247,5 +293,6 @@ export const useMenuManagement = () => {
     deleteMenuItem,
     imageFile,
     setImageFile,
+    validateInput,
   };
 };

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Restaurant } from "@/components/types";
 import { useSession } from "next-auth/react";
+import { toast } from "@/hooks/use-toast";
 
 interface UseRestaurantReturn {
   restaurant: Restaurant | null;
@@ -35,7 +36,11 @@ const useRestaurant = (): UseRestaurantReturn => {
       setRestaurant(data);
     } catch (err) {
       console.error("Error fetching restaurant details:", err);
-      setError("Failed to load restaurant details. Please try again later.");
+      toast({
+        title: "Error",
+        description: "Failed to fetch restaurant details",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -57,12 +62,21 @@ const useRestaurant = (): UseRestaurantReturn => {
       });
 
       if (!response.ok) throw new Error("Failed to update restaurant");
+      
+      toast({
+        title: "Success",
+        description: "Restaurant updated successfully",
+      });
 
       const updatedData = await response.json();
       setRestaurant(updatedData); // Update restaurant state
     } catch (err) {
       console.error("Error updating restaurant:", err);
-      setError("Failed to update restaurant. Please try again later.");
+      toast({
+        title: "Error",
+        description: "Failed to update restaurant",
+        variant: "destructive",
+      });
     }
   };
 

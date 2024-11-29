@@ -3,8 +3,8 @@ import { isBefore} from 'date-fns';
 
 // Coupon Schema Validation
 export const CouponSchema = z.object({
-    title: z.string().min(1, "Title is required").max(60, "Title is too long"),
-    description: z.string().max(200, "Description is too long").optional(),
+    title: z.string().max(60, "Title is too long"),
+    description: z.string().max(150, "Description is too long").optional(),
     discountType: z.enum(["PERCENTAGE", "FIXED_AMOUNT"]),
     discountValue: z.number()
       .min(0, "Discount value cannot be negative")

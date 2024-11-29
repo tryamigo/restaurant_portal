@@ -25,6 +25,7 @@ const MenuDetails: React.FC = () => {
     deleteMenuItem,
     imageFile,
     setImageFile,
+    validateInput,
   } = useMenuManagement();
 
   const [isAddItemDialogOpen, setIsAddItemDialogOpen] = useState(false);
@@ -204,6 +205,7 @@ const MenuDetails: React.FC = () => {
                 className="px-4 py-2 mx-2 bg-gray-500 rounded hover:dark:bg-gray-700"
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
+                aria-label="Go to previous page"
               >
                 Previous
               </Button>
@@ -216,6 +218,7 @@ const MenuDetails: React.FC = () => {
                   setCurrentPage(Math.min(totalPages, currentPage + 1))
                 }
                 disabled={currentPage === totalPages}
+                 aria-label="Go to next page"
               >
                 Next
               </Button>
@@ -232,6 +235,7 @@ const MenuDetails: React.FC = () => {
           validationErrors={validationErrors}
           handleSubmit={handleSubmitItem}
           setImageFile={setImageFile}
+          validateInput={validateInput}
         />
 
         <DeleteConfirmationDialog

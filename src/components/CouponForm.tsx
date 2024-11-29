@@ -1,10 +1,16 @@
-import React from 'react';
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Coupon } from "@/components/types";
-import { CustomButton } from './CustomButton';
+import { CustomButton } from "./CustomButton";
 
 interface CouponFormProps {
   onSubmit: (e: React.FormEvent) => void;
@@ -12,6 +18,7 @@ interface CouponFormProps {
   setNewCoupon: React.Dispatch<React.SetStateAction<Coupon>>;
   validationErrors: { [key: string]: string };
   onCancel: () => void;
+  validateInput: (name: string, value: string) => void;
 }
 
 // Mapping for custom labels
@@ -26,18 +33,15 @@ const LABEL_MAPPING: { [key: string]: string } = {
   usageLimit: "Usage Limit",
   eligibleOrders: "Eligible Orders",
   startDate: "Start Date",
-  endDate: "End Date"
+  endDate: "End Date",
 };
 
 // Function to format label
 const formatLabel = (key: string): string => {
-  // If there's a custom mapping, use it
   if (LABEL_MAPPING[key]) return LABEL_MAPPING[key];
-
-  // Default formatting
   return key
-    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
-    .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+    .replace(/([A-Z])/g, " $1") // Add space before capital letters
+    .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
     .trim();
 };
 
@@ -46,11 +50,18 @@ export const CouponForm: React.FC<CouponFormProps> = ({
   newCoupon,
   setNewCoupon,
   validationErrors,
-  onCancel
+  onCancel,
+  validateInput,
 }) => {
   // Exclude discountType from automatic rendering
-  const renderFields = Object.entries(newCoupon)
-    .filter(([key]) => key !== 'discountType');
+  const renderFields = Object.entries(newCoupon).filter(
+    ([key]) => key !== "discountType"
+  );
+
+  const handleChange = (name: string, value: string) => {
+    setNewCoupon({ ...newCoupon, [name]: value });
+    validateInput(name, value);
+  };
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -60,11 +71,13 @@ export const CouponForm: React.FC<CouponFormProps> = ({
           <Label htmlFor="discountType">Discount Type</Label>
           <Select
             value={newCoupon.discountType}
-            onValueChange={(value) => setNewCoupon({ 
-              ...newCoupon, 
-              discountType: value as "PERCENTAGE" | "FIXED_AMOUNT" 
-            })}
-            required
+            onValueChange={(value) => {
+              setNewCoupon({
+                ...newCoupon,
+                discountType: value as "PERCENTAGE" | "FIXED_AMOUNT",
+              });
+              validateInput("discountType", value); // Validate the select value
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select discount type" />
@@ -75,19 +88,26 @@ export const CouponForm: React.FC<CouponFormProps> = ({
             </SelectContent>
           </Select>
           {validationErrors.discountType && (
-            <p className="text-red-500 text-sm">{validationErrors.discountType}</p>
+            <p className="text-red-500 text-sm">
+              {validationErrors.discountType}
+            </p>
           )}
         </div>
 
-        {/* Other Fields */}
         {renderFields.map(([key, value]) => {
-          // Determine input type
           const getInputType = () => {
-            if (key.toLowerCase().includes('date')) return 'date';
-            if (key.toLowerCase().includes('limit') || key.toLowerCase().includes('orders')) return 'number';
-            if (key.toLowerCase().includes('value')) return 'number';
-            return 'text';
+            if (key.toLowerCase().includes("date")) return "date";
+            if (
+              key.toLowerCase().includes("limit") ||
+              key.toLowerCase().includes("orders")
+            )
+              return "number";
+            if (key.toLowerCase().includes("value")) return "number";
+            return "text";
           };
+
+          // Check if the current field is "description"
+          const isDescriptionField = key === "description";
 
           return (
             <div key={key} className="space-y-2">
@@ -96,10 +116,11 @@ export const CouponForm: React.FC<CouponFormProps> = ({
                 id={key}
                 type={getInputType()}
                 value={value || ""}
-                onChange={(e) => setNewCoupon({ ...newCoupon, [key]: e.target.value })}
-                required
+                onChange={(e) => handleChange(key, e.target.value)} // Use the handleChange function
                 className="w-full dark:bg-slate-700 dark:text-white"
-                step={getInputType() === 'number' ? '0.01' : undefined}
+                step={getInputType() === "number" ? "0.01" : undefined}
+                // Conditionally remove the required attribute for the description field
+                {...(!isDescriptionField && { required: true })}
               />
               {validationErrors[key] && (
                 <p className="text-red-500 text-sm">{validationErrors[key]}</p>
@@ -108,18 +129,18 @@ export const CouponForm: React.FC<CouponFormProps> = ({
           );
         })}
       </div>
-      
+
       <div className="flex flex-col md:flex-row justify-end space-y-2 md:space-y-0 md:space-x-2">
-        <Button 
-          type="button" 
+        <Button
+          type="button"
           variant="default"
-          onClick={onCancel} 
+          onClick={onCancel}
           className="w-full md:w-auto"
         >
           Cancel
         </Button>
-        <CustomButton 
-          type="submit" 
+        <CustomButton
+          type="submit"
           className="w-full justify-center md:w-auto text"
         >
           Add Coupon
