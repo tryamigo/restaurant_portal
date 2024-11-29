@@ -23,13 +23,6 @@ export const useMenuManagement = () => {
         MenuItemSchema.shape[name as keyof typeof MenuItemSchema.shape];
 
       if (schemaType instanceof z.ZodNumber) {
-        if (parsedValue === "") {
-          throw new Error("This field is required.");
-        }
-
-        if (isNaN(Number(parsedValue))) {
-          throw new Error(`Expected a number, but received '${value}'`);
-        }
         parsedValue = Number(parsedValue);
       }
       schemaType.parse(parsedValue);
