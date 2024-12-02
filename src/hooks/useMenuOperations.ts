@@ -21,19 +21,16 @@ export const useMenuManagement = () => {
       let parsedValue: any = value.trim(); // Trim any surrounding whitespace
       const schemaType =
         MenuItemSchema.shape[name as keyof typeof MenuItemSchema.shape];
-
+  
       if (schemaType instanceof z.ZodNumber) {
-        if (parsedValue === "") {
-          throw new Error("This field is required.");
-        }
-
-        if (isNaN(Number(parsedValue))) {
-          throw new Error(`Expected a number, but received '${value}'`);
+        if (parsedValue === "" || isNaN(Number(parsedValue))) {
+          throw new Error("Input must be a valid number");
         }
         parsedValue = Number(parsedValue);
       }
+  
       schemaType.parse(parsedValue);
-
+  
       // Clear any previous validation errors
       setValidationErrors((prev) => ({ ...prev, [name]: "" }));
     } catch (error) {
@@ -47,6 +44,7 @@ export const useMenuManagement = () => {
       }
     }
   };
+  
 
   const fetchMenu = useCallback(async () => {
     if (!session) return;
@@ -259,7 +257,7 @@ export const useMenuManagement = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to delete Item",
+        description: "Item cannot be deleted because it is already in someone else's cart.",
         variant: "destructive",
       });
       console.error("Error deleting menu item:", error);
