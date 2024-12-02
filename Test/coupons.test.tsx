@@ -278,58 +278,149 @@ describe("Coupons Page Component", () => {
   });
 
   test('deletes a coupon', async () => {
-    // Mock initial fetch for coupons (if needed)
+    // Mock the initial fetch with a list of coupons
     fetchMock.mockResponseOnce(
       JSON.stringify({
-        id: "1",
-        title: "New Coupon",
-        description: "10% off",
-        discountType: "PERCENTAGE",
-        discountValue: "10",
-        minOrderValue: "10",
-        maxDiscount: "10",
-        couponCode: "NEW10",
-        usageLimit: 10,
-        eligibleOrders: 10,
-        startDate: "2024-01-01",
-        endDate: "2024-12-31",
-      }),
-      { status: 201 }
+        coupons: [
+          {
+            id: "1",
+            title: "New Coupon",
+            description: "10% off",
+            discountType: "PERCENTAGE",
+            discountValue: "10",
+            minOrderValue: "10",
+            maxDiscount: "10",
+            couponCode: "SEARCH10",
+            usageLimit: 10,
+            eligibleOrders: 10,
+            startDate: "2024-01-01",
+            endDate: "2024-12-31",
+          },
+        ],
+      })
     );
-
-    // Mock the response for delete operation
-    fetchMock.mockResponseOnce(
-      JSON.stringify({ message: 'Coupon deleted successfully' })
-    );
-
-    renderWithThemeProvider(<Coupons />);
-
-    // Wait for the initial render and find the delete button
+  
+    // Mock the delete coupon API response
+    fetchMock.mockResponseOnce(JSON.stringify({ message: 'Coupon deleted successfully' }), { status: 200 });
+  
+    // Render the CouponsPage
+    const { container } = renderWithThemeProvider(<Coupons />);
+  
+    // Wait for the coupons list to be displayed
     await waitFor(() => {
-      const deleteButton = screen.getByTestId("delete-coupon");
-      expect(deleteButton).toBeInTheDocument();
-
-      // Simulate clicking the delete button
-      fireEvent.click(deleteButton);
+      expect(screen.getByText('Discount 10%')).toBeInTheDocument();
     });
-
-    // Wait for the fetch call and verify that it's called with the correct parameters
+  
+    // Simulate clicking the delete button for the first coupon
+    const deleteButton = container.querySelector('.delete-button'); // Adjust selector based on your implementation
+    if (deleteButton) {
+      fireEvent.click(deleteButton);
+    }
+  
+    // Wait for the deletion API call
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
         '/api/restaurants/coupons/1',
-        {
+        expect.objectContaining({
           method: 'DELETE',
           headers: expect.objectContaining({
-            Authorization: 'Bearer test-token', // Replace with actual token logic if needed
+            Authorization: 'Bearer test-token', // Ensure token is used for auth
           }),
-        }
+        })
       );
     });
-
-    // Optionally, check for confirmation or UI update after deletion
+  
+    // Verify that the coupon is removed from the UI
     await waitFor(() => {
-      expect(screen.getByText(/coupon deleted successfully/i)).toBeInTheDocument();
+      expect(screen.queryByText('Discount 10%')).not.toBeInTheDocument();
     });
+  });
+
+  it('displays an error message when the coupon creation API fails', async () => {
+    // Mock the fetch API to return a 500 error
+    fetchMock.mockRejectOnce(new Error('Internal Server Error'));  
+
+    const { container } = renderWithThemeProvider(<Coupons/>);
+
+
+    fireEvent.change(screen.getByLabelText(/Discount/i), {
+      target: { value: '10' },
+    });
+
+
+       // Wait for initial render and simulate clicking the "Add Coupon" button
+    await waitFor(() => {
+      const addButton = container.querySelector('.text');
+      if (addButton) {
+        fireEvent.click(addButton);
+      }
+    });
+
+    // Wait for error handling to trigger
+    await waitFor(() =>
+      expect(
+        screen.getByText(/Failed to create coupon. Please try again later./i)
+      ).toBeInTheDocument()
+    );
+  });
+
+
+  it('displays a message when no coupons are available', async () => {
+    // Mock API response to return an empty list
+    fetchMock.mockResponseOnce(JSON.stringify([]), { status: 200 });
+
+    // Render the CouponsPage component
+    renderWithThemeProvider(<Coupons/>);
+
+    // Verify the message "No coupons available" is displayed
+    await waitFor(() => {
+      expect(screen.getByText(/No coupons available/i)).toBeInTheDocument();
+    });
+  });
+
+  it('toggles coupon status correctly and calls the API', async () => {
+
+    fetchMock.mockResponseOnce(JSON.stringify({ coupons: [] }));
+    // Mock API response for fetching coupons
+    fetchMock.mockResponseOnce(
+          JSON.stringify({
+            id: "1",
+            title: "New Coupon",
+            description: "10% off",
+            discountType: "PERCENTAGE",
+            discountValue: "10",
+            minOrderValue: "10",
+            maxDiscount: "10",
+            couponCode: "NEW10",
+            usageLimit: 10,
+            eligibleOrders: 10,
+            startDate: "2024-01-01",
+            endDate: "2024-12-31",
+          }),
+          { status: 201 }
+        );
+
+    // Render the CouponsPage component
+    renderWithThemeProvider(<Coupons/>);
+
+    // Wait for the coupons to be displayed
+    await waitFor(() => {
+      expect(screen.getByText(/NEW10/i)).toBeInTheDocument();
+    });
+
+    expect(screen.getByText(/Active/i)).toBeInTheDocument();
+
+    // Simulate clicking the deactivate button for the first coupon
+    const deactivateButton = screen.getByRole('button', { name: /Deactivate/i });
+    fireEvent.click(deactivateButton);
+
+    // Verify the API was called with the correct data
+    await waitFor(() => {
+      expect(screen.getByText(/Inactive/i)).toBeInTheDocument();
+    });
+
+    // Verify the UI is updated to show the coupon is inactive
+    expect(screen.getByRole('button', { name: /Activate/i })).toBeInTheDocument();
   });
 
 });

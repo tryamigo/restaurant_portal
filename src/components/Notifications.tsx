@@ -167,7 +167,7 @@ export default function Notifications() {
           className="block p-2"
           onClick={() => handleNotificationClick(notification.id)}
         >
-          <div className="flex justify-between items-start dark:bg-gray-900">
+          <div className="flex justify-between items-start">
             <div className="flex-grow">
               <div className="flex justify-between items-center">
                 <span className="font-semibold text-sm">

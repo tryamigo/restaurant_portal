@@ -57,17 +57,24 @@
    - The search input should be present.
    - After entering `SEARCH10`, the corresponding coupon should be displayed.
 
-## 5. **Test for Showing the "Add Coupon" Form**
-   **Description:**  
-   Verify that the "Add Coupon" form is displayed correctly when the user clicks the "Add Coupon" button.
 
-   **Test Steps:**
-   - Render the `CouponsPage` component.
-   - Simulate a click on the "Add Coupon" button.
-   - Verify that the coupon creation form is displayed.
-   
-   **Expected Result:**  
-   - The coupon creation form should be displayed after clicking the button.
+### 5. Test for Deleting a Coupon
+
+**Description:**  
+Ensure that a coupon can be successfully deleted, and the UI updates accordingly.
+
+**Test Steps:**  
+1. Mock the API response with a list of coupons.  
+2. Mock the API delete response with a successful `200` status.  
+3. Render the `CouponsPage` component.  
+4. Simulate clicking the delete button for a coupon.  
+5. Verify that the coupon is removed from the list after the delete operation.  
+
+**Expected Result:**  
+- The coupon should be removed from the UI after deletion.  
+- The delete API should be called with the correct coupon ID.  
+
+---
 
 ## 6. **Test for Coupon Creation Error Handling**
    **Description:**  
@@ -82,32 +89,8 @@
    **Expected Result:**  
    - The error handling should be triggered (e.g., a toast notification or an error message).
 
-## 7. **Test for Rendering Coupons with Correct Data**
-   **Description:**  
-   Ensure that the coupons are displayed with correct data, such as coupon title, code, description, and active status.
-   
-   **Test Steps:**
-   - Mock the fetch API response to include multiple coupons with various attributes.
-   - Render the `CouponsPage` component.
-   - Wait for the page to update and check that the correct coupon details (title, code, description, active status) are rendered.
-   
-   **Expected Result:**  
-   - Coupons should display correctly with the expected attributes (e.g., title, code, description).
 
-## 8. **Test for Validating Coupon Form Inputs**
-   **Description:**  
-   Ensure the form fields for creating a coupon are validated before submission.
-
-   **Test Steps:**
-   - Simulate filling out the form with invalid data (e.g., missing required fields).
-   - Attempt to submit the form.
-   - Verify that the form validation is triggered and the form is not submitted.
-   
-   **Expected Result:**  
-   - The form should not be submitted when required fields are missing or incorrect.
-   - Validation messages should appear.
-
-## 9. **Test for Correct Display of Empty Coupons List**
+## 7. **Test for Correct Display of Empty Coupons List**
    **Description:**  
    Ensure that an empty coupons list is handled correctly and an appropriate message is displayed when no coupons are available.
    
@@ -119,15 +102,19 @@
    **Expected Result:**  
    - A message indicating no coupons are available should be displayed when the list is empty.
 
-## 10. **Test for Mocking EventSource for SSE (Server-Sent Events)**
-   **Description:**  
-   Ensure that the `EventSource` is mocked correctly for testing purposes, simulating real-time updates.
-   
-   **Test Steps:**
-   - Mock the `EventSource` constructor and set the appropriate state (`OPEN`, `CLOSED`).
-   - Render the `CouponsPage` component.
-   - Verify that the `EventSource` constructor is called correctly and that event listeners are added.
-   
-   **Expected Result:**  
-   - The `EventSource` constructor should be mocked, and event listeners should be added for real-time coupon updates.
 
+### 8. Test for Activating or Deactivating a Coupon
+
+**Description:**  
+Ensure that the activate/deactivate functionality for coupons works correctly.
+
+**Test Steps:**  
+1. Mock the API response with a list of coupons, including both active and inactive coupons.  
+2. Mock the API response for updating the coupon status with a successful `200` status.  
+3. Render the `CouponsPage` component.  
+4. Simulate clicking the "Activate" or "Deactivate" button for a coupon.  
+5. Verify that the coupon status is updated in the UI after the operation.  
+
+**Expected Result:**  
+- The coupon status (active/inactive) should toggle correctly.  
+- The status update API should be called with the correct coupon ID and status.  

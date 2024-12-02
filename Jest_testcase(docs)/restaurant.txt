@@ -1,0 +1,52 @@
+# RestaurantDetails Component Tests
+
+## Test Cases
+
+### 1. **fetches and displays restaurant details**
+   - **Description**: This test verifies that the restaurant details are fetched from the API and correctly displayed on the page.
+   - **Test Steps**:
+     1. Mock the `fetch` function to return restaurant data (`mockRestaurantData`).
+     2. Render the `RestaurantDetails` component.
+     3. Wait for the data to be fetched and displayed.
+     4. Verify that key restaurant details like name, phone number, opening hours, GSTIN, and FSSAI are present on the screen.
+   - **Expected Outcome**:
+     - The restaurant details should be displayed correctly.
+
+### 2. **displays error message on fetch failure**
+   - **Description**: This test checks if an error message is shown when the API request to fetch restaurant details fails.
+   - **Test Steps**:
+     1. Mock the `fetch` function to return a failed response with a 404 status and an error message.
+     2. Render the `RestaurantDetails` component.
+     3. Wait for the error message to be displayed.
+     4. Verify that the error message is shown on the screen.
+   - **Expected Outcome**:
+     - The error message (`Failed to load restaurant details`) should be displayed.
+
+### 3. **edit button toggles form for editing restaurant details and saves changes**
+   - **Description**: This test checks if clicking the edit button opens the form with pre-filled values, allows editing, and saves the changes successfully.
+   - **Test Steps**:
+     1. Mock the `fetch` function to return restaurant data.
+     2. Render the `RestaurantDetails` component.
+     3. Wait for the restaurant details to load and display on the screen.
+     4. Click the "Edit Restaurant" button to toggle the edit form.
+     5. Verify that the form elements are pre-filled with the existing restaurant data.
+     6. Simulate a change in the restaurant name.
+     7. Click the "Save Changes" button to save the new name.
+     8. Verify that the updated name is displayed after saving.
+   - **Expected Outcome**:
+     - The restaurant name should be updated and displayed after saving the changes.
+
+### 4. **cancel button stops editing and reverts changes**
+   - **Description**: This test verifies that clicking the cancel button reverts any changes made during editing and stops the editing process.
+   - **Test Steps**:
+     1. Mock the `fetch` function to return restaurant data.
+     2. Render the `RestaurantDetails` component.
+     3. Wait for the restaurant details to load and display.
+     4. Click the "Edit" button to open the edit form.
+     5. Modify the restaurant name in the form.
+     6. Click the "Cancel" button to stop the editing process.
+     7. Verify that the restaurant name reverts to the original value.
+   - **Expected Outcome**:
+     - The restaurant name should remain as it was before editing (i.e., no changes should be saved).
+
+---
