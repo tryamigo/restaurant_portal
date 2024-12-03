@@ -146,7 +146,7 @@ const MenuDetails: React.FC = () => {
                 ].map((header) => (
                   <th
                     key={header}
-                    className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     {header}
                   </th>

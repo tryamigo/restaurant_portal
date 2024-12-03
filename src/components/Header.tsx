@@ -105,9 +105,9 @@ function Header({
                 {theme === "light" ? <Moon /> : <Sun />}
               </Button>
               <div className="relative flex-grow dark:bg-gray-700 rounded-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input
-                  placeholder="Search orders"
+                  placeholder="Enter order ID or customer name..."
                   className="pl-10 w-full"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm?.(e.target.value)}
@@ -143,9 +143,9 @@ function Header({
                 {theme === "light" ? <Moon /> : <Sun />}
               </Button>
               <div className="relative flex-grow dark:bg-gray-700 rounded-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input
-                  placeholder="Search menu items"
+                  placeholder="Enter menu item..."
                   className="pl-10 w-full"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm?.(e.target.value)}
@@ -171,9 +171,9 @@ function Header({
                 {theme === "light" ? <Moon /> : <Sun />}
               </Button>
               <div className="relative flex-grow dark:bg-gray-700 rounded-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input
-                  placeholder="Search coupons"
+                  placeholder="Enter coupon code..."
                   className="pl-10 w-full"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm?.(e.target.value)}
@@ -240,15 +240,6 @@ function Header({
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>
-                  <div className="flex flex-col font-semibold">
-                    {session?.user?.name}
-                    <span className="text-xs text-gray-500">
-                      {session?.user?.email}
-                    </span>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => router.push("/restaurants")}
                   className="cursor-pointer hover:dark:bg-gray-800"

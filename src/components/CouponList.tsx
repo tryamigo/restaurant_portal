@@ -17,11 +17,11 @@ interface CouponListProps {
   onStatusUpdate: (id: string, isActive: boolean) => void;
 }
 
-const truncateTextdesc = (text: string, maxLength = 25): string => {
+const truncateTextdesc = (text: string, maxLength = 15): string => {
   return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 };
 
-const truncateTexttitle = (text: string, maxLength = 30): string => {
+const truncateTexttitle = (text: string, maxLength = 15): string => {
   return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 };
 
