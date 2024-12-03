@@ -96,6 +96,7 @@ export const CouponForm: React.FC<CouponFormProps> = ({
 
         {renderFields.map(([key, value]) => {
           const getInputType = () => {
+            if (key === "maxDiscount") return "number";
             if (key.toLowerCase().includes("date")) return "date";
             if (
               key.toLowerCase().includes("limit") ||
