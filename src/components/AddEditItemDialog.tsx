@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -202,7 +202,12 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
           </div>
 
           <div>
-            <Label htmlFor="vegOrNonVeg" className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Veg/Non-Veg</Label>
+            <Label
+              htmlFor="vegOrNonVeg"
+              className="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
+            >
+              Veg/Non-Veg
+            </Label>
             <Select
               value={newItem.vegOrNonVeg}
               onValueChange={(value) => {
@@ -211,7 +216,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
               }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select Veg/Non-Veg"/>
+                <SelectValue placeholder="Select Veg/Non-Veg" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Veg">Vegetarian</SelectItem>
@@ -221,7 +226,12 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
           </div>
 
           <div>
-            <Label htmlFor="cuisine" className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Cuisine</Label>
+            <Label
+              htmlFor="cuisine"
+              className="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
+            >
+              Cuisine
+            </Label>
             <Input
               id="cuisine"
               className="w-full dark:bg-slate-700 dark:text-white"

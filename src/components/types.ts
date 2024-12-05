@@ -1,18 +1,18 @@
 // src/components/admin/types.ts
-export type OrderStatus = 'pending' | 'preparing' | 'on the way' | 'delivered';
-export type MenuItemType = 'Veg' | 'Non-Veg';
-export type CouponStatus = 'active' | 'inactive';
+export type OrderStatus = "pending" | "preparing" | "on the way" | "delivered";
+export type MenuItemType = "Veg" | "Non-Veg";
+export type CouponStatus = "active" | "inactive";
 
 export interface Address {
-id?: string;
-restaurantId?: string;
-streetAddress: string;
-latitude?: string;
-longitude?: string;
-landmark: string;
-city: string;
-state: string;
-pincode: string;
+  id?: string;
+  restaurantId?: string;
+  streetAddress: string;
+  latitude?: string;
+  longitude?: string;
+  landmark: string;
+  city: string;
+  state: string;
+  pincode: string;
 }
 
 export interface orderAddress {
@@ -36,8 +36,8 @@ export interface OrderItem {
   quantity: number;
   price: number;
   ratings: number;
-  description: string; 
-  imageLink: string; 
+  description: string;
+  imageLink: string;
 }
 
 export interface Order {
@@ -81,21 +81,20 @@ export interface MenuItem {
   vegOrNonVeg?: string; // New field
   cuisine?: string; // New field
 }
-export type deliveryStatus = 'available' | 'on delivery' | 'offline';
+export type deliveryStatus = "available" | "on delivery" | "offline";
 
 export interface DeliveryAgent {
   id: string;
   name: string;
-  status:deliveryStatus
+  status: deliveryStatus;
   completedDeliveries: number;
   phoneNumber: string;
   email: string;
   joinDate: Date;
   rating: number;
   licenseNumber?: string;
-  aadharNumber?: string; 
-  address:Address
-
+  aadharNumber?: string;
+  address: Address;
 }
 
 export interface User {
@@ -107,15 +106,14 @@ export interface Coupon {
   id: string;
   title: string;
   description: string;
-  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discountType: "PERCENTAGE" | "FIXED_AMOUNT";
   discountValue: string;
   minOrderValue?: string;
   maxDiscount?: string;
   couponCode: string;
   usageLimit?: number;
-  eligibleOrders?:number,
+  eligibleOrders?: number;
   startDate: string;
   endDate: string;
   isActive: boolean;
 }
-

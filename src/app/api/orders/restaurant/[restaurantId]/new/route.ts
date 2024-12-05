@@ -1,4 +1,3 @@
-// app/api/orders/restaurant/[restaurantId]/new/route.ts
 import { handleRequest } from "@/components/helper";
 import { NextRequest, NextResponse } from "next/server";
 

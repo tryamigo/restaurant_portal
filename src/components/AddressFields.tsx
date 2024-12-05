@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Address } from './types';
+import { Address } from "./types";
 import { AddressSchema } from "@/schema/RestaurantSchema"; // Zod schema
 
 interface AddressFieldsProps {
@@ -16,77 +16,62 @@ export const AddressFields: React.FC<AddressFieldsProps> = ({
   address,
   onChange,
   isEditing = false,
-  className = ''
+  className = "",
 }) => {
   const addressFields = [
-    { key: 'streetAddress', label: 'Street Address' },
-    { key: 'landmark', label: 'Landmark' },
-    { key: 'city', label: 'City' },
-    { key: 'state', label: 'State' },
-    { key: 'pincode', label: 'Pincode' },
+    { key: "streetAddress", label: "Street Address" },
+    { key: "landmark", label: "Landmark" },
+    { key: "city", label: "City" },
+    { key: "state", label: "State" },
+    { key: "pincode", label: "Pincode" },
   ];
-  
+
   const [validationErrors, setValidationErrors] = useState<any>({});
 
-  // Validation function using Zod
+  // Validate address using Zod schema
   const validate = (address: Address) => {
     try {
-      AddressSchema.parse(address); // This will throw an error if invalid
+      AddressSchema.parse(address);
       setValidationErrors({});
     } catch (error: any) {
       const errors: any = {};
-      if (error.errors) {
-        error.errors.forEach((err: any) => {
-          errors[err.path[0]] = err.message;
-        });
-      }
+      error.errors?.forEach((err: any) => {
+        errors[err.path[0]] = err.message;
+      });
       setValidationErrors(errors);
     }
   };
 
-  // Handle changes to the address fields during editing
+  // Handle input change and validation
   const handleInputChange = (key: string, value: string) => {
     const updatedAddress = { ...address, [key]: value };
-    
-    if (onChange) {
-      onChange(updatedAddress);
-    }
+    onChange?.(updatedAddress);  // Trigger onChange callback
 
-    // Trigger validation after every change
-    validate(updatedAddress);
+    validate(updatedAddress); // Trigger validation
   };
 
-  // Render address fields in edit mode
-  if (isEditing) {
-    return (
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${className}`}>
-        {addressFields.map(({ key, label }) => (
-          <div key={key} className="space-y-2">
-            <Label htmlFor={key}>{label}</Label>
+  return (
+    <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${className}`}>
+      {addressFields.map(({ key, label }) => (
+        <div key={key} className="space-y-2">
+          <Label htmlFor={key}>{label}</Label>
+
+          {isEditing ? (
             <Input
               id={key}
-              value={address[key as keyof Address] || ''}
+              value={address[key as keyof Address] || ""}
               onChange={(e) => handleInputChange(key, e.target.value)}
             />
-            {/* Display validation error for the specific field */}
-            {validationErrors[key] && (
-              <p className="text-sm text-red-500">{validationErrors[key]}</p>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  }
+          ) : (
+            <Badge variant="outline">
+              {address[key as keyof Address] || "N/A"}
+            </Badge>
+          )}
 
-  // Render address fields in view mode (non-editable)
-  return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 gap-1 ${className}`}>
-      {address && addressFields.map(({ key, label }) => (
-        <div key={key} className="">
-          <Label className='pr-2 font-bold text-md'>{label}:</Label>
-          <Badge variant="outline">
-            {address[key as keyof Address] || 'N/A'} {/* Display 'N/A' if value is empty */}
-          </Badge>
+          {/* Display validation error for the specific field */}
+          {validationErrors[key] && (
+            <p className="text-sm text-red-500">{validationErrors[key]}</p>
+          )}
         </div>
       ))}
     </div>

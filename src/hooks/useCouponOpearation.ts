@@ -223,27 +223,29 @@ export const useCouponOperations = () => {
     }
   };
 
-  const filterCoupons = useCallback((searchTerm: string) => {
-    const filtered = coupons.filter((item) => {
-      const matchesSearchTerm =
-        item.couponCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.title.toLowerCase().includes(searchTerm.toLowerCase());
-  
-      const matchesStatus =
-        coupuonstatusFilter === "all" ||
-        (coupuonstatusFilter === "active" && item.isActive) ||
-        (coupuonstatusFilter === "inactive" && !item.isActive);
-  
-      return matchesSearchTerm && matchesStatus;
-    });
-  
-    setFilteredCoupons(filtered);
-  }, [searchTerm, coupuonstatusFilter, coupons]);
+  const filterCoupons = useCallback(
+    (searchTerm: string) => {
+      const filtered = coupons.filter((item) => {
+        const matchesSearchTerm =
+          item.couponCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.title.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesStatus =
+          coupuonstatusFilter === "all" ||
+          (coupuonstatusFilter === "active" && item.isActive) ||
+          (coupuonstatusFilter === "inactive" && !item.isActive);
+
+        return matchesSearchTerm && matchesStatus;
+      });
+
+      setFilteredCoupons(filtered);
+    },
+    [searchTerm, coupuonstatusFilter, coupons]
+  );
 
   useEffect(() => {
     filterCoupons(searchTerm);
   }, [filterCoupons]);
-
 
   return {
     coupons,

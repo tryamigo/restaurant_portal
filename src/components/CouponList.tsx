@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
@@ -49,8 +48,24 @@ export const CouponList: React.FC<CouponListProps> = ({
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            <Card className="overflow-hidden dark:bg-gray-900">
-              <CardHeader className="pb-2">
+            <Card className="dark:bg-gray-900 dark:border-gray-200 relative">
+              <CardHeader
+                className={
+                  "pb-2 " +
+                  (!coupon.isActive ? "relative grayscale opacity-40" : "")
+                }
+              >
+                {!coupon.isActive && (
+                  <div className="absolute top-[215px] left-10 inset-0 flex justify-center items-center bg-gray-900/70 backdrop-blur-sm transform rotate-[-45deg]">
+                    <div className="flex flex-col items-center animate-pulse">
+                      <span className="text-6xl font-bold tracking-wider mb-2">
+                        INACTIVE
+                      </span>
+                      <TagIcon className="h-16 w-16 transform rotate-[135deg]" />
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center">
                   <Badge
                     variant={coupon.isActive ? "default" : "secondary"}
@@ -86,18 +101,27 @@ export const CouponList: React.FC<CouponListProps> = ({
                 </div>
                 <CardTitle className="text-lg mt-2">
                   <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <span>{truncateText(coupon.title || "N/A")}</span>
-                      </TooltipTrigger>
-                      <TooltipContent className="border-gray-200" side="left">
-                        <p>{coupon.title || "N/A"}</p>
-                      </TooltipContent>
-                    </Tooltip>
+                    {coupon.title && coupon.title.length > 20 ? (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <span>{truncateText(coupon.title || "N/A")}</span>
+                        </TooltipTrigger>
+                        <TooltipContent className="border-gray-200" side="left">
+                          <p>{coupon.title || "N/A"}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <span>{coupon.title || "N/A"}</span>
+                    )}
                   </TooltipProvider>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pb-2">
+              <CardContent
+                className={
+                  "pb-2 " +
+                  (!coupon.isActive ? "relative grayscale opacity-50" : "")
+                }
+              >
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Code:</span>

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { MenuItemRow } from "@/components/MenuItemRow";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMenuManagement } from "@/hooks/useMenuOperations";
@@ -157,55 +157,57 @@ const MenuDetails: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                Array(5)
-                  .fill(0)
-                  .map((_, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      {Array(6)
-                        .fill(0)
-                        .map((_, colIndex) => (
-                          <td key={colIndex} className="px-6 py-4">
-                            <Skeleton className="h-8 w-full" />
-                          </td>
-                        ))}
-                    </tr>
+              <AnimatePresence>
+                {isLoading ? (
+                  Array(7)
+                    .fill(0)
+                    .map((_, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        {Array(6)
+                          .fill(0)
+                          .map((_, colIndex) => (
+                            <td key={colIndex} className="px-6 py-4">
+                              <Skeleton className="h-8 w-full" />
+                            </td>
+                          ))}
+                      </tr>
+                    ))
+                ) : currentItems.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={9}
+                      className="text-center py-12 text-gray-500 dark:bg-slate-800"
+                    >
+                      <div className="flex flex-col items-center justify-center space-y-4 h-full">
+                        <ListOrdered className="w-16 h-16 text-gray-300" />
+                        <p className="text-xl">
+                          {searchTerm
+                            ? "No menu items found"
+                            : "No menu items available"}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  currentItems.map((item) => (
+                    <MenuItemRow
+                      key={item.id}
+                      item={item}
+                      setSelectedImage={setSelectedImage}
+                      selectedImage={selectedImage}
+                      onEdit={handleEditItem}
+                      onDelete={(id) => {
+                        setMenuItemToDelete(id);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                      onClick={() => {
+                        setCurrentEditItem(item);
+                        setIsDescriptionDialogOpen(true);
+                      }}
+                    />
                   ))
-              ) : currentItems.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={9}
-                    className="text-center py-12 text-gray-500 dark:bg-slate-800"
-                  >
-                    <div className="flex flex-col items-center justify-center space-y-4 h-full">
-                      <ListOrdered className="w-16 h-16 text-gray-300" />
-                      <p className="text-xl">
-                        {searchTerm
-                          ? "No menu items found"
-                          : "No menu items available"}
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                currentItems.map((item) => (
-                  <MenuItemRow
-                    key={item.id}
-                    item={item}
-                    setSelectedImage={setSelectedImage}
-                    selectedImage={selectedImage}
-                    onEdit={handleEditItem}
-                    onDelete={(id) => {
-                      setMenuItemToDelete(id);
-                      setIsDeleteDialogOpen(true);
-                    }}
-                    onClick={() => {
-                      setCurrentEditItem(item);
-                      setIsDescriptionDialogOpen(true);
-                    }}
-                  />
-                ))
-              )}
+                )}
+              </AnimatePresence>
             </tbody>
           </table>
           {/* Pagination Controls */}

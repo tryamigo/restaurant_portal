@@ -5,7 +5,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -36,7 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MenuItemType, OrderStatus,CouponStatus } from "./types";
+import { MenuItemType, OrderStatus, CouponStatus } from "./types";
 import { CustomButton } from "./CustomButton";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -162,7 +161,7 @@ function Header({
               <Select
                 value={categoryFilter}
                 onValueChange={(value: MenuItemType) =>
-                setCategoryFilter?.(value)
+                  setCategoryFilter?.(value)
                 }
               >
                 <SelectTrigger className="w-full md:w-[180px]">
@@ -205,7 +204,7 @@ function Header({
               <Select
                 value={coupuonstatusFilter}
                 onValueChange={(value: CouponStatus) =>
-                setCoupuonstatusFilter?.(value)
+                  setCoupuonstatusFilter?.(value)
                 }
               >
                 <SelectTrigger className="w-full md:w-[180px]">

@@ -62,7 +62,7 @@ const useRestaurant = (): UseRestaurantReturn => {
       });
 
       if (!response.ok) throw new Error("Failed to update restaurant");
-      
+
       toast({
         title: "Success",
         description: "Restaurant updated successfully",

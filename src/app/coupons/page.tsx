@@ -122,6 +122,8 @@ const CouponsPage: React.FC = () => {
             )}
           </CardContent>
 
+          {/* Pagination Controls */}
+
           {filteredCoupons.length > itemsPerPage && (
             <div className="flex justify-center mt-4 mb-3">
               <Button

@@ -1,5 +1,3 @@
-// app/api/restaurants/route.ts
-
 import { handleRequest } from "@/components/helper";
 import { NextRequest, NextResponse } from "next/server";
 

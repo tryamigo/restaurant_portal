@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { MenuItem, MenuItemType} from "@/components/types";
+import { MenuItem, MenuItemType } from "@/components/types";
 import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -12,7 +12,9 @@ export const useMenuManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: session } = useSession();
   const [imageFile, setImageFile] = useState<string>("");
-  const [categoryFilter, setCategoryFilter] = useState<MenuItemType | "all">("all");
+  const [categoryFilter, setCategoryFilter] = useState<MenuItemType | "all">(
+    "all"
+  );
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
@@ -22,16 +24,16 @@ export const useMenuManagement = () => {
       let parsedValue: any = value.trim(); // Trim any surrounding whitespace
       const schemaType =
         MenuItemSchema.shape[name as keyof typeof MenuItemSchema.shape];
-  
+
       if (schemaType instanceof z.ZodNumber) {
         if (parsedValue === "" || isNaN(Number(parsedValue))) {
           throw new Error("Input must be a valid number");
         }
         parsedValue = Number(parsedValue);
       }
-  
+
       schemaType.parse(parsedValue);
-  
+
       // Clear any previous validation errors
       setValidationErrors((prev) => ({ ...prev, [name]: "" }));
     } catch (error) {
@@ -45,7 +47,6 @@ export const useMenuManagement = () => {
       }
     }
   };
-  
 
   const fetchMenu = useCallback(async () => {
     if (!session) return;
@@ -262,7 +263,8 @@ export const useMenuManagement = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Item cannot be deleted because it is already in someone else's cart.",
+        description:
+          "Item cannot be deleted because it is already in someone else's cart.",
         variant: "destructive",
       });
       console.error("Error deleting menu item:", error);
@@ -284,7 +286,6 @@ export const useMenuManagement = () => {
       return matchesSearchTerm && matchesCategory;
     });
   }, [menu, searchTerm, categoryFilter]);
-
 
   return {
     menu,

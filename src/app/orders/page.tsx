@@ -102,10 +102,10 @@ function OrdersPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="container mx-auto px-4 py-12 md:py-12 pt-[11rem]"
+        className="container mx-auto px-4 py-12 md:py-12 pt-[12rem]"
       >
         <div className="bg-white shadow-lg rounded-xl overflow-hidden dark:bg-gray-900 dark:shadow-none">
-          <div className="hidden md:block overflow-x-auto">
+          <div className="hidden md:block overflow-hidden">
             <table className="w-full">
               <thead className="bg-gray-100 border-b">
                 <tr>
@@ -130,7 +130,7 @@ function OrdersPage() {
               <tbody className="divide-y divide-gray-200">
                 <AnimatePresence>
                   {loading ? (
-                    Array(5)
+                    Array(7)
                       .fill(0)
                       .map((_, index) => (
                         <tr key={index} className="hover:bg-gray-50">

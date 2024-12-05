@@ -1,5 +1,6 @@
 // components/OrderRow.tsx
 import React from "react";
+import { motion } from "framer-motion";
 import { Order } from "@/components/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,12 +15,12 @@ import {
   EyeIcon,
   MapPin,
   Star,
-  Search,
   Package,
   Clock,
   TruckIcon,
   CheckCircle,
 } from "lucide-react";
+
 interface OrderRowProps {
   order: Order;
   onView: (id: string) => void;
@@ -51,8 +52,22 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
     }
   };
 
+  // Animation Variants
+  const variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+    exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
+  };
+
   const renderDesktopRow = () => (
-    <tr className="hover:bg-gray-50 hover:dark:bg-gray-800">
+    <motion.tr
+    className="hover:bg-gray-50 hover:dark:bg-gray-800"
+    variants={variants}
+    initial="hidden"
+    animate="visible"
+    exit="exit"
+    transition={{ duration: 0.3 }}
+  >
       <td className="px-6 py-4">
         <div className="font-medium">{order.id.slice(0, 8)}</div>
         <div className="text-xs text-gray-500">
@@ -79,16 +94,13 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
           </TooltipProvider>
         ) : (
           <>
-            <div className="font-medium">
-              {order.userAddress?.name || "N/A"}
-            </div>
+            <div className="font-medium">{order.userAddress?.name || "N/A"}</div>
             <div className="text-xs text-gray-500">
               {order.userAddress?.mobile || "No contact"}
             </div>
           </>
         )}
       </td>
-
       <td className="px-6 py-4">
         <TooltipProvider>
           <Tooltip>
@@ -99,7 +111,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
               <div className="p-2">
                 {order.orderItems.map((item) => (
                   <div key={item.id} className="text-xs">
-                    {item.quantity}x {item.name}
+                    {item.quantity} x {item.name}
                   </div>
                 ))}
               </div>
@@ -120,9 +132,9 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
         <div className="text-sm">
           <div>
             Subtotal: ₹
-            {Number(
-              order.total - order.deliveryCharge + order.discount
-            ).toFixed(2)}
+            {Number(order.total - order.deliveryCharge + order.discount).toFixed(
+              2
+            )}
           </div>
           <div className="text-xs text-gray-500">
             Delivery: ₹{Number(order.deliveryCharge).toFixed(2)}
@@ -159,11 +171,17 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
           View
         </Button>
       </td>
-    </tr>
+    </motion.tr>
   );
 
   const renderMobileRow = () => (
-    <div className="p-4 bg-white border-b hover:bg-gray-50">
+    <motion.div
+      className="p-4 bg-white border-b hover:bg-gray-50"
+      variants={variants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
       <div className="flex justify-between items-center mb-2">
         <div>
           <div className="font-medium">{order.id.slice(0, 8)}</div>
@@ -203,10 +221,12 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 
-  return isMobile ? renderMobileRow() : renderDesktopRow();
+  return (
+      isMobile ? renderMobileRow() : renderDesktopRow()
+  );
 };
 
 export default OrderRow;
