@@ -47,8 +47,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
   return (
     <div className="space-y-4 w-full">
-      <Label className="block text-sm font-medium text-gray-700 dark:text-white">Menu Item Image</Label>
-      <div className="flex flex-col space-y-2">
+      <Label  className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Menu Item Image</Label>
+      <div className="flex flex-col space-y-1">
         <input
           type="file"
           ref={fileInputRef}

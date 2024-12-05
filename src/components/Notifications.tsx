@@ -180,14 +180,14 @@ export default function Notifications() {
                   {notification.order.status}
                 </Badge>
               </div>
-              <div className="text-xs text-muted-foreground mt-1">
+              <div className="text-xs text-muted-foreground mt-1 ">
                 Total: ${notification.order.total.toFixed(2)}
                 <span className="ml-2">
                   {new Date(notification.order.orderTime).toLocaleString()}
                 </span>
               </div>
             </div>
-            <div className="flex items-center ml-2">
+            <div className="flex items-center ml-2 mt-2">
               {!notification.read && (
                 <span className="h-2 w-2 bg-blue-500 rounded-full mr-2" />
               )}

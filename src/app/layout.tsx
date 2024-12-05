@@ -6,7 +6,7 @@ import "./globals.css";
 
 import { SessionProvider, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { Home, ShoppingBag, Tag, Moon, Sun } from "lucide-react";
+import { ListOrdered, ShoppingBag, Tag, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,7 +14,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const navItems = [
   { href: "/orders", label: "Orders", icon: ShoppingBag },
-  { href: "/menu", label: "Menu", icon: Home },
+  { href: "/menu", label: "Menu", icon: ListOrdered },
   { href: "/coupons", label: "Coupons", icon: Tag },
 ];
 
@@ -28,7 +28,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-100 dark:bg-gray-800">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100 dark:bg-gray-800">
       {/* Desktop Sidebar */}
       <motion.div
         initial={{ x: -100, opacity: 0 }}

@@ -36,7 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { OrderStatus } from "./types";
+import { MenuItemType, OrderStatus,CouponStatus } from "./types";
 import { CustomButton } from "./CustomButton";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -52,6 +52,10 @@ interface HeaderProps {
   setSearchTerm?: (term: string) => void;
   statusFilter?: OrderStatus | "all";
   setStatusFilter?: (status: OrderStatus | "all") => void;
+  categoryFilter?: MenuItemType | "all";
+  setCategoryFilter?: (category: MenuItemType | "all") => void;
+  coupuonstatusFilter?: CouponStatus | "all";
+  setCoupuonstatusFilter?: (couponStatus: CouponStatus | "all") => void;
   onAddItem?: () => void;
   restaurantActions?: {
     onEditRestaurant?: () => void;
@@ -63,6 +67,10 @@ function Header({
   setSearchTerm,
   statusFilter,
   setStatusFilter,
+  categoryFilter,
+  setCategoryFilter,
+  coupuonstatusFilter,
+  setCoupuonstatusFilter,
   onAddItem,
   restaurantActions,
 }: HeaderProps) {
@@ -107,7 +115,7 @@ function Header({
               <div className="relative flex-grow dark:bg-gray-700 rounded-md">
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input
-                  placeholder="Enter order ID or customer name..."
+                  placeholder="Enter order ID or customer name"
                   className="pl-10 w-full"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm?.(e.target.value)}
@@ -145,12 +153,27 @@ function Header({
               <div className="relative flex-grow dark:bg-gray-700 rounded-md">
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input
-                  placeholder="Enter menu item..."
+                  placeholder="Enter menu item"
                   className="pl-10 w-full"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm?.(e.target.value)}
                 />
               </div>
+              <Select
+                value={categoryFilter}
+                onValueChange={(value: MenuItemType) =>
+                setCategoryFilter?.(value)
+                }
+              >
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <SelectValue placeholder="Filter Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Category</SelectItem>
+                  <SelectItem value="Veg">Veg</SelectItem>
+                  <SelectItem value="Non-Veg">Non-Veg</SelectItem>
+                </SelectContent>
+              </Select>
               <CustomButton
                 onClick={onAddItem}
                 className="flex items-center justify-center gap-2 w-full md:w-auto"
@@ -173,12 +196,28 @@ function Header({
               <div className="relative flex-grow dark:bg-gray-700 rounded-md">
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input
-                  placeholder="Enter coupon code..."
+                  placeholder="Enter coupon code"
                   className="pl-10 w-full"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm?.(e.target.value)}
                 />
               </div>
+              <Select
+                value={coupuonstatusFilter}
+                onValueChange={(value: CouponStatus) =>
+                setCoupuonstatusFilter?.(value)
+                }
+              >
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <SelectValue placeholder="Filter Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">In Active</SelectItem>
+                </SelectContent>
+              </Select>
+
               <CustomButton
                 onClick={onAddItem}
                 className="flex items-center justify-center gap-2 w-full md:w-auto"

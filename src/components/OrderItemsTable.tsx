@@ -59,8 +59,8 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
                   <Image
                     src={item.imageLink}
                     alt="Image"
-                    width={50}
-                    height={50}
+                    width={48}
+                    height={48}
                     className="rounded-md object-cover"
                   />
                 </td>
@@ -87,8 +87,8 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
                       </div>
                     )}
                   </div>
-
-                  <div>
+                  {/* Description column if you want to comment it out */}
+                  {/* <div>
                     {item?.description?.length > 20 ? (
                       <TooltipProvider>
                         <Tooltip>
@@ -107,7 +107,7 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
                         {item.description}
                       </div>
                     )}
-                  </div>
+                  </div> */}
                 </td>
 
                 {/* Quantity column */}
@@ -171,7 +171,6 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
             )}
             <div>
               <div className="font-medium text-gray-800">{item.name}</div>
-              <div className="text-sm text-gray-500">{item.description}</div>
             </div>
           </div>
           <div className="flex flex-col items-end">

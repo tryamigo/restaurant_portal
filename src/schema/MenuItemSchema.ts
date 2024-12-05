@@ -7,7 +7,7 @@ export const MenuItemSchema = z.object({
   ratings: z.number().min(0, { message: "Ratings must be between 0 and 5" }).max(5, { message: "Ratings must be between 0 and 5" }),
   discounts: z.number().min(0, { message: "Discount must be between 0 and 100" }).max(100, { message: "Discount must be between 0 and 100" }),
   vegOrNonVeg: z.string().optional(),
-  cuisine: z.string().optional(),
+  cuisine: z.string().min(0, "Cuisine is too long").max(15, "Cuisine is too long").optional(),
   imageLink: z.string().optional()
 });
 

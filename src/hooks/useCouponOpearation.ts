@@ -1,28 +1,39 @@
-import { useState} from 'react';
+import { useCallback, useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
-import { Coupon } from "@/components/types";
+import { Coupon, CouponStatus } from "@/components/types";
 import { CouponSchema, initialObject } from "@/schema/CouponSchema";
-import { z } from 'zod';
-import { parse, isValid } from 'date-fns';
-import { useSession } from 'next-auth/react';
-
+import { z } from "zod";
+import { parse, isValid } from "date-fns";
+import { useSession } from "next-auth/react";
 
 export const useCouponOperations = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [coupuonstatusFilter, setCoupuonstatusFilter] = useState<
+    CouponStatus | "all"
+  >("all");
   const [filteredCoupons, setFilteredCoupons] = useState<Coupon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [newCoupon, setNewCoupon] = useState(initialObject);
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
-  const {data:session}=useSession()
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const { data: session } = useSession();
 
   const validateInput = (name: string, value: string) => {
     try {
       // Parse value based on field type
       let parsedValue: any = value;
-      if (["discountValue", "minOrderValue", "maxDiscount", "usageLimit", "eligibleOrders"].includes(name)) {
+
+      if (
+        [
+          "discountValue",
+          "minOrderValue",
+          "maxDiscount",
+          "usageLimit",
+          "eligibleOrders",
+        ].includes(name)
+      ) {
         parsedValue = parseFloat(value);
         if (isNaN(parsedValue)) {
           throw new Error(`Invalid number for ${name}: ${value}`);
@@ -33,35 +44,37 @@ export const useCouponOperations = () => {
           throw new Error(`Invalid date for ${name}: ${value}`);
         }
       }
-  
+
       // Pick specific field for validation
-      const fieldSchema = z.object({ [name]: (CouponSchema._def.schema as z.ZodObject<any>).shape[name] });
+      const fieldSchema = z.object({
+        [name]: (CouponSchema._def.schema as z.ZodObject<any>).shape[name],
+      });
       fieldSchema.parse({ [name]: parsedValue });
-  
-      // If validation passes, update the errors
-      setValidationErrors((prev: any) => {
-        const updated = { ...prev, [name]: "" };
-        return updated;
+
+      // If validation passes, clear the error for the field
+      setValidationErrors((prevErrors: Record<string, string>) => {
+        const updatedErrors = { ...prevErrors, [name]: "" };
+        return updatedErrors;
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
         // Handle validation errors
         const errMessages = error.errors.map((err) => err.message).join(", ");
         console.error(`Validation error for ${name}: ${errMessages}`);
-        setValidationErrors((prev: any) => {
-          const updated = { ...prev, [name]: errMessages };
-          console.log("Validation failed. Updated errors:", updated);
-          return updated;
+
+        // Update state with the error messages
+        setValidationErrors((prevErrors: Record<string, string>) => {
+          const updatedErrors = { ...prevErrors, [name]: errMessages };
+          console.log("Validation failed. Updated errors:", updatedErrors);
+          return updatedErrors;
         });
       } else {
-        // Catch any other unexpected errors
+        // Handle other unexpected errors
         console.error("Unexpected validation error:", error);
       }
     }
   };
-  
-  
-  
+
   const fetchCoupons = async () => {
     try {
       const response = await fetch("/api/restaurants/coupons", {
@@ -87,24 +100,24 @@ export const useCouponOperations = () => {
   const validateCoupon = async () => {
     try {
       const parseDate = (dateString: string) => {
-        const parsedDate = parse(dateString, 'yyyy-MM-dd', new Date());
+        const parsedDate = parse(dateString, "yyyy-MM-dd", new Date());
         if (!isValid(parsedDate)) {
-          throw new Error('Invalid date format. Use YYYY-MM-DD');
+          throw new Error("Invalid date format. Use YYYY-MM-DD");
         }
         return parsedDate;
       };
-  
+
       const couponData = {
         ...newCoupon,
         discountValue: parseFloat(newCoupon.discountValue),
-        minOrderValue: parseFloat(newCoupon.minOrderValue || '0'),
-        maxDiscount: parseFloat(newCoupon.maxDiscount || '0'),
+        minOrderValue: parseFloat(newCoupon.minOrderValue || "0"),
+        maxDiscount: parseFloat(newCoupon.maxDiscount || "0"),
         usageLimit: Number(newCoupon.usageLimit),
         eligibleOrders: Number(newCoupon.eligibleOrders),
         startDate: parseDate(newCoupon.startDate),
         endDate: parseDate(newCoupon.endDate),
       };
-  
+
       await CouponSchema.parseAsync(couponData);
       setValidationErrors({}); // Clear validation errors if valid
       return true;
@@ -121,7 +134,6 @@ export const useCouponOperations = () => {
       return false;
     }
   };
-  
 
   const handleAddCoupon = async (restaurantId?: string) => {
     try {
@@ -196,7 +208,9 @@ export const useCouponOperations = () => {
 
       toast({
         title: "Success",
-        description: `Coupon ${isActive ? "activated" : "deactivated"} successfully`,
+        description: `Coupon ${
+          isActive ? "activated" : "deactivated"
+        } successfully`,
       });
 
       fetchCoupons();
@@ -209,27 +223,44 @@ export const useCouponOperations = () => {
     }
   };
 
-  const filterCoupons = (searchTerm: string) => {
-    const filtered = coupons.filter(item =>
-      item.couponCode.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const filterCoupons = useCallback((searchTerm: string) => {
+    const filtered = coupons.filter((item) => {
+      const matchesSearchTerm =
+        item.couponCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.title.toLowerCase().includes(searchTerm.toLowerCase());
+  
+      const matchesStatus =
+        coupuonstatusFilter === "all" ||
+        (coupuonstatusFilter === "active" && item.isActive) ||
+        (coupuonstatusFilter === "inactive" && !item.isActive);
+  
+      return matchesSearchTerm && matchesStatus;
+    });
+  
     setFilteredCoupons(filtered);
-  };
+  }, [searchTerm, coupuonstatusFilter, coupons]);
+
+  useEffect(() => {
+    filterCoupons(searchTerm);
+  }, [filterCoupons]);
+
 
   return {
     coupons,
-    filteredCoupons,
+    filterCoupons,
     isLoading,
     newCoupon,
     validationErrors,
     setNewCoupon,
     setValidationErrors,
+    coupuonstatusFilter,
+    setCoupuonstatusFilter,
     fetchCoupons,
     validateCoupon,
     handleAddCoupon,
     handleDeleteCoupon,
+    filteredCoupons,
     handleUpdateCouponStatus,
-    filterCoupons,
-    validateInput
+    validateInput,
   };
 };

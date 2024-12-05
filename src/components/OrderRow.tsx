@@ -143,7 +143,6 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
               <Badge variant="secondary">
                 Delivery <MapPin className="h-4 w-4 ml-2" />
               </Badge>
-              {/* <span className="text-xs">DELIVERY</span> */}
             </div>
           )}
           {order.rating && (
@@ -194,7 +193,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
       </div>
       <div className="flex justify-between items-center">
         <Button variant="ghost" size="sm" onClick={() => onView(order.id)}>
-          <EyeIcon className="mr-2 h-4 w-4" />
+          <EyeIcon className="h-4 w-4" />
           View
         </Button>
         {order.rating && (

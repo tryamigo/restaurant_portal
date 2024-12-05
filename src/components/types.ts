@@ -1,5 +1,7 @@
 // src/components/admin/types.ts
 export type OrderStatus = 'pending' | 'preparing' | 'on the way' | 'delivered';
+export type MenuItemType = 'Veg' | 'Non-Veg';
+export type CouponStatus = 'active' | 'inactive';
 
 export interface Address {
 id?: string;

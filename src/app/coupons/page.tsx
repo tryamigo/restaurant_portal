@@ -29,7 +29,7 @@ const CouponsPage: React.FC = () => {
   // Custom Hook for Coupon Operations
   const {
     coupons,
-    filteredCoupons,
+    filterCoupons,
     isLoading,
     newCoupon,
     validationErrors,
@@ -40,7 +40,9 @@ const CouponsPage: React.FC = () => {
     handleUpdateCouponStatus,
     setNewCoupon,
     setValidationErrors,
-    filterCoupons,
+    coupuonstatusFilter,
+    setCoupuonstatusFilter,
+    filteredCoupons,
     validateInput,
   } = useCouponOperations();
 
@@ -96,6 +98,8 @@ const CouponsPage: React.FC = () => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         onAddItem={() => setIsAddingCoupon(true)}
+        coupuonstatusFilter={coupuonstatusFilter}
+        setCoupuonstatusFilter={setCoupuonstatusFilter}
       />
 
       {/* Main Content Container */}
@@ -105,8 +109,8 @@ const CouponsPage: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4 py-6 md:py-12 pt-[12rem]"
       >
-        <div className="bg-white shadow-lg rounded-xl overflow-hidden dark:bg-gray-900 dark:shadow-none">
-          <CardContent className="mt-4">
+        <div className="bg-white shadow-lg rounded-xl overflow-hidden dark:bg-gray-800 dark:shadow-none">
+          <CardContent className="mt-6">
             {currentCoupons.length > 0 ? (
               <CouponList
                 coupons={currentCoupons}
@@ -117,8 +121,6 @@ const CouponsPage: React.FC = () => {
               <EmptyCouponState onAddCoupon={() => setIsAddingCoupon(true)} />
             )}
           </CardContent>
-
-          {/* Pagination Controls */}
 
           {filteredCoupons.length > itemsPerPage && (
             <div className="flex justify-center mt-4 mb-3">

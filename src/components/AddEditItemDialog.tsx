@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ImageUpload";
 import { MenuItem } from "@/components/types";
 import { initialObject } from "@/schema/MenuItemSchema";
+import { Textarea } from "@/components/ui/textarea";
 
 interface AddEditItemDialogProps {
   isOpen: boolean;
@@ -71,7 +72,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                 setNewItem({ ...newItem, name: value });
                 validateInput("name", value);
               }}
-              className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-slate-700"
+              className="w-full dark:bg-slate-700 dark:text-white"
             />
             {validationErrors.name && (
               <p className="text-red-500 text-sm mt-1">
@@ -87,7 +88,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
             >
               Description
             </Label>
-            <Input
+            <Textarea
               id="description"
               required
               placeholder="Item description"
@@ -97,7 +98,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                 setNewItem({ ...newItem, description: value });
                 validateInput("description", value);
               }}
-              className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-slate-700"
+              className="w-full dark:bg-slate-700 dark:text-white"
             />
             {validationErrors.description && (
               <p className="text-red-500 text-sm mt-1">
@@ -105,7 +106,6 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
               </p>
             )}
           </div>
-
           <div>
             <Label
               htmlFor="price"
@@ -127,7 +127,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                 });
                 validateInput("price", value);
               }}
-              className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-slate-700"
+              className="w-full dark:bg-slate-700 dark:text-white"
             />
             {validationErrors.price && (
               <p className="text-red-500 text-sm mt-1">
@@ -155,12 +155,13 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                 const value = e.target.value;
                 setNewItem({
                   ...newItem,
-                  ratings: Number(parseFloat(value).toFixed(2)),
+                  ratings: Math.round(Number(value)), // Use Math.round to store the rating as an integer
                 });
                 validateInput("ratings", value);
               }}
-              className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-slate-700"
+              className="w-full dark:bg-slate-700 dark:text-white"
             />
+
             {validationErrors.ratings && (
               <p className="text-red-500 text-sm mt-1">
                 {validationErrors.ratings}
@@ -191,7 +192,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                 });
                 validateInput("discounts", value);
               }}
-              className="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-slate-700"
+              className="w-full dark:bg-slate-700 dark:text-white"
             />
             {validationErrors.discounts && (
               <p className="text-red-500 text-sm mt-1">
@@ -200,8 +201,8 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="vegOrNonVeg">Veg/Non-Veg</Label>
+          <div>
+            <Label htmlFor="vegOrNonVeg" className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Veg/Non-Veg</Label>
             <Select
               value={newItem.vegOrNonVeg}
               onValueChange={(value) => {
@@ -210,7 +211,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
               }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select Veg/Non-Veg" />
+                <SelectValue placeholder="Select Veg/Non-Veg"/>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Veg">Vegetarian</SelectItem>
@@ -219,11 +220,11 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="cuisine">Cuisine</Label>
+          <div>
+            <Label htmlFor="cuisine" className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Cuisine</Label>
             <Input
               id="cuisine"
-              className="dark:bg-slate-700"
+              className="w-full dark:bg-slate-700 dark:text-white"
               placeholder="Enter cuisine type"
               value={newItem.cuisine || ""}
               onChange={(e) => {

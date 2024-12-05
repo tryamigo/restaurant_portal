@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { MenuItem } from "@/components/types";
+import { MenuItem, MenuItemType} from "@/components/types";
 import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -12,6 +12,7 @@ export const useMenuManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: session } = useSession();
   const [imageFile, setImageFile] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<MenuItemType | "all">("all");
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
@@ -74,6 +75,10 @@ export const useMenuManagement = () => {
       setIsLoading(false);
     }
   }, [session]);
+
+  useEffect(() => {
+    fetchMenu();
+  }, [fetchMenu]);
 
   const handleValidationErrors = (zodError: z.ZodError) => {
     const errors: { [key: string]: string } = {};
@@ -266,16 +271,20 @@ export const useMenuManagement = () => {
   };
 
   const filteredMenu = useCallback(() => {
-    return menu.filter(
-      (item) =>
+    return menu.filter((item) => {
+      // Check if the search term matches either the name or description
+      const matchesSearchTerm =
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [menu, searchTerm]);
+        item.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-  useEffect(() => {
-    fetchMenu();
-  }, [fetchMenu]);
+      // Check if the category matches the categoryFilter (or if "all" is selected)
+      const matchesCategory =
+        categoryFilter === "all" || item.vegOrNonVeg === categoryFilter;
+
+      return matchesSearchTerm && matchesCategory;
+    });
+  }, [menu, searchTerm, categoryFilter]);
+
 
   return {
     menu,
@@ -286,6 +295,8 @@ export const useMenuManagement = () => {
     searchTerm,
     setSearchTerm,
     fetchMenu,
+    categoryFilter,
+    setCategoryFilter,
     addMenuItem,
     updateMenuItem,
     deleteMenuItem,

@@ -9,7 +9,8 @@ import { initialObject } from "@/schema/MenuItemSchema";
 import Header from "@/components/Header";
 import AddEditItemDialog from "@/components/AddEditItemDialog";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
-import { Search } from "lucide-react";
+import DescriptionDialog from "@/components/DescriptionDialog";
+import { ListOrdered } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const MenuDetails: React.FC = () => {
@@ -23,6 +24,8 @@ const MenuDetails: React.FC = () => {
     addMenuItem,
     updateMenuItem,
     deleteMenuItem,
+    categoryFilter,
+    setCategoryFilter,
     imageFile,
     setImageFile,
     validateInput,
@@ -35,10 +38,11 @@ const MenuDetails: React.FC = () => {
   const [menuItemToDelete, setMenuItemToDelete] = useState<string | null>(null);
   const [newItem, setNewItem] = useState<Omit<MenuItem, "id">>(initialObject);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isDescriptionDialogOpen, setIsDescriptionDialogOpen] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 15; // You can adjust the number of items per page
+  const itemsPerPage = 15; // Adjust the number of items per page
 
   const totalPages = Math.ceil(filteredMenu.length / itemsPerPage);
 
@@ -61,8 +65,8 @@ const MenuDetails: React.FC = () => {
       vegOrNonVeg: item.vegOrNonVeg,
       cuisine: item.cuisine,
     });
-    setFormMode("edit"); // Switch to edit mode
-    setIsAddItemDialogOpen(true); // Open the dialog
+    setFormMode("edit");
+    setIsAddItemDialogOpen(true);
   };
 
   const handleDeleteItem = async () => {
@@ -107,7 +111,7 @@ const MenuDetails: React.FC = () => {
 
   const handleSearchChange = (term: string) => {
     setSearchTerm(term);
-    setCurrentPage(1); // Reset to first page when search term changes
+    setCurrentPage(1);
   };
 
   return (
@@ -121,6 +125,8 @@ const MenuDetails: React.FC = () => {
         }}
         searchTerm={searchTerm}
         setSearchTerm={handleSearchChange}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
       />
 
       <motion.div
@@ -136,17 +142,14 @@ const MenuDetails: React.FC = () => {
                 {[
                   "Image",
                   "Item",
-                  "Description",
                   "Price",
-                  "Ratings",
-                  "Discounts",
                   "Cuisines",
                   "Category",
                   "Actions",
                 ].map((header) => (
                   <th
                     key={header}
-                    className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     {header}
                   </th>
@@ -159,7 +162,7 @@ const MenuDetails: React.FC = () => {
                   .fill(0)
                   .map((_, index) => (
                     <tr key={index} className="hover:bg-gray-50">
-                      {Array(9)
+                      {Array(6)
                         .fill(0)
                         .map((_, colIndex) => (
                           <td key={colIndex} className="px-6 py-4">
@@ -170,9 +173,12 @@ const MenuDetails: React.FC = () => {
                   ))
               ) : currentItems.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-12 text-gray-500 dark:bg-slate-800">
+                  <td
+                    colSpan={9}
+                    className="text-center py-12 text-gray-500 dark:bg-slate-800"
+                  >
                     <div className="flex flex-col items-center justify-center space-y-4 h-full">
-                      <Search className="w-16 h-16 text-gray-300" />
+                      <ListOrdered className="w-16 h-16 text-gray-300" />
                       <p className="text-xl">
                         {searchTerm
                           ? "No menu items found"
@@ -192,6 +198,10 @@ const MenuDetails: React.FC = () => {
                     onDelete={(id) => {
                       setMenuItemToDelete(id);
                       setIsDeleteDialogOpen(true);
+                    }}
+                    onClick={() => {
+                      setCurrentEditItem(item);
+                      setIsDescriptionDialogOpen(true);
                     }}
                   />
                 ))
@@ -218,7 +228,7 @@ const MenuDetails: React.FC = () => {
                   setCurrentPage(Math.min(totalPages, currentPage + 1))
                 }
                 disabled={currentPage === totalPages}
-                 aria-label="Go to next page"
+                aria-label="Go to next page"
               >
                 Next
               </Button>
@@ -243,6 +253,14 @@ const MenuDetails: React.FC = () => {
           onClose={() => setIsDeleteDialogOpen(false)}
           onConfirmDelete={handleDeleteItem}
         />
+
+        {currentEditItem && (
+          <DescriptionDialog
+            isOpen={isDescriptionDialogOpen}
+            onClose={() => setIsDescriptionDialogOpen(false)} // Close dialog on button click
+            item={currentEditItem}
+          />
+        )}
       </motion.div>
     </>
   );
