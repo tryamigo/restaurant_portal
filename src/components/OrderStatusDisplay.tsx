@@ -1,18 +1,22 @@
 // components/OrderStatusDisplay.tsx
-import React from 'react';
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Clock,
-  Package,
+  CookingPot,
   Truck,
-  CheckCircle2
-} from 'lucide-react';
+  CircleCheckBig,
+  CircleX,
+  CalendarArrowDown,
+} from "lucide-react";
 
 const StatusIcon = {
-  pending: <Clock className="text-yellow-500" />,
-  preparing: <Package className="text-blue-500" />,
-  'on the way': <Truck className="text-orange-500" />,
-  delivered: <CheckCircle2 className="text-green-500" />
+  Pending: <Clock className="text-blue-500" />,
+  "Order Received": <CalendarArrowDown className="text-cyan-600" />,
+  Preparing: <CookingPot className="text-indigo-500" />,
+  "Ready for Pickup": <Truck className="text-orange-500" />,
+  Completed: <CircleCheckBig className="text-green-500" />, 
+  "Ask for Cancel": <CircleX className="text-red-500" />,
 };
 
 interface OrderStatusDisplayProps {
@@ -20,15 +24,28 @@ interface OrderStatusDisplayProps {
   takeFromStore: boolean;
 }
 
-export const OrderStatusDisplay: React.FC<OrderStatusDisplayProps> = ({ status, takeFromStore }) => {
+export const OrderStatusDisplay: React.FC<OrderStatusDisplayProps> = ({
+  status,
+  takeFromStore,
+}) => {
   const getStatusColor = (currentStatus: string) => {
     switch (currentStatus) {
-      case 'delivered': return 'text-green-600 border-green-600';
-      case 'preparing': return 'text-blue-600 border-blue-600';
-      case 'on the way': return 'text-orange-600 border-orange-600';
-      default: return 'text-yellow-600 border-yellow-600';
+      case "Order Received":
+        return "text-cyan-600 border-cyan-600";
+      case "Preparing":
+        return "text-indigo-500 border-indigo-500";
+      case "Ready for Pickup":
+        return "text-orange-500 border-orange-500";
+      case "Completed":
+        return "text-green-600 border-green-600";
+      case "Ask for Cancel":
+        return "text-red-500 border-red-500";
+      default:
+        return "text-blue-500 border-blue-500";
     }
   };
+
+  console.log("status", status);
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 md:p-6 mb-6 dark:bg-gray-800 dark:shadow-none">
@@ -36,16 +53,22 @@ export const OrderStatusDisplay: React.FC<OrderStatusDisplayProps> = ({ status, 
         <div className="flex items-center space-x-4 mb-4 md:mb-0">
           {StatusIcon[status as keyof typeof StatusIcon]}
           <div>
-            <h2 className="text-lg md:text-xl font-semibold capitalize">{status}</h2>
-            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Current order status</p>
+            <h2 className="text-lg md:text-xl font-semibold capitalize">
+              {status}
+            </h2>
+            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
+              Current order status
+            </p>
           </div>
         </div>
-        <div className='flex items-center'>
+        <div className="flex items-center">
           <Badge
             variant="outline"
-            className={`capitalize text-xs md:text-sm ${getStatusColor(status)}`}
+            className={`capitalize text-xs md:text-sm ${getStatusColor(
+              status
+            )}`}
           >
-              {takeFromStore ? "Pick Up" : "Delivery"}
+            {takeFromStore ? "Pick Up" : "Delivery"}
           </Badge>
         </div>
       </div>

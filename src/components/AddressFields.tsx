@@ -61,6 +61,7 @@ export const AddressFields: React.FC<AddressFieldsProps> = ({
               id={key}
               value={address[key as keyof Address] || ""}
               onChange={(e) => handleInputChange(key, e.target.value)}
+              className="w-full dark:bg-slate-700 dark:text-white"
             />
           ) : (
             <Badge variant="outline">

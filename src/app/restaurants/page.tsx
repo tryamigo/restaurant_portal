@@ -133,7 +133,7 @@ const RestaurantDetails: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4 pt-[5rem] md:pt-2 md:px-0"
       >
-        <Card className="shadow-lg border-none">
+        <Card className="shadow-lg border-none dark:bg-black/50">
           <CardContent className="p-4 md:p-6">
             <AnimatePresence mode="wait">
               {isEditing ? (
@@ -158,6 +158,7 @@ const RestaurantDetails: React.FC = () => {
                           }));
                           validateInput("name", newName); // Validate input on change
                         }}
+                        className="w-full dark:bg-slate-700 dark:text-white"
                       />
                       {validationErrors.name && (
                         <p className="text-sm text-red-500">
@@ -179,7 +180,7 @@ const RestaurantDetails: React.FC = () => {
                           validateInput("phoneNumber", newPhoneNumber); // Validate input on change
                         }}
                         readOnly={true}
-                        className="w-full bg-gray-200 text-gray-500 border border-gray-300 cursor-not-allowed"
+                        className="w-full dark:bg-slate-700 dark:text-white cursor-not-allowed"
                       />
                       {validationErrors.phoneNumber && (
                         <p className="text-sm text-red-500">
@@ -200,6 +201,7 @@ const RestaurantDetails: React.FC = () => {
                           }));
                           validateInput("openingHours", newOpeningHours); // Validate input on change
                         }}
+                        className="w-full dark:bg-slate-700 dark:text-white"
                       />
                       {validationErrors.openingHours && (
                         <p className="text-sm text-red-500">
@@ -220,6 +222,7 @@ const RestaurantDetails: React.FC = () => {
                           }));
                           validateInput("gstin", newGstin); // Validate input on change
                         }}
+                        className="w-full dark:bg-slate-700 dark:text-white"
                       />
                       {validationErrors.gstin && (
                         <p className="text-sm text-red-500">
@@ -240,6 +243,7 @@ const RestaurantDetails: React.FC = () => {
                           }));
                           validateInput("FSSAI", newFssai); // Validate input on change
                         }}
+                        className="w-full dark:bg-slate-700 dark:text-white"
                       />
                       {validationErrors.FSSAI && (
                         <p className="text-sm text-red-500">

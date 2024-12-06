@@ -59,15 +59,14 @@ const OrderDetails: React.FC = () => {
   const { subtotal, discount, total } = calculateOrderTotals(order.orderItems);
 
   // Conditional status options based on takeFromStore
-  const statusOptions = order.takeFromStore
-    ? [
-        "Order Received",
-        "Preparing",
-        "Ready for Pickup",
-        "Completed",
-        "Ask for cancel",
-      ]
-    : ["Pending", "Preparing", "On the way", "Delivered", "Ask for cancel"];
+  const statusOptions = [
+    "Pending",
+    "Order Received",
+    "Preparing",
+    "Ready for Pickup",
+    "Completed",
+    "Ask for cancel",
+  ];
 
   return (
     <>
@@ -139,13 +138,8 @@ const OrderDetails: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {statusOptions.map((status, index) => {
-                    const value =
-                      status === "On the way"
-                        ? "on the way" // Assign specific value for "On The Way"
-                        : status.toLowerCase().replace(/\s+/g, ""); // Default transformation for others
-
                     return (
-                      <SelectItem key={index} value={value}>
+                      <SelectItem key={index} value={status}>
                         {status}
                       </SelectItem>
                     );

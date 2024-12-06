@@ -131,10 +131,12 @@ function Header({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="preparing">Preparing</SelectItem>
-                  <SelectItem value="on the way">On the Way</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Order Received">Order Received</SelectItem>
+                  <SelectItem value="Preparing">Preparing</SelectItem>
+                  <SelectItem value="Ready for Pickup">Ready for Pickup</SelectItem>
+                  <SelectItem value="Completed">Completed</SelectItem>
+                  <SelectItem value="Ask for Cancel">Ask for Cancel</SelectItem>
                 </SelectContent>
               </Select>
             </div>
