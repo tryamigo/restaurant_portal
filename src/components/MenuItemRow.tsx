@@ -3,7 +3,7 @@ import Image from "next/image";
 import { motion } from "framer-motion"; // Import Framer Motion
 import { MenuItem } from "@/components/types";
 import { Edit, Trash2, Package } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogTitle, DialogContent } from "@/components/ui/dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -15,7 +15,6 @@ interface MenuItemRowProps {
   item: MenuItem;
   onEdit: (item: MenuItem) => void;
   onDelete: (id: string) => void;
-  onImageView?: (imageLink: string) => void;
   setSelectedImage: React.Dispatch<React.SetStateAction<string | null>>;
   selectedImage: string | null;
   onClick: () => void;
@@ -26,7 +25,6 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = React.memo(
     item,
     onEdit,
     onDelete,
-    onImageView,
     setSelectedImage,
     selectedImage,
     onClick,
@@ -45,23 +43,25 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = React.memo(
     return (
       <motion.tr
         key={item.id}
-        className="hover:bg-gray-50 hover:dark:bg-gray-800"
+        className="hover:bg-gray-50 hover:dark:bg-gray-700"
         variants={rowVariants}
         initial="hidden"
         animate="visible"
         exit="exit"
         transition={{ duration: 0.3 }}
       >
-        <td className="px-6 py-4 relative">
+        <td className="px-6 py-3">
           {item.imageLink ? (
             <>
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
                 <Image
                   src={item.imageLink}
                   alt={item.name}
-                  width={50}
-                  height={50}
-                  className="object-cover rounded-md cursor-pointer"
+                  width= "0"
+                  height= "0"
+                  sizes="100vw"
+                  priority
+                  className="w-12 h-auto rounded-md cursor-pointer"
                   onClick={() => setSelectedImage(item.imageLink || "")}
                 />
               </motion.div>
@@ -72,14 +72,16 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = React.memo(
                   open={!!selectedImage}
                   onOpenChange={() => setSelectedImage(null)}
                 >
-                  <DialogContent className="w-full">
+                  <DialogTitle></DialogTitle>
+                  <DialogContent className="w-full" aria-describedby={undefined} aria-hidden="true">
                     <div className="flex justify-center items-center">
                       <Image
                         src={selectedImage}
                         alt="Full Image"
-                        width={400}
-                        height={400}
-                        className="max-h-[70vh] object-contain"
+                        width= "0"
+                        height= "0"
+                        sizes="100vw"
+                        className="object-contain h-auto w-96"
                       />
                     </div>
                   </DialogContent>
@@ -92,7 +94,7 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = React.memo(
             </div>
           )}
         </td>
-        <td className="px-6 py-4 relative cursor-pointer" onClick={onClick}>
+        <td className="px-6 cursor-pointer" onClick={onClick}>
           {item.name.length > 15 ? (
             <TooltipProvider>
               <Tooltip>
@@ -116,10 +118,10 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = React.memo(
             <div>{item.name}</div>
           )}
         </td>
-        <td className="px-6 py-4 cursor-pointer" onClick={onClick}>
+        <td className="px-6 cursor-pointer" onClick={onClick}>
           ₹{Number(item.price).toFixed(2)}
         </td>
-        <td className="px-6 py-4 relative cursor-pointer" onClick={onClick}>
+        <td className="px-6 cursor-pointer" onClick={onClick}>
           {(item.cuisine ?? "").length > 15 ? (
             <TooltipProvider>
               <Tooltip>
@@ -143,10 +145,10 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = React.memo(
             <div>{item.cuisine}</div>
           )}
         </td>
-        <td className="px-6 py-4 cursor-pointer" onClick={onClick}>
+        <td className="px-6 cursor-pointer" onClick={onClick}>
           {item.vegOrNonVeg}
         </td>
-        <td className="px-6 py-6 flex space-x-5">
+        <td className="px-6 mt-[22px] flex space-x-5">
           <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.9 }}>
             <Edit
               className="mt-[1px]"

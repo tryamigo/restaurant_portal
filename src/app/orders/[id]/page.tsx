@@ -1,21 +1,35 @@
-'use client'
-import React from 'react';
-import { useOrderDetails } from '@/hooks/useOrderDetails';
-import { OrderStatusDisplay } from '@/components/OrderStatusDisplay';
-import { OrderItemsTable } from '@/components/OrderItemsTable';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
+"use client";
+import React from "react";
+import { useOrderDetails } from "@/hooks/useOrderDetails";
+import { OrderStatusDisplay } from "@/components/OrderStatusDisplay";
+import { OrderItemsTable } from "@/components/OrderItemsTable";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CustomButton } from '@/components/CustomButton';
-import { motion } from 'framer-motion';
-import { useParams } from 'next/navigation';
-import { Skeleton } from '@/components/ui/skeleton';
-import Header from '@/components/Header';
-import { format } from 'date-fns';
-import Link from 'next/link';
-import { ArrowLeftIcon } from 'lucide-react';
-import { Label } from '@/components/ui/label';
-import { OrderStatus } from '@/components/types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CustomButton } from "@/components/CustomButton";
+import { motion } from "framer-motion";
+import { useParams } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
+import Header from "@/components/Header";
+import { format } from "date-fns";
+import Link from "next/link";
+import { ArrowLeftIcon } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { OrderStatus } from "@/components/types";
 
 const OrderDetails: React.FC = () => {
   const params = useParams();
@@ -28,21 +42,33 @@ const OrderDetails: React.FC = () => {
     setEditedOrder,
     setIsEditDialogOpen,
     updateOrderStatus,
-    calculateOrderTotals
+    calculateOrderTotals,
   } = useOrderDetails(id);
 
-  if (!order) return (
-    <div className="container mx-auto max-w-4xl p-4 md:p-6 mt-20">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        {[...Array(4)].map((_, index) => (
-          <Skeleton key={index} className="h-24 md:h-32 w-full" />
-        ))}
+  if (!order)
+    return (
+      <div className="container mx-auto max-w-4xl p-4 md:p-6 mt-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          {[...Array(4)].map((_, index) => (
+            <Skeleton key={index} className="h-24 md:h-32 w-full" />
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
 
   const { subtotal, discount, total } = calculateOrderTotals(order.orderItems);
-  
+
+  // Conditional status options based on takeFromStore
+  const statusOptions = order.takeFromStore
+    ? [
+        "Order Received",
+        "Preparing",
+        "Ready for Pickup",
+        "Completed",
+        "Ask for cancel",
+      ]
+    : ["Pending", "Preparing", "On the way", "Delivered", "Ask for cancel"];
+
   return (
     <>
       <Header />
@@ -54,10 +80,12 @@ const OrderDetails: React.FC = () => {
       >
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-          <div className='mb-4 md:mb-0'>
-            <h1 className="text-2xl md:text-3xl font-bold">Order #{order.id}</h1>
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-2xl md:text-3xl font-bold">
+              Order #{order.id}
+            </h1>
             <p className="text-sm md:text-base text-gray-600 mt-1 dark:text-gray-300">
-            Placed on  {format(new Date(order.orderTime), "PPp")}
+              Placed on {format(new Date(order.orderTime), "PPp")}
             </p>
           </div>
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto">
@@ -67,7 +95,7 @@ const OrderDetails: React.FC = () => {
                 Back to Orders
               </CustomButton>
             </Link>
-            <CustomButton 
+            <CustomButton
               onClick={() => setIsEditDialogOpen(true)}
               className="w-full md:w-auto justify-center"
             >
@@ -75,16 +103,18 @@ const OrderDetails: React.FC = () => {
             </CustomButton>
           </div>
         </div>
-
         {/* Order Status */}
-        <OrderStatusDisplay status={order.status} />
+        <OrderStatusDisplay
+          status={order.status}
+          takeFromStore={order.takeFromStore}
+        />
 
         {/* Order Items Table */}
-        <OrderItemsTable 
-          items={order.orderItems} 
-          subtotal={subtotal} 
-          discount={discount} 
-          total={total} 
+        <OrderItemsTable
+          items={order.orderItems}
+          subtotal={subtotal}
+          discount={discount}
+          total={total}
         />
 
         {/* Edit Status Dialog */}
@@ -101,17 +131,25 @@ const OrderDetails: React.FC = () => {
               <Select
                 value={editedOrder?.status}
                 onValueChange={(value: OrderStatus) =>
-                  setEditedOrder(prev => ({ ...prev!, status: value }))
+                  setEditedOrder((prev) => ({ ...prev!, status: value }))
                 }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="preparing">Preparing</SelectItem>
-                  <SelectItem value="on the way">On the way</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
+                  {statusOptions.map((status, index) => {
+                    const value =
+                      status === "On The Way"
+                        ? "on the way" // Assign specific value for "On The Way"
+                        : status.toLowerCase().replace(/\s+/g, ""); // Default transformation for others
+
+                    return (
+                      <SelectItem key={index} value={value}>
+                        {status}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -121,7 +159,9 @@ const OrderDetails: React.FC = () => {
                   Cancel
                 </Button>
               </DialogClose>
-              <CustomButton onClick={updateOrderStatus}>Save Changes</CustomButton>
+              <CustomButton onClick={updateOrderStatus}>
+                Save Changes
+              </CustomButton>
             </DialogFooter>
           </DialogContent>
         </Dialog>

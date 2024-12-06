@@ -2,6 +2,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import React from "react";
 import "./globals.css";
+import 'boxicons/css/boxicons.min.css';
 
 import { SessionProvider, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";

@@ -29,7 +29,7 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
   isMobile,
 }) => {
   const renderDesktopTable = () => (
-    <div className="bg-white shadow-lg rounded-xl overflow-hidden dark:bg-gray-900 dark:shadow-none">
+    <div className="bg-white shadow-lg rounded-xl overflow-hidden dark:bg-gray-800 dark:shadow-none">
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-100 border-b">
@@ -38,9 +38,9 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
                 (header) => (
                   <th
                     key={header}
-                    className={`px-6 py-3 text-${
+                    className={`px-6 py-4 text-${
                       header === "Total" ? "right" : "left"
-                    } text-sm font-medium text-gray-500 uppercase tracking-wider`}
+                    } text-xs font-semibold text-gray-500 uppercase tracking-wider`}
                   >
                     {header}
                   </th>
@@ -52,21 +52,23 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
             {items.map((item) => (
               <tr
                 key={item.id}
-                className="hover:bg-gray-50 transition-colors hover:dark:bg-gray-800"
+                className="hover:bg-gray-50 transition-colors hover:dark:bg-gray-700"
               >
                 {/* Image column */}
-                <td className="px-6 py-4">
-                  <Image
-                    src={item.imageLink}
-                    alt="Image"
-                    width={48}
-                    height={48}
-                    className="rounded-md object-cover"
-                  />
+                <td className="px-6 py-3">
+                <Image
+                  src={item.imageLink}
+                  alt={item.name}
+                  width= "0"
+                  height= "0"
+                  sizes="100vw"
+                  priority
+                  className="w-12 h-auto rounded-md cursor-pointer"
+                />
                 </td>
 
                 {/* Product details column */}
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 whitespace-nowrap">
                   <div>
                     {item?.name?.length > 20 ? (
                       <TooltipProvider>
@@ -111,15 +113,15 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
                 </td>
 
                 {/* Quantity column */}
-                <td className="px-6 py-4 whitespace-nowrap">{item.quantity}</td>
+                <td className="px-6 whitespace-nowrap">{item.quantity}</td>
 
                 {/* Price column */}
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 whitespace-nowrap">
                   ₹{item.price ? Number(item.price).toFixed(2) : "N/A"}
                 </td>
 
                 {/* Total column */}
-                <td className="px-6 py-4 whitespace-nowrap text-right">
+                <td className="px-6 whitespace-nowrap text-right">
                   ₹{(item.price * item.quantity).toFixed(2)}
                 </td>
               </tr>
@@ -162,12 +164,14 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
           <div className="flex items-center space-x-4">
             {item.imageLink && (
               <Image
-                src={item.imageLink}
-                alt={item.name}
-                width={48}
-                height={48}
-                className="rounded-md object-cover"
-              />
+              src={item.imageLink}
+              alt={item.name}
+              width= "0"
+              height= "0"
+              sizes="100vw"
+              priority
+              className="w-12 h-auto rounded-md cursor-pointer"
+            />
             )}
             <div>
               <div className="font-medium text-gray-800">{item.name}</div>

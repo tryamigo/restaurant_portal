@@ -1,6 +1,6 @@
 // hooks/useOrderDetails.ts
 import { useState, useEffect } from 'react';
-import { Order, OrderItem, OrderStatus } from '@/components/types';
+import { Order, OrderItem,} from '@/components/types';
 import { useSession } from 'next-auth/react';
 
 export const useOrderDetails = (id: string) => {

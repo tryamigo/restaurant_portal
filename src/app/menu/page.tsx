@@ -135,7 +135,7 @@ const MenuDetails: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4 py-6 md:py-12 pt-[12rem]"
       >
-        <div className="bg-white shadow-lg rounded-xl overflow-hidden overflow-x-auto dark:bg-gray-900 dark:shadow-none">
+        <div className="bg-white shadow-lg rounded-xl overflow-hidden overflow-x-auto dark:bg-gray-800 dark:shadow-none">
           <table className="w-full">
             <thead className="bg-gray-100 border-b">
               <tr>
@@ -149,7 +149,7 @@ const MenuDetails: React.FC = () => {
                 ].map((header) => (
                   <th
                     key={header}
-                    className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
                   >
                     {header}
                   </th>
@@ -162,7 +162,7 @@ const MenuDetails: React.FC = () => {
                   Array(7)
                     .fill(0)
                     .map((_, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
+                      <tr key={index}>
                         {Array(6)
                           .fill(0)
                           .map((_, colIndex) => (

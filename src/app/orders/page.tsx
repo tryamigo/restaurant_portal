@@ -104,7 +104,7 @@ function OrdersPage() {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4 py-12 md:py-12 pt-[12rem]"
       >
-        <div className="bg-white shadow-lg rounded-xl overflow-hidden dark:bg-gray-900 dark:shadow-none">
+        <div className="bg-white shadow-lg rounded-xl overflow-hidden dark:bg-gray-800 dark:shadow-none">
           <div className="hidden md:block overflow-hidden">
             <table className="w-full">
               <thead className="bg-gray-100 border-b">
@@ -120,7 +120,7 @@ function OrdersPage() {
                   ].map((header) => (
                     <th
                       key={header}
-                      className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
                     >
                       {header}
                     </th>
@@ -133,7 +133,7 @@ function OrdersPage() {
                     Array(7)
                       .fill(0)
                       .map((_, index) => (
-                        <tr key={index} className="hover:bg-gray-50">
+                        <tr key={index}>
                           {Array(7)
                             .fill(0)
                             .map((_, colIndex) => (
@@ -147,7 +147,7 @@ function OrdersPage() {
                     <tr>
                       <td
                         colSpan={7}
-                        className="text-center py-12 text-gray-500 dark:bg-slate-800"
+                        className="text-center py-12 text-gray-500 dark:bg-gray-800"
                       >
                         <div className="flex flex-col items-center justify-center space-y-4 h-full">
                           <ShoppingBag className="w-16 h-16 text-gray-300" />

@@ -5,6 +5,7 @@ import { Order } from "@/components/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+
 import {
   Tooltip,
   TooltipContent,
@@ -61,7 +62,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
 
   const renderDesktopRow = () => (
     <motion.tr
-    className="hover:bg-gray-50 hover:dark:bg-gray-800"
+    className="hover:bg-gray-50 hover:dark:bg-gray-700"
     variants={variants}
     initial="hidden"
     animate="visible"
@@ -74,7 +75,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
           {format(new Date(order.orderTime), "PPp")}
         </div>
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6">
         {order.userAddress?.name && order.userAddress.name.length > 15 ? (
           <TooltipProvider>
             <Tooltip>
@@ -101,7 +102,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
           </>
         )}
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
@@ -122,13 +123,13 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
           Total: ₹{Number(order.total).toFixed(2)}
         </div>
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6">
         <Badge variant={getStatusColor(order.status)}>
           {STATUS_ICONS[order.status as keyof typeof STATUS_ICONS]}
           {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
         </Badge>
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6">
         <div className="text-sm">
           <div>
             Subtotal: ₹
@@ -146,10 +147,10 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
           )}
         </div>
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6">
         <div className="flex flex-col gap-1">
           {order.takeFromStore ? (
-            <Badge variant="secondary">Pick Up</Badge>
+            <Badge variant= "secondary">Pick Up</Badge>
           ) : (
             <div className="flex items-center gap-2">
               <Badge variant="secondary">
@@ -165,7 +166,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
           )}
         </div>
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6">
         <Button variant="ghost" size="sm" onClick={() => onView(order.id)}>
           <EyeIcon className="mr-2 h-4 w-4" />
           View

@@ -17,15 +17,16 @@ const StatusIcon = {
 
 interface OrderStatusDisplayProps {
   status: string;
+  takeFromStore: boolean;
 }
 
-export const OrderStatusDisplay: React.FC<OrderStatusDisplayProps> = ({ status }) => {
+export const OrderStatusDisplay: React.FC<OrderStatusDisplayProps> = ({ status, takeFromStore }) => {
   const getStatusColor = (currentStatus: string) => {
     switch (currentStatus) {
       case 'delivered': return 'text-green-600 border-green-600';
       case 'preparing': return 'text-blue-600 border-blue-600';
       case 'on the way': return 'text-orange-600 border-orange-600';
-      default: return 'text-gray-600 border-gray-600';
+      default: return 'text-yellow-600 border-yellow-600';
     }
   };
 
@@ -44,7 +45,7 @@ export const OrderStatusDisplay: React.FC<OrderStatusDisplayProps> = ({ status }
             variant="outline"
             className={`capitalize text-xs md:text-sm ${getStatusColor(status)}`}
           >
-            {status}
+              {takeFromStore ? "Pick Up" : "Delivery"}
           </Badge>
         </div>
       </div>
