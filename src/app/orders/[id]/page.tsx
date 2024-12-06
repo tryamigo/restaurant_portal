@@ -140,7 +140,7 @@ const OrderDetails: React.FC = () => {
                 <SelectContent>
                   {statusOptions.map((status, index) => {
                     const value =
-                      status === "On The Way"
+                      status === "On the way"
                         ? "on the way" // Assign specific value for "On The Way"
                         : status.toLowerCase().replace(/\s+/g, ""); // Default transformation for others
 
