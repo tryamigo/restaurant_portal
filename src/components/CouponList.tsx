@@ -57,12 +57,12 @@ export const CouponList: React.FC<CouponListProps> = ({
               >
                 {!coupon.isActive && (
                   <div className="absolute top-[215px] left-10 inset-0 flex justify-center items-center bg-gray-900/70 backdrop-blur-sm transform rotate-[-45deg]">
-                    <div className="flex flex-col items-center animate-pulse">
+                    <div className="flex flex-col items-center">
                       <span className="text-6xl font-bold tracking-wider mb-2">
                         INACTIVE
                       </span>
                       <i
-                        className="bx bxs-coupon bx-tada bx-rotate-270"
+                        className="bx bxs-coupon"
                         style={{ fontSize: "70px" }}
                       ></i>
                     </div>

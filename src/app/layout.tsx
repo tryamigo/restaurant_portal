@@ -36,26 +36,10 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         transition={{ duration: 0.5 }}
         className="hidden md:block fixed top-0 left-0 w-64 h-screen bg-white shadow-lg border-r border-gray-200 dark:bg-gray-900 dark:border-gray-700"
       >
-        <div className="p-6">
-          <motion.h1
-            className="text-[24px] font-bold mb-6 text-transparent bg-clip-text"
-            initial={{ opacity: 0, x: -100 }}
-            animate={{
-              opacity: 1,
-              x: 0,
-              backgroundImage:
-                "linear-gradient(to right, purple, #8383ff, green, red)",
-            }}
-            transition={{ duration: 2, ease: "easeInOut" }}
-            whileHover={{
-              scale: 1.1,
-              backgroundImage:
-                "linear-gradient(to right, red, green, #8383ff, purple)",
-              transition: { duration: 0.5, ease: "easeOut" },
-            }}
-          >
+        <div className="p-[14px]">
+          <h1 className="text-xl md:text-2xl font-bold text mb-6">
             Restaurant Portal
-          </motion.h1>
+          </h1>
 
           <nav className="space-y-2">
             {navItems.map((item) => (
