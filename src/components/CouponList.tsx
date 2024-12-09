@@ -61,7 +61,10 @@ export const CouponList: React.FC<CouponListProps> = ({
                       <span className="text-6xl font-bold tracking-wider mb-2">
                         INACTIVE
                       </span>
-                      <i className='bx bxs-coupon bx-tada bx-rotate-270' style={{ fontSize: '70px' }}  ></i>
+                      <i
+                        className="bx bxs-coupon bx-tada bx-rotate-270"
+                        style={{ fontSize: "70px" }}
+                      ></i>
                     </div>
                   </div>
                 )}

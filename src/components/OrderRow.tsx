@@ -13,15 +13,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  EyeIcon,
+  Eye,
   MapPin,
+  HandPlatter,
   Star,
   Clock,
   CookingPot,
-  Truck,
-  CircleCheckBig,
+  CalendarArrowUp,
   CircleX,
   CalendarArrowDown,
+  Package,
 } from "lucide-react";
 
 interface OrderRowProps {
@@ -32,31 +33,30 @@ interface OrderRowProps {
 
 const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
   const STATUS_ICONS = {
-    Pending: <Clock className="text-blue-500 w-5 h-5 mr-2" />,
-    "Order Received": <CalendarArrowDown className="text-cyan-600 w-5 h-5 mr-2" />,
-    Preparing: <CookingPot className="text-indigo-500 w-5 h-5 mr-2" />,
-    "Ready for Pickup": <Truck className="text-orange-500 w-5 h-5 mr-2" />,
-    Completed: <CircleCheckBig className="text-green-500 w-5 h-5 mr-2" />, 
-    "Ask for Cancel": <CircleX className="text-red-500 w-5 h-5 mr-2" />,
+    Pending: <Clock className="text-yellow-600 w-5 h-5" />,
+    "Order Received": <CalendarArrowDown className="text-cyan-600 w-5 h-5" />,
+    Preparing: <CookingPot className="text-indigo-600 w-5 h-5" />,
+    "Ready for Pickup": <Package className="text-orange-600 w-5 h-5" />,
+    "Order Collected": <CalendarArrowUp className="text-green-600 w-5 h-5" />,
+    "Ask for Cancel": <CircleX className="text-red-600 w-5 h-5" />,
   };
 
   const getStatusColor = (status: string): string => {
     switch (status) {
       case "Order Received":
-        return "bg-blue-100 text-blue-800";
+        return "bg-cyan-100";
       case "Preparing":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-indigo-100";
       case "Ready for Pickup":
-        return "bg-orange-100 text-orange-800";
-      case "Completed":
-        return "bg-green-100 text-green-800";
+        return "bg-orange-100";
+      case "Order Collected":
+        return "bg-green-100";
       case "Ask for Cancel":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-yellow-50";
     }
   };
-  
 
   // Animation Variants
   const variants = {
@@ -76,7 +76,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
     >
       <td className="px-6 py-4 cursor-pointer" onClick={() => onView(order.id)}>
         <div className="font-medium">{order.id.slice(0, 8)}</div>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-muted-foreground">
           {format(new Date(order.orderTime), "PPp")}
         </div>
       </td>
@@ -88,7 +88,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
                 <div className="font-medium truncate max-w-[50px] overflow-hidden whitespace-nowrap">
                   {order.userAddress?.name || "N/A"}
                 </div>
-                <div className="text-xs text-gray-500 truncate max-w-[50px] overflow-hidden whitespace-nowrap">
+                <div className="text-xs  text-muted-foreground truncate max-w-[50px] overflow-hidden whitespace-nowrap">
                   {order.userAddress?.mobile || "No contact"}
                 </div>
               </TooltipTrigger>
@@ -103,11 +103,21 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
             <div className="font-medium">
               {order.userAddress?.name || "N/A"}
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs  text-muted-foreground">
               {order.userAddress?.mobile || "No contact"}
             </div>
           </>
         )}
+      </td>
+      <td className="px-6 cursor-pointer" onClick={() => onView(order.id)}>
+        <Badge
+          className={`${getStatusColor(
+            order.status
+          )} text-gray-800 hover:bg-gray-300 flex gap-[10px]`}
+        >
+          {STATUS_ICONS[order.status as keyof typeof STATUS_ICONS]}
+          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+        </Badge>
       </td>
       <td className="px-6 cursor-pointer" onClick={() => onView(order.id)}>
         <TooltipProvider>
@@ -116,7 +126,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
               <div className="text-sm">{order.orderItems.length} items</div>
             </TooltipTrigger>
             <TooltipContent>
-              <div className="p-2">
+              <div>
                 {order.orderItems.map((item) => (
                   <div key={item.id} className="text-xs">
                     {item.quantity} x {item.name}
@@ -126,15 +136,9 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs  text-muted-foreground">
           Total: ₹{Number(order.total).toFixed(2)}
         </div>
-      </td>
-      <td className="px-6 cursor-pointer" onClick={() => onView(order.id)}>
-      <Badge className={`${getStatusColor(order.status)} hover:bg-gray-300 flex gap-1`}>
-          {STATUS_ICONS[order.status as keyof typeof STATUS_ICONS]}
-          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-        </Badge>
       </td>
       <td className="px-6 cursor-pointer" onClick={() => onView(order.id)}>
         <div className="text-sm">
@@ -144,7 +148,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
               order.total - order.deliveryCharge + order.discount
             ).toFixed(2)}
           </div>
-          <div className="text-xs text-gray-500">
+          <div className="text-xs  text-muted-foreground">
             Delivery: ₹{Number(order.deliveryCharge).toFixed(2)}
           </div>
           {order.discount > 0 && (
@@ -157,11 +161,13 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
       <td className="px-6 cursor-pointer" onClick={() => onView(order.id)}>
         <div className="flex flex-col">
           {order.takeFromStore ? (
-            <Badge className="bg-gray-300 text-gray-800 hover:bg-gray-200">Pick Up</Badge>
+            <Badge className="bg-gray-200 text-gray-800 hover:bg-gray-300">
+              <HandPlatter className="h-4 w-4 mr-2" /> Pick Up
+            </Badge>
           ) : (
             <div className="flex flex-col">
               <Badge className="bg-gray-200 text-gray-800 hover:bg-gray-300">
-                Delivery <MapPin className="h-4 w-4 ml-2" />
+                <MapPin className="h-4 w-4 mr-2" /> Delivery
               </Badge>
             </div>
           )}
@@ -173,12 +179,15 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
           )}
         </div>
       </td>
-      <td className="px-6">
-        <Button variant= "ghost" className="font-semibold" size="sm" onClick={() => onView(order.id)}>
-          <EyeIcon className="mr-1 h-4 w-4" />
-          View
-        </Button>
-      </td>
+      {/* <td className="px-6 cursor-pointer" onClick={() => onView(order.id)}>
+        <button
+          onClick={() => onView(order.id)}
+          className="text-xs font-semibold flex items-center justify-center px-4 py-1 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+          aria-label={`View order ${order.id}`}
+        >
+          <Eye className="w-4 h-4 mr-2" /> <span>View</span>
+        </button>
+      </td> */}
     </motion.tr>
   );
 
@@ -193,7 +202,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
       <div className="flex justify-between items-center mb-2">
         <div>
           <div className="font-medium">{order.id.slice(0, 8)}</div>
-          <div className="text-xs text-gray-500">
+          <div className="text-xs  text-muted-foreground">
             {format(new Date(order.orderTime), "PPp")}
           </div>
         </div>
@@ -207,7 +216,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
           <div className="text-sm font-medium">
             {order.userAddress?.name || "N/A"}
           </div>
-          <div className="text-xs text-gray-500">
+          <div className="text-xs  text-muted-foreground">
             {order.userAddress?.mobile || "No contact"}
           </div>
         </div>
@@ -219,7 +228,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, onView, isMobile }) => {
       </div>
       <div className="flex justify-between items-center">
         <Button variant="ghost" size="sm" onClick={() => onView(order.id)}>
-          <EyeIcon className="h-4 w-4" />
+          <Eye className="h-4 w-4" />
           View
         </Button>
         {order.rating && (

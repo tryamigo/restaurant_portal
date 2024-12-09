@@ -112,11 +112,11 @@ function OrdersPage() {
                   {[
                     "Order ID",
                     "Customer",
-                    "Order Details",
                     "Status",
+                    "Order Details",
                     "Payment",
-                    "Delivery",
-                    "Actions",
+                    "Order Flow",
+                    // "Actions",
                   ].map((header) => (
                     <th
                       key={header}
@@ -134,7 +134,7 @@ function OrdersPage() {
                       .fill(0)
                       .map((_, index) => (
                         <tr key={index}>
-                          {Array(7)
+                          {Array(6)
                             .fill(0)
                             .map((_, colIndex) => (
                               <td key={colIndex} className="px-6 py-4">

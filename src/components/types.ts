@@ -1,5 +1,5 @@
 // src/components/admin/types.ts
-export type OrderStatus = 'Pending'| 'Order Received' | 'Preparing' | 'Ready for Pickup' | 'Completed' | 'Ask for cancel';
+export type OrderStatus = 'Pending'| 'Order Received' | 'Preparing' | 'Ready for Pickup' | 'Order Collected' | 'Ask for cancel';
 export type MenuItemType = "Veg" | "Non-Veg";
 export type CouponStatus = "active" | "inactive";
 

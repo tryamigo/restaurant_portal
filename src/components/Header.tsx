@@ -90,7 +90,7 @@ function Header({
           <div className={containerClasses}>
             <h1 className={commonClasses}>Restaurant Details</h1>
             <div className="flex space-x-4">
-              <Button onClick={toggleTheme} aria-label="Toggle Theme">
+            <Button onClick={toggleTheme} aria-label="Toggle Theme" variant= "outline" className="bg-white dark:bg-gray-700 dark:text-gray-50 border-gray-200 dark:border-none dark:hover:bg-gray-600">
                 {theme === "light" ? <Moon /> : <Sun />}
               </Button>
               <CustomButton
@@ -108,7 +108,7 @@ function Header({
           <div className={containerClasses}>
             <h1 className={commonClasses}>Orders Management</h1>
             <div className="flex flex-col md:flex-row gap-3 w-full md:items-center">
-              <Button onClick={toggleTheme}>
+            <Button onClick={toggleTheme} aria-label="Toggle Theme" variant= "outline" className="bg-white dark:bg-gray-700 dark:text-gray-50 border-gray-200 dark:border-none dark:hover:bg-gray-600">
                 {theme === "light" ? <Moon /> : <Sun />}
               </Button>
               <div className="relative flex-grow dark:bg-gray-700 rounded-md">
@@ -135,7 +135,7 @@ function Header({
                   <SelectItem value="Order Received">Order Received</SelectItem>
                   <SelectItem value="Preparing">Preparing</SelectItem>
                   <SelectItem value="Ready for Pickup">Ready for Pickup</SelectItem>
-                  <SelectItem value="Completed">Completed</SelectItem>
+                  <SelectItem value="Order Collected">Order Collected</SelectItem>
                   <SelectItem value="Ask for Cancel">Ask for Cancel</SelectItem>
                 </SelectContent>
               </Select>
@@ -148,7 +148,7 @@ function Header({
           <div className={containerClasses}>
             <h1 className={commonClasses}>Menu Management</h1>
             <div className="flex flex-col md:flex-row gap-3 w-full md:items-center">
-              <Button onClick={toggleTheme} aria-label="Toggle Theme">
+              <Button onClick={toggleTheme} aria-label="Toggle Theme" variant= "outline" className="bg-white dark:bg-gray-700 dark:text-gray-50 border-gray-200 dark:border-none dark:hover:bg-gray-600">
                 {theme === "light" ? <Moon /> : <Sun />}
               </Button>
               <div className="relative flex-grow dark:bg-gray-700 rounded-md">
@@ -191,7 +191,7 @@ function Header({
           <div className={containerClasses}>
             <h1 className={commonClasses}>Coupon Management</h1>
             <div className="flex flex-col md:flex-row gap-3 w-full md:items-center">
-              <Button onClick={toggleTheme} aria-label="Toggle Theme">
+            <Button onClick={toggleTheme} aria-label="Toggle Theme" variant= "outline" className="bg-white dark:bg-gray-700 dark:text-gray-50 border-gray-200 dark:border-none dark:hover:bg-gray-600">
                 {theme === "light" ? <Moon /> : <Sun />}
               </Button>
               <div className="relative flex-grow dark:bg-gray-700 rounded-md">
@@ -234,7 +234,7 @@ function Header({
         return (
           <div className={containerClasses}>
             <h1 className={commonClasses}>Dashboard</h1>
-            <Button onClick={toggleTheme} aria-label="Toggle Theme">
+            <Button onClick={toggleTheme} aria-label="Toggle Theme" variant= "outline" className="bg-white dark:bg-gray-700 dark:text-gray-50 border-gray-200 dark:border-none dark:hover:bg-gray-600">
               {theme === "light" ? <Moon /> : <Sun />}
             </Button>
           </div>

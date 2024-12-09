@@ -64,7 +64,7 @@ const OrderDetails: React.FC = () => {
     "Order Received",
     "Preparing",
     "Ready for Pickup",
-    "Completed",
+    "Order Collected",
     "Ask for cancel",
   ];
 
